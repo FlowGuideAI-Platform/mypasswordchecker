@@ -1,0 +1,203 @@
+# Cloudflare Workers API Configuration - Dual Payment Processing
+#
+# File: /Users/jack/Projects - Xcode/mypasswordchecker/wrangler-api.toml
+# Action: NEW FILE
+# Dependencies: D1 database, R2 bucket, 3 KV namespaces, PayPal + Stripe APIs
+#
+# Worker: mypasswordchecker-api
+# Purpose: Handle payment processing (PayPal + Stripe), premium sessions, API subscriptions
+# Smart Routing: PayPal for ≤$5 (5% + $0.09), Stripe for >$5 (2.9% + $0.30)
+# Cost Savings: $228/year at 100 premium + 10 API subs/month
+
+name = "mypasswordchecker-api"
+main = "workers/mypasswordchecker-api.js"
+compatibility_date = "2025-12-26"
+account_id = "be1ad24bfb43615483c3a472aa134892"
+
+# D1 Database (primary data store)
+[[d1_databases]]
+binding = "DB"
+database_name = "mypasswordchecker-db"
+database_id = "9fbf81b9-50ad-4515-a40f-b94f78dd56fd"
+
+# R2 Bucket (audit logs - 7 year retention)
+[[r2_buckets]]
+binding = "AUDIT_LOGS"
+bucket_name = "mypasswordchecker-audit-logs"
+
+# Email Sending (Cloudflare Email Routing)
+send_email = [
+  {name = "EMAIL", destination_address = "noreply@mypasswordchecker.com"}
+]
+
+# KV Namespaces (caching layer)
+[[kv_namespaces]]
+binding = "API_KEYS"
+id = "51ae7a6e8bf84e1a8f6d94b630a7f30d"
+
+[[kv_namespaces]]
+binding = "SESSION_CACHE"
+id = "8c1d651ce8cc4e87a4f30912e0d52ddb"
+
+[[kv_namespaces]]
+binding = "USAGE_TRACKING"
+id = "345ef42a47164293bf9bfd0779da5e5d"
+
+# Routes - API endpoints only
+[[routes]]
+pattern = "mypasswordchecker.com/api/*"
+zone_name = "mypasswordchecker.com"
+
+[[routes]]
+pattern = "www.mypasswordchecker.com/api/*"
+zone_name = "mypasswordchecker.com"
+
+# Environment Variables (non-secret configuration)
+[vars]
+ENVIRONMENT = "production"
+
+# Email Configuration
+EMAIL_FROM = "MyPasswordChecker API <noreply@mypasswordchecker.com>"
+EMAIL_REPLY_TO = "support@mypasswordchecker.com"
+VERIFICATION_EMAIL_SUBJECT = "Verify Your Email - MyPasswordChecker API"
+ADMIN_EMAIL = "jack@mypasswordchecker.com"
+
+# PayPal Configuration
+PAYPAL_ENVIRONMENT = "live"  # Change to "sandbox" for testing, "live" for production
+PREMIUM_PRICE_USD = "1.00"
+PREMIUM_DURATION_HOURS = "24"
+
+# Stripe Configuration
+STRIPE_ENABLED = "true"
+STRIPE_PUBLISHABLE_KEY = "PLACEHOLDER_pk_live_XXXXXXXX"  # Jack: Replace with Stripe publishable key
+STRIPE_WEBHOOK_SECRET = "PLACEHOLDER_whsec_XXXXXXXX"     # Jack: Replace with Stripe webhook secret
+
+# Payment Routing Configuration
+# Transactions ≤ $5.00 use PayPal (5% + $0.09 fee)
+# Transactions > $5.00 use Stripe (2.9% + $0.30 fee)
+PAYMENT_THRESHOLD = "5.00"
+
+# Free Tier (UPDATED - abuse prevention)
+FREE_TIER_QUOTA = "50"            # 50 requests per MONTH (not per day)
+FREE_TIER_REQUIRES_DOMAIN = "true" # Domain verification required
+FREE_TIER_ONE_KEY_PER_DOMAIN = "true" # Prevent multi-key abuse
+
+# API Subscription Tiers (monthly pricing)
+API_TIER_1_PRICE = "5.00"    # Standard: 12K password checks/mo
+API_TIER_2_PRICE = "10.00"   # Basic Quantum
+API_TIER_3_PRICE = "40.00"   # Standard Quantum (+ Breach Check)
+API_TIER_4_PRICE = "80.00"   # Large Quantum (+ Breach Check)
+API_TIER_5_PRICE = "150.00"  # Super Quantum (+ Breach Check)
+
+# Quota Limits per Tier (monthly)
+# TIER 1: Standard ($5/mo)
+API_TIER_1_QUOTA = "12000"        # 12K password checks
+API_TIER_1_QUANTUM = "100"        # 100 quantum estimates
+API_TIER_1_PHONETIC = "100"       # 100 phonetic generations
+API_TIER_1_BREACH = "0"           # No breach checks
+
+# TIER 2: Basic Quantum ($10/mo)
+API_TIER_2_QUOTA = "50000"        # 50K password checks
+API_TIER_2_QUANTUM = "1000"       # 1K quantum estimates
+API_TIER_2_PHONETIC = "1000"      # 1K phonetic generations
+API_TIER_2_BREACH = "0"           # No breach checks
+
+# TIER 3: Standard Quantum ($40/mo)
+API_TIER_3_QUOTA = "150000"       # 150K password checks
+API_TIER_3_QUANTUM = "5000"       # 5K quantum estimates
+API_TIER_3_PHONETIC = "5000"      # 5K phonetic generations
+API_TIER_3_BREACH = "1000"        # 1K breach checks
+
+# TIER 4: Large Quantum ($80/mo)
+API_TIER_4_QUOTA = "400000"       # 400K password checks
+API_TIER_4_QUANTUM = "25000"      # 25K quantum estimates
+API_TIER_4_PHONETIC = "25000"     # 25K phonetic generations
+API_TIER_4_BREACH = "5000"        # 5K breach checks
+
+# TIER 5: Super Quantum ($150/mo)
+API_TIER_5_QUOTA = "1000000"      # 1M password checks
+API_TIER_5_QUANTUM = "100000"     # 100K quantum estimates
+API_TIER_5_PHONETIC = "100000"    # 100K phonetic generations
+API_TIER_5_BREACH = "20000"       # 20K breach checks
+
+# Overage Pricing
+OVERAGE_PRICE_FREE = "0.20"       # Free tier overage (expensive to discourage)
+OVERAGE_PRICE_TIER_1 = "0.0125"   # $0.0125 per request
+OVERAGE_PRICE_TIER_2 = "0.0125"
+OVERAGE_PRICE_TIER_3 = "0.0125"
+OVERAGE_PRICE_TIER_4 = "0.0115"
+OVERAGE_PRICE_TIER_5 = "0.0111"
+
+# Secrets (DO NOT PUT ACTUAL VALUES HERE - Use wrangler secret put)
+#
+# Required PayPal Secrets:
+#   wrangler secret put PAYPAL_CLIENT_ID --config wrangler-api.toml
+#   wrangler secret put PAYPAL_CLIENT_SECRET --config wrangler-api.toml
+#
+# Required Stripe Secrets:
+#   wrangler secret put STRIPE_SECRET_KEY --config wrangler-api.toml
+#
+# Required Admin Token (for admin dashboard access):
+#   Generate strong token: openssl rand -hex 32
+#   wrangler secret put ADMIN_TOKEN --config wrangler-api.toml
+#
+# Get PayPal credentials: https://developer.paypal.com/dashboard/
+# Get Stripe credentials: https://dashboard.stripe.com/apikeys
+
+[observability]
+enabled = true
+
+# ═══════════════════════════════════════════════════════════════
+# DEPLOYMENT CHECKLIST
+# ═══════════════════════════════════════════════════════════════
+#
+# Before deploying:
+# 1. Create D1 database:
+#    wrangler d1 create mypasswordchecker-db
+#    Copy database_id → Update line 18
+#
+# 2. Create R2 bucket:
+#    wrangler r2 bucket create mypasswordchecker-audit-logs
+#
+# 3. Create KV namespaces:
+#    wrangler kv:namespace create "MYPWDCKR_API_KEYS"
+#    wrangler kv:namespace create "MYPWDCKR_SESSION_CACHE"
+#    wrangler kv:namespace create "MYPWDCKR_USAGE_TRACKING"
+#    Copy all 3 IDs → Update lines 26, 30, 34
+#
+# 4. Load database schema:
+#    wrangler d1 execute mypasswordchecker-db --file=schema.sql
+#
+# 5. Update Stripe variables:
+#    Line 52: STRIPE_PUBLISHABLE_KEY (from Stripe dashboard)
+#    Line 53: STRIPE_WEBHOOK_SECRET (from Stripe webhook setup)
+#
+# 6. Add secrets:
+#    wrangler secret put PAYPAL_CLIENT_ID --config wrangler-api.toml
+#    wrangler secret put PAYPAL_CLIENT_SECRET --config wrangler-api.toml
+#    wrangler secret put STRIPE_SECRET_KEY --config wrangler-api.toml
+#    wrangler secret put ADMIN_TOKEN --config wrangler-api.toml
+#
+# 7. Deploy:
+#    wrangler deploy --config wrangler-api.toml
+#
+# ═══════════════════════════════════════════════════════════════
+# COST ANALYSIS
+# ═══════════════════════════════════════════════════════════════
+#
+# Workers Paid Plan: $5.00/month (base fee)
+#   - 30M CPU milliseconds included
+#   - 10M requests included
+#
+# Expected API Usage:
+#   - CPU: 2-5ms per request
+#   - Requests: <20,000/month
+#   - Total CPU: <100,000ms/month (well within 30M free)
+#
+# Payment Processing Savings (vs Stripe-only):
+#   - $1 transaction: PayPal $0.14 vs Stripe $0.33 = Save $0.19
+#   - 100 premium/month: Save $19.00/month = $228/year
+#
+# TOTAL EXPECTED COST: $5.00/month (no overage charges)
+#
+# ═══════════════════════════════════════════════════════════════

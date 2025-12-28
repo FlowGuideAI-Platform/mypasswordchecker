@@ -2,13 +2,13 @@ name = "mypasswordchecker-api"
 main = "workers/api-d1.js"
 compatibility_date = "2024-10-11"
 compatibility_flags = ["nodejs_compat"]
-account_id = "ee34e44964865d1bccb86107d578c55a"
+account_id = "be1ad24bfb43615483c3a472aa134892"
 
 # D1 Database (primary data store - SOC 2 compliant)
 [[d1_databases]]
 binding = "DB"
 database_name = "mypasswordchecker-db"
-database_id = "b85d3188-2c9b-4fa8-89b6-81d3a1861f97"
+database_id = "9fbf81b9-50ad-4515-a40f-b94f78dd56fd"
 
 # R2 Bucket (audit log storage - 7 year retention)
 [[r2_buckets]]

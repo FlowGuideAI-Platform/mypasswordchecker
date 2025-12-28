@@ -1,0 +1,88 @@
+Item,Status,Notes,Required_Before_Deploy,Command_Reference
+Prerequisites,,,YES,
+Phase_3_Complete,Pending,Static_site_deployed_(mypasswordchecker-main),YES,wrangler deployments list --name mypasswordchecker-main
+Bot_Protection_Deployed,Pending,Bot_protection_worker_active,YES,wrangler deployments list --name mypasswordchecker-bot-protection
+PayPal_Account_Created,Pending,PayPal_Business_account_setup,YES,https://paypal.com/business
+PayPal_Client_ID_Obtained,Pending,From_PayPal_Developer_Dashboard,YES,https://developer.paypal.com/dashboard/
+PayPal_Client_Secret_Obtained,Pending,From_PayPal_Developer_Dashboard,YES,https://developer.paypal.com/dashboard/
+Wrangler_Logged_In,Pending,Account_be1ad24bfb43615483c3a472aa134892,YES,wrangler whoami
+,,,,,
+Cloudflare_Resources,,,YES,
+D1_Database_Created,Pending,mypasswordchecker-db,YES,wrangler d1 create mypasswordchecker-db
+D1_Schema_Loaded,Pending,sessions_+_api_keys_+_usage_tracking_tables,YES,wrangler d1 execute mypasswordchecker-db --file=schema.sql
+D1_Database_ID_Noted,Pending,For_wrangler-api.toml,YES,wrangler d1 list
+R2_Bucket_Created,Pending,mypasswordchecker-audit-logs,YES,wrangler r2 bucket create mypasswordchecker-audit-logs
+KV_API_KEYS_Created,Pending,Namespace_for_API_key_caching,YES,wrangler kv:namespace create "MYPWDCKR_API_KEYS"
+KV_USAGE_TRACKING_Created,Pending,Namespace_for_usage_quota_caching,YES,wrangler kv:namespace create "MYPWDCKR_USAGE_TRACKING"
+KV_SESSION_CACHE_Created,Pending,Namespace_for_session_caching,YES,wrangler kv:namespace create "MYPWDCKR_SESSION_CACHE"
+All_KV_IDs_Noted,Pending,For_wrangler-api.toml,YES,wrangler kv:namespace list
+,,,,,
+Configuration,,,YES,
+wrangler-api.toml_Updated,Pending,All_PLACEHOLDER_values_replaced,YES,Edit_wrangler-api.toml
+D1_Database_ID_Updated,Pending,Line_~28_in_wrangler-api.toml,YES,Replace_PLACEHOLDER_with_actual_D1_ID
+KV_API_KEYS_ID_Updated,Pending,Line_~50_in_wrangler-api.toml,YES,Replace_PLACEHOLDER_with_actual_KV_ID
+KV_USAGE_TRACKING_ID_Updated,Pending,Line_~55_in_wrangler-api.toml,YES,Replace_PLACEHOLDER_with_actual_KV_ID
+KV_SESSION_CACHE_ID_Updated,Pending,Line_~60_in_wrangler-api.toml,YES,Replace_PLACEHOLDER_with_actual_KV_ID
+PayPal_Client_ID_Secret_Added,Pending,Secret_stored_in_Cloudflare,YES,wrangler secret put PAYPAL_CLIENT_ID --config wrangler-api.toml
+PayPal_Client_Secret_Added,Pending,Secret_stored_in_Cloudflare,YES,wrangler secret put PAYPAL_CLIENT_SECRET --config wrangler-api.toml
+Secrets_Verified,Pending,Check_both_secrets_listed,YES,wrangler secret list --config wrangler-api.toml
+,,,,,
+Code_Implementation,,,YES,
+schema.sql_Created,Pending,Database_schema_in_project_root,YES,Copy_from_deployment_guide
+PayPal_Integration_Implemented,Pending,handleCreatePayPalOrder_function,YES_if_deploying,Edit_workers/mypasswordchecker-api.js
+PayPal_Verification_Implemented,Pending,handlePayPalVerify_function,YES_if_deploying,Edit_workers/mypasswordchecker-api.js
+PayPal_AccessToken_Implemented,Pending,getPayPalAccessToken_function,YES_if_deploying,Edit_workers/mypasswordchecker-api.js
+TODOs_Removed,Pending,No_TODO_comments_remaining,YES_if_deploying,Search_for_TODO_in_worker_file
+,,,,,
+Local_Testing,,,Recommended,
+Local_Dev_Server_Started,Pending,Worker_running_on_localhost:8787,Recommended,wrangler dev --config wrangler-api.toml --local
+API_Verify_Endpoint_Tested,Pending,curl_localhost:8787/api/verify,Recommended,curl "http://localhost:8787/api/verify?session_id=test"
+API_TrackUsage_Endpoint_Tested,Pending,curl_localhost:8787/api/track-usage,Recommended,curl -X POST http://localhost:8787/api/track-usage -d ...
+API_CreatePayPal_Endpoint_Tested,Pending,curl_localhost:8787/api/create-paypal-order,Recommended,curl -X POST http://localhost:8787/api/create-paypal-order -d ...
+API_PayPalVerify_Endpoint_Tested,Pending,curl_localhost:8787/api/paypal-verify,Recommended,curl "http://localhost:8787/api/paypal-verify?order_id=test"
+D1_Database_Queries_Verified,Pending,Check_data_inserted_from_test,Recommended,wrangler d1 execute mypasswordchecker-db --command="SELECT ..."
+,,,,,
+Production_Deployment,,,YES,
+Final_Verification_Complete,Pending,All_above_items_checked,YES,Review_checklist
+API_Worker_Deployed,Pending,Uploaded_to_Cloudflare,YES,wrangler deploy --config wrangler-api.toml
+Deployment_Success_Confirmed,Pending,Check_deployment_status,YES,wrangler deployments list --name mypasswordchecker-api
+,,,,,
+Production_Testing,,,YES,
+Production_Verify_Endpoint_Works,Pending,curl_mypasswordchecker.com/api/verify,YES,curl "https://mypasswordchecker.com/api/verify?session_id=test"
+Production_TrackUsage_Works,Pending,curl_mypasswordchecker.com/api/track-usage,YES,curl -X POST https://mypasswordchecker.com/api/track-usage -d ...
+Production_PayPal_EndToEnd_Test,Pending,Complete_test_payment_on_/premium.html,YES,Browser_test_at_/premium.html
+D1_Production_Data_Verified,Pending,Check_records_from_production_tests,YES,wrangler d1 execute mypasswordchecker-db --command="SELECT COUNT(*) FROM usage_tracking"
+R2_Audit_Logs_Created,Pending,Verify_audit_files_in_R2,YES,wrangler r2 object list mypasswordchecker-audit-logs
+,,,,,
+Monitoring,,,Recommended,
+CPU_Usage_Dashboard_Checked,Pending,Verify_1-5ms_per_request,YES,https://dash.cloudflare.com/.../mypasswordchecker-api/production/metrics
+Request_Count_Monitored,Pending,Track_API_usage,Recommended,Cloudflare_Dashboard_Metrics
+Error_Rate_Checked,Pending,Should_be_near_0%,YES,Cloudflare_Dashboard_Metrics
+CPU_Alert_Set,Pending,Alert_if_>10M_ms/month,Recommended,Cloudflare_Dashboard_Alerts
+Error_Alert_Set,Pending,Alert_if_>5%_error_rate,Recommended,Cloudflare_Dashboard_Alerts
+24_Hour_CPU_Verification,Pending,Check_after_24_hours_no_overage,YES,Wait_24_hours_then_check_dashboard
+,,,,,
+Documentation,,,Recommended,
+API_Endpoints_Documented,Complete,4_endpoints_in_worker_comments,N/A,See_workers/mypasswordchecker-api.js
+Deployment_Guide_Reviewed,Pending,Read_deployment/api-deployment-guide.md,Recommended,/deployment/api-deployment-guide.md
+Analysis_Report_Reviewed,Pending,Read_analysis/api-worker-analysis.md,Recommended,/analysis/api-worker-analysis.md
+Database_Status_Guide_Reviewed,Pending,Read_analysis/d1-database-status.md,Recommended,/analysis/d1-database-status.md
+,,,,,
+Security,,,YES,
+Secrets_Not_In_Git,Pending,Verify_.gitignore_excludes_secrets,YES,Check_.gitignore
+CORS_Headers_Verified,Pending,Only_allow_mypasswordchecker.com,Recommended,Review_worker_CORS_config
+PayPal_Sandbox_Tested_First,Pending,Before_using_production_credentials,Recommended,Use_sandbox.paypal.com_first
+Production_Credentials_Secure,Pending,No_credentials_in_code_or_logs,YES,Code_review
+,,,,,
+Cost_Verification,,,YES,
+Expected_Cost_Understood,Pending,$5/month_base_+_$0_overage,N/A,See_wrangler-api.toml_cost_section
+Free_Tier_Limits_Verified,Pending,All_usage_within_limits,YES,Review_cost_analysis_in_config
+No_CPU_Overage_Charges,Pending,Monitor_for_1_month,YES,Check_Cloudflare_billing_after_1_month
+,,,,,
+Final_Checklist,,,YES,
+Phase_4_Complete,Pending,All_critical_items_Complete,YES,Review_entire_checklist
+API_Worker_Functional,Pending,All_endpoints_working,YES,End-to-end_testing
+PayPal_Payments_Working,Pending,Premium_purchases_successful,YES,Test_purchase_on_/premium.html
+No_Errors_In_Logs,Pending,Clean_deployment,YES,wrangler tail mypasswordchecker-api
+CPU_Usage_Within_Limits,Pending,No_overage_charges,YES,24-hour_monitoring
+Ready_For_Phase_5,Pending,Monitoring_and_optimization,N/A,Optional_next_phase
