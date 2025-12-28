@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate quantum-resistant passwords from memorable phrases using phonetic substitution">
+    <title>Phonetic Password Generator - MyPasswordChecker.com</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Phonetic Password Generator - MyPasswordChecker.com">
+    <meta property="og:description" content="Turn memorable phrases into quantum-resistant passwords">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mypasswordchecker.com/generate-phonetic.html">
+    <meta property="og:image" content="https://mypasswordchecker.com/og-image.png">
+
+    <link rel="canonical" href="https://mypasswordchecker.com/generate-phonetic.html">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+
+    <style>
+        .generator-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.1);
+            margin: 2rem 0;
+        }
+
+        .phrase-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .phrase-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .slider-container {
+            margin: 1.5rem 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #10b981, #f59e0b, #ef4444);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider-hint {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .password-variation {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: border-color 0.2s;
+        }
+
+        .password-variation:hover {
+            border-color: var(--primary-color);
+        }
+
+        .password-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            word-break: break-all;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.375rem;
+        }
+
+        .password-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat {
+            font-size: 0.875rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        .quantum-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .quantum-resistant {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .not-quantum-resistant {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.9;
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pricing-notice {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-notice h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
+                <nav class="nav">
+                    <a href="/">Password Checker</a>
+                    <a href="/free-password-checker.html">Free Tool</a>
+                    <a href="/password-api.html">Developer API</a>
+                    <a href="/docs.html">Docs</a>
+                    <a href="/pricing.html">Pricing</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <div class="quantum-badge" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;">✨ Premium Feature</div>
+                <h1>Phonetic Password Generator</h1>
+                <p>Turn memorable phrases into quantum-resistant passwords that are phonetically similar and easy to remember.</p>
+            </section>
+
+            <!-- Pricing Notice -->
+            <div class="pricing-notice">
+                <h3>💎 Pricing</h3>
+                <ul style="margin: 0.5rem 0 0 1.5rem; color: var(--text-primary);">
+                    <li><strong>Quantum Tier ($49/mo):</strong> 5,000 generations/month included</li>
+                    <li><strong>Standard Tier ($19/mo):</strong> 100 generations/month included</li>
+                    <li><strong>Pay-per-use:</strong> $1.00 per generation (5 variations)</li>
+                </ul>
+            </div>
+
+            <div class="generator-card">
+                <label for="phrase-input" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">
+                    Enter Your Memorable Phrase
+                </label>
+                <textarea
+                    id="phrase-input"
+                    class="phrase-input"
+                    placeholder="e.g., 'mission to mars' or 'I love hiking in Yosemite'"
+                    rows="3"
+                ></textarea>
+
+                <!-- Memorability Slider -->
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Memorability</span>
+                        <span id="slider-value">Medium</span>
+                    </div>
+                    <input
+                        type="range"
+                        min="1"
+                        max="3"
+                        value="2"
+                        class="slider"
+                        id="memorability-slider"
+                    >
+                    <div class="slider-hint" id="slider-hint">
+                        Balanced mix of original characters and creative substitutions
+                    </div>
+                </div>
+
+                <button class="btn" id="generate-btn" onclick="generatePasswords()">
+                    Generate Quantum-Resistant Passwords
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generating passwords...</p>
+            </div>
+
+            <!-- Results -->
+            <div id="results" style="display: none;">
+                <h2>Generated Passwords</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Choose your favorite variation. Each time you generate, you'll get different results!
+                </p>
+                <div id="variations-container"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>MyPasswordChecker.com</h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="/">Password Checker</a></li>
+                        <li><a href="/generate-phonetic.html">Phonetic Generator</a></li>
+                        <li><a href="/premium.html">Quantum Estimate</a></li>
+                        <li><a href="/api-docs.html">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacy.html">Privacy Policy</a></li>
+                        <li><a href="/terms.html">Terms of Service</a></li>
+                        <li><a href="/disclaimer.html">Quantum Estimate Disclaimer</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developer</h4>
+                    <ul>
+                        <li><a href="/dashboard.html">Dashboard</a></li>
+                        <li><a href="/pricing.html">API Pricing</a></li>
+                        <li><a href="/api-docs.html">Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy.html" style="color: inherit;">Privacy</a> | <a href="/terms.html" style="color: inherit;">Terms</a></p>
+                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
+                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
+                    This service is also available at:
+                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
+                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
+                </p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+    <script src="/js/quantum-estimator.js?v=2"></script>
+    <script src="/js/phonetic-generator.js?v=1"></script>
+    <script>
+        // Slider handling
+        const slider = document.getElementById('memorability-slider');
+        const sliderValue = document.getElementById('slider-value');
+        const sliderHint = document.getElementById('slider-hint');
+
+        const sliderLabels = {
+            1: {
+                label: 'Easy to Remember',
+                hint: 'Fewer substitutions - closer to original phrase (may need more characters for quantum resistance)',
+                value: 'low'
+            },
+            2: {
+                label: 'Medium',
+                hint: 'Balanced mix of original characters and creative substitutions',
+                value: 'medium'
+            },
+            3: {
+                label: 'Maximum Security',
+                hint: 'Aggressive substitutions - highest entropy but harder to remember',
+                value: 'high'
+            }
+        };
+
+        slider.addEventListener('input', (e) => {
+            const level = e.target.value;
+            sliderValue.textContent = sliderLabels[level].label;
+            sliderHint.textContent = sliderLabels[level].hint;
+        });
+
+        async function generatePasswords() {
+            const phrase = document.getElementById('phrase-input').value.trim();
+            const aggressiveness = sliderLabels[slider.value].value;
+
+            if (!phrase) {
+                alert('Please enter a memorable phrase');
+                return;
+            }
+
+            if (phrase.length < 10) {
+                alert('Please enter a phrase with at least 10 characters for better security');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('generate-btn').disabled = true;
+
+            try {
+                // Call API to authorize generation (uses Tier 2 quota)
+                const apiResponse = await fetch('/api/v1/generate-phonetic-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phrase })
+                });
+
+                const apiData = await apiResponse.json();
+
+                if (!apiData.success) {
+                    throw new Error(apiData.error || 'Failed to authorize generation');
+                }
+
+                // Generate client-side
+                const variations = PhoneticGenerator.generateMultiple(phrase, 5, {
+                    minLength: 20,
+                    minEntropy: 80,
+                    aggressiveness
+                });
+
+                // Display results
+                displayResults(variations, apiData);
+
+            } catch (error) {
+                console.error('Generation error:', error);
+                alert(error.message || 'Failed to generate passwords. Please try again.');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('generate-btn').disabled = false;
+            }
+        }
+
+        function displayResults(variations, apiData) {
+            const container = document.getElementById('variations-container');
+            container.innerHTML = '';
+
+            variations.forEach((v, index) => {
+                const div = document.createElement('div');
+                div.className = 'password-variation';
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <strong style="color: var(--text-primary);">Variation ${index + 1}</strong>
+                            <span class="quantum-badge ${v.quantumResistant ? 'quantum-resistant' : 'not-quantum-resistant'}">
+                                ${v.quantumResistant ? '✅ Quantum Resistant' : '⚠️ Not Quantum Resistant'}
+                            </span>
+                        </div>
+                        <button class="copy-btn" onclick="copyPassword(this, '${v.password.replace(/'/g, "\\'")}')">
+                            Copy
+                        </button>
+                    </div>
+
+                    <div class="password-display">${v.password}</div>
+
+                    <div class="password-stats">
+                        <div class="stat">
+                            <div class="stat-label">Length</div>
+                            <div class="stat-value">${v.length} characters</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Entropy</div>
+                            <div class="stat-value">${v.entropy.toFixed(1)} bits</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Pattern</div>
+                            <div class="stat-value">${v.pattern}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Classical Crack Time</div>
+                            <div class="stat-value">${v.classical.human.label}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Quantum (Plausible)</div>
+                            <div class="stat-value">${v.quantum.plausible.human.label}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Show usage info
+            if (apiData.usage !== undefined) {
+                const usageDiv = document.createElement('div');
+                usageDiv.style.cssText = 'margin-top: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 0.5rem; text-align: center;';
+                usageDiv.innerHTML = `
+                    <p style="margin: 0; color: var(--text-secondary);">
+                        <strong>Usage:</strong> ${apiData.usage} / ${apiData.remaining + apiData.usage} generations this month
+                        ${apiData.remaining > 0 ? `(${apiData.remaining} remaining)` : ''}
+                    </p>
+                    ${apiData.pay_per_use ? '<p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">💳 Billed at $1.00 per generation</p>' : ''}
+                `;
+                container.appendChild(usageDiv);
+            }
+
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function copyPassword(button, password) {
+            navigator.clipboard.writeText(password).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>

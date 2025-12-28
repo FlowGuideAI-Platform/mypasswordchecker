@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manage verified domains for MyPasswordChecker.com API - fraud prevention">
+    <title>Domain Verification - MyPasswordChecker.com</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+    <style>
+        .domain-card {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .domain-card.verified {
+            border-color: var(--success-color);
+        }
+
+        .domain-card.pending {
+            border-color: var(--warning-color);
+        }
+
+        .domain-card.failed {
+            border-color: var(--danger-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #78350f;
+        }
+
+        .status-badge.failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .instructions {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .instructions ol {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .instructions li {
+            margin: 0.5rem 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: var(--bg-primary);
+            margin: 5% auto;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .close {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 20px;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
+                <nav class="nav">
+                    <a href="/">Password Checker</a>
+                    <a href="/free-password-checker.html">Free Tool</a>
+                    <a href="/password-api.html">Developer API</a>
+                    <a href="/docs.html">Docs</a>
+                    <a href="/pricing.html">Pricing</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h1 style="margin-bottom: 0.5rem;">🔒 Domain Verification</h1>
+                    <p style="color: var(--text-secondary);">Verify domain ownership to prevent API key theft and increase rate limits</p>
+                </div>
+                <button class="btn btn-primary" onclick="showAddDomainModal()">+ Add Domain</button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" style="text-align: center; padding: 4rem;">
+                <div class="loading" style="width: 50px; height: 50px; border-width: 5px; margin: 0 auto;"></div>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">Loading domains...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" style="display: none;">
+                <div class="alert alert-error">
+                    <strong>Error:</strong> <span id="error-message"></span>
+                </div>
+                <p style="margin-top: 1rem;">
+                    <a href="/dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+                </p>
+            </div>
+
+            <!-- Domains List -->
+            <div id="domains-container" style="display: none;">
+                <!-- Info Banner -->
+                <div class="alert alert-info" style="margin-bottom: 2rem;">
+                    <strong>🛡️ Fraud Prevention:</strong> Verified domains get <strong>100 requests/minute</strong>.
+                    Unverified domains are throttled to <strong>10 requests/minute</strong> and trigger alerts.
+                    <br><br>
+                    <strong>Maximum:</strong> 3 verified domains per account.
+                </div>
+
+                <!-- Domains Count -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h2 style="display: inline-block; margin-right: 1rem;">Your Domains (<span id="domain-count">0</span>/3)</h2>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                    </svg>
+                    <h3>No domains verified yet</h3>
+                    <p>Add your first domain to enable fraud protection and increase rate limits</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showAddDomainModal()">Add Your First Domain</button>
+                </div>
+
+                <!-- Domains List -->
+                <div id="domains-list"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Domain Modal -->
+    <div id="addDomainModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddDomainModal()">&times;</span>
+            <h2 style="margin-bottom: 1.5rem;">Add New Domain</h2>
+
+            <div class="input-group">
+                <label for="domain-input">Domain Name</label>
+                <input type="text" id="domain-input" class="password-input" placeholder="example.com" style="width: 100%;">
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    Enter your domain without https:// or paths
+                </p>
+            </div>
+
+            <div class="input-group">
+                <label>Verification Method</label>
+                <div style="display: flex; gap: 1rem;">
+                    <label style="flex: 1; padding: 1rem; border: 2px solid var(--border-color); border-radius: 0.5rem; cursor: pointer; display: flex; align-items: center;">
+                        <input type="radio" name="verification-method" value="dns" checked style="margin-right: 0.5rem;">
+                        <div>
+                            <strong>DNS TXT Record</strong>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">More secure, requires DNS access</p>
+                        </div>
+                    </label>
+                    <label style="flex: 1; padding: 1rem; border: 2px solid var(--border-color); border-radius: 0.5rem; cursor: pointer; display: flex; align-items: center;">
+                        <input type="radio" name="verification-method" value="http" style="margin-right: 0.5rem;">
+                        <div>
+                            <strong>HTTP File</strong>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Easier, requires file upload</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="add-domain-error" class="alert alert-error" style="display: none; margin-top: 1rem;"></div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeAddDomainModal()">Cancel</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="addDomain()" id="add-domain-btn">Add Domain</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>MyPasswordChecker.com</h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="/">Password Checker</a></li>
+                        <li><a href="/premium.html">Quantum Estimate</a></li>
+                        <li><a href="/api-docs.html">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacy.html">Privacy Policy</a></li>
+                        <li><a href="/terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developer</h4>
+                    <ul>
+                        <li><a href="/dashboard.html">Dashboard</a></li>
+                        <li><a href="/domains.html">Domain Verification</a></li>
+                        <li><a href="/pricing.html">API Pricing</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy.html" style="color: inherit;">Privacy</a> | <a href="/terms.html" style="color: inherit;">Terms</a></p>
+                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
+                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
+                    This service is also available at:
+                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
+                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
+                </p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/domains.js"></script>
+</body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyPasswordChecker.com Compact Widget</title>
+    <style>
+        /* Widget Container - Compact Design */
+        .mypc-widget {
+            max-width: 500px;
+            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Tab Navigation */
+        .mypc-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .mypc-tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .mypc-tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .mypc-tab.active {
+            color: #4c6ef5;
+            background: white;
+        }
+
+        .mypc-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #4c6ef5;
+        }
+
+        /* Tab Content */
+        .mypc-tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .mypc-tab-content.active {
+            display: block;
+        }
+
+        /* Input Groups */
+        .mypc-input-group {
+            margin-bottom: 16px;
+        }
+
+        .mypc-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .mypc-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .mypc-input:focus {
+            outline: none;
+            border-color: #4c6ef5;
+            box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+        }
+
+        /* Buttons */
+        .mypc-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .mypc-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .mypc-btn:active {
+            transform: translateY(0);
+        }
+
+        .mypc-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results */
+        .mypc-result {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .mypc-result.show {
+            display: block;
+        }
+
+        .mypc-result-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #212529;
+            font-size: 14px;
+        }
+
+        .mypc-result-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4c6ef5;
+            margin-bottom: 4px;
+        }
+
+        .mypc-result-detail {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        /* Strength Meter */
+        .mypc-strength-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .mypc-strength-fill {
+            height: 100%;
+            transition: width 0.3s, background-color 0.3s;
+            border-radius: 3px;
+        }
+
+        /* Error Message */
+        .mypc-error {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            color: #856404;
+            font-size: 13px;
+            display: none;
+        }
+
+        .mypc-error.show {
+            display: block;
+        }
+
+        /* Branding Footer */
+        .mypc-branding {
+            padding: 10px;
+            text-align: center;
+            background: rgba(76, 110, 245, 0.08);
+            border-top: 1px solid rgba(76, 110, 245, 0.1);
+        }
+
+        .mypc-branding a {
+            font-size: 12px;
+            color: #4c6ef5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .mypc-branding a:hover {
+            text-decoration: underline;
+        }
+
+        /* Helper Text */
+        .mypc-helper {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 6px;
+        }
+
+        /* Compact mode - even smaller */
+        .mypc-widget.compact {
+            max-width: 400px;
+        }
+
+        .mypc-widget.compact .mypc-tab {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .mypc-widget.compact .mypc-tab-content {
+            padding: 16px;
+        }
+    </style>
+</head>
+<body style="background: #f1f3f5; padding: 40px 20px;">
+
+    <!-- Example Usage: Default Size -->
+    <h2 style="text-align: center; margin-bottom: 20px; color: #212529;">Default Widget Size</h2>
+
+    <div class="mypc-widget" id="mypc-widget-1" data-api-key="YOUR_API_KEY_HERE">
+        <!-- Tab Navigation -->
+        <div class="mypc-tabs">
+            <button class="mypc-tab active" data-tab="password">
+                🔒 Password Check
+            </button>
+            <button class="mypc-tab" data-tab="quantum">
+                ⚛️ Quantum Test
+            </button>
+            <button class="mypc-tab" data-tab="generator">
+                🔑 Generator
+            </button>
+        </div>
+
+        <!-- Password Strength Tab -->
+        <div class="mypc-tab-content active" data-content="password">
+            <div class="mypc-input-group">
+                <label class="mypc-label">Enter a password to test:</label>
+                <input
+                    type="password"
+                    class="mypc-input"
+                    id="password-input-1"
+                    placeholder="Type password here..."
+                    autocomplete="off"
+                >
+                <div class="mypc-helper">🔒 Privacy-focused: Analysis happens client-side</div>
+            </div>
+
+            <button class="mypc-btn" id="check-password-btn-1">
+                Check Password Strength
+            </button>
+
+            <div class="mypc-result" id="password-result-1">
+                <div class="mypc-strength-bar">
+                    <div class="mypc-strength-fill" id="strength-fill-1"></div>
+                </div>
+                <div class="mypc-result-title">Strength: <span id="strength-label-1"></span></div>
+                <div class="mypc-result-detail">Score: <strong id="score-value-1"></strong>/4</div>
+                <div class="mypc-result-detail">Entropy: <strong id="entropy-value-1"></strong> bits</div>
+                <div class="mypc-result-detail">Crack Time: <strong id="crack-time-1"></strong></div>
+            </div>
+
+            <div class="mypc-error" id="password-error-1"></div>
+        </div>
+
+        <!-- Quantum Resistance Tab -->
+        <div class="mypc-tab-content" data-content="quantum">
+            <div class="mypc-input-group">
+                <label class="mypc-label">Test quantum resistance:</label>
+                <input
+                    type="password"
+                    class="mypc-input"
+                    id="quantum-input-1"
+                    placeholder="Enter password to analyze..."
+                    autocomplete="off"
+                >
+                <div class="mypc-helper">⚛️ Tests against Grover's algorithm</div>
+            </div>
+
+            <button class="mypc-btn" id="quantum-btn-1">
+                Estimate Quantum Resistance
+            </button>
+
+            <div class="mypc-result" id="quantum-result-1">
+                <div class="mypc-result-title">Quantum Resistance</div>
+                <div class="mypc-result-value" id="quantum-safe-1"></div>
+                <div class="mypc-result-detail">Grover Iterations: <strong id="grover-iterations-1"></strong></div>
+                <div class="mypc-result-detail">NISQ Era: <strong id="nisq-time-1"></strong></div>
+                <div class="mypc-result-detail" id="quantum-recommendation-1"></div>
+            </div>
+
+            <div class="mypc-error" id="quantum-error-1"></div>
+        </div>
+
+        <!-- Password Generator Tab -->
+        <div class="mypc-tab-content" data-content="generator">
+            <div class="mypc-input-group">
+                <label class="mypc-label">Memorable phrase:</label>
+                <input
+                    type="text"
+                    class="mypc-input"
+                    id="phrase-input-1"
+                    placeholder="e.g., I love secure passwords"
+                    autocomplete="off"
+                >
+                <div class="mypc-helper">🔑 Creates phonetic password from your phrase</div>
+            </div>
+
+            <button class="mypc-btn" id="generate-btn-1">
+                Generate Password
+            </button>
+
+            <div class="mypc-result" id="generator-result-1">
+                <div class="mypc-result-title">Generated Password</div>
+                <div class="mypc-result-value" style="word-break: break-all; font-size: 16px;" id="generated-password-1"></div>
+                <div class="mypc-result-detail">Entropy: <strong id="gen-entropy-1"></strong> bits</div>
+                <div class="mypc-result-detail">Words used: <strong id="gen-words-1"></strong></div>
+            </div>
+
+            <div class="mypc-error" id="generator-error-1"></div>
+        </div>
+
+        <!-- Branding Footer -->
+        <div class="mypc-branding">
+            <a href="https://mypasswordchecker.com" target="_blank" rel="noopener">
+                Powered by MyPasswordChecker.com
+            </a>
+        </div>
+    </div>
+
+    <!-- Example Usage: Compact Size -->
+    <h2 style="text-align: center; margin: 60px 0 20px; color: #212529;">Compact Widget Size</h2>
+
+    <div class="mypc-widget compact" id="mypc-widget-2" data-api-key="YOUR_API_KEY_HERE">
+        <!-- Same structure as above... -->
+        <div class="mypc-tabs">
+            <button class="mypc-tab active" data-tab="password">🔒 Check</button>
+            <button class="mypc-tab" data-tab="quantum">⚛️ Quantum</button>
+            <button class="mypc-tab" data-tab="generator">🔑 Generate</button>
+        </div>
+
+        <div class="mypc-tab-content active" data-content="password">
+            <div class="mypc-input-group">
+                <label class="mypc-label">Password:</label>
+                <input type="password" class="mypc-input" placeholder="Enter password..." autocomplete="off">
+            </div>
+            <button class="mypc-btn">Check Strength</button>
+            <div class="mypc-helper" style="margin-top: 12px;">🔒 Analyzed client-side for privacy</div>
+        </div>
+
+        <div class="mypc-tab-content" data-content="quantum">
+            <div class="mypc-input-group">
+                <label class="mypc-label">Password:</label>
+                <input type="password" class="mypc-input" placeholder="Enter password..." autocomplete="off">
+            </div>
+            <button class="mypc-btn">Test Quantum Resistance</button>
+        </div>
+
+        <div class="mypc-tab-content" data-content="generator">
+            <div class="mypc-input-group">
+                <label class="mypc-label">Phrase:</label>
+                <input type="text" class="mypc-input" placeholder="Memorable phrase..." autocomplete="off">
+            </div>
+            <button class="mypc-btn">Generate Password</button>
+        </div>
+
+        <div class="mypc-branding">
+            <a href="https://mypasswordchecker.com" target="_blank">Powered by MyPasswordChecker.com</a>
+        </div>
+    </div>
+
+    <!-- Widget JavaScript -->
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.mypc-widget').forEach(widget => {
+            const tabs = widget.querySelectorAll('.mypc-tab');
+            const contents = widget.querySelectorAll('.mypc-tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.dataset.tab;
+
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+
+                    // Show corresponding content
+                    const targetContent = widget.querySelector(`[data-content="${targetTab}"]`);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Password Strength Check (Widget 1)
+        document.getElementById('check-password-btn-1')?.addEventListener('click', async () => {
+            const password = document.getElementById('password-input-1').value;
+            const resultDiv = document.getElementById('password-result-1');
+            const errorDiv = document.getElementById('password-error-1');
+            const apiKey = document.getElementById('mypc-widget-1').dataset.apiKey;
+
+            if (!password) {
+                errorDiv.textContent = 'Please enter a password';
+                errorDiv.classList.add('show');
+                resultDiv.classList.remove('show');
+                return;
+            }
+
+            errorDiv.classList.remove('show');
+
+            try {
+                const response = await fetch('https://mypasswordchecker.com/api/v1/check-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update strength bar
+                    const strengthFill = document.getElementById('strength-fill-1');
+                    const strengthColors = ['#dc2626', '#f59e0b', '#eab308', '#3b82f6', '#10b981'];
+                    const strengthLabels = ['Very Weak', 'Weak', 'Fair', 'Strong', 'Very Strong'];
+
+                    strengthFill.style.width = ((data.score + 1) * 20) + '%';
+                    strengthFill.style.background = strengthColors[data.score] || '#dc2626';
+
+                    // Update result text
+                    document.getElementById('strength-label-1').textContent = strengthLabels[data.score] || 'Unknown';
+                    document.getElementById('score-value-1').textContent = data.score;
+                    document.getElementById('entropy-value-1').textContent = data.entropy.toFixed(2);
+                    document.getElementById('crack-time-1').textContent = data.crack_time_display;
+
+                    resultDiv.classList.add('show');
+                } else {
+                    errorDiv.textContent = data.error || 'Error checking password';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error calling API. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        });
+
+        // Quantum Resistance Check (Widget 1)
+        document.getElementById('quantum-btn-1')?.addEventListener('click', async () => {
+            const password = document.getElementById('quantum-input-1').value;
+            const resultDiv = document.getElementById('quantum-result-1');
+            const errorDiv = document.getElementById('quantum-error-1');
+            const apiKey = document.getElementById('mypc-widget-1').dataset.apiKey;
+
+            if (!password) {
+                errorDiv.textContent = 'Please enter a password';
+                errorDiv.classList.add('show');
+                resultDiv.classList.remove('show');
+                return;
+            }
+
+            errorDiv.classList.remove('show');
+
+            try {
+                // First get password entropy
+                const checkResponse = await fetch('https://mypasswordchecker.com/api/v1/check-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const checkData = await checkResponse.json();
+
+                if (!checkData.success) {
+                    errorDiv.textContent = checkData.error || 'Error analyzing password';
+                    errorDiv.classList.add('show');
+                    return;
+                }
+
+                // Then get quantum estimate
+                const quantumResponse = await fetch('https://mypasswordchecker.com/api/v1/quantum-estimate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({ entropy: checkData.entropy })
+                });
+
+                const quantumData = await quantumResponse.json();
+
+                if (quantumData.success) {
+                    document.getElementById('quantum-safe-1').textContent =
+                        quantumData.quantum_safe ? '✅ Likely Quantum Resistant' : '⚠️ Not Likely Quantum Resistant';
+                    document.getElementById('quantum-safe-1').style.color =
+                        quantumData.quantum_safe ? '#10b981' : '#f59e0b';
+
+                    document.getElementById('grover-iterations-1').textContent =
+                        quantumData.grover_iterations.toExponential(2);
+                    document.getElementById('nisq-time-1').textContent =
+                        quantumData.quantum_scenarios.nisq.years_to_crack.toFixed(0) + ' years';
+                    document.getElementById('quantum-recommendation-1').textContent =
+                        quantumData.recommendation;
+
+                    resultDiv.classList.add('show');
+                } else {
+                    errorDiv.textContent = quantumData.error || 'Error getting quantum estimate';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error calling API. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        });
+
+        // Password Generator (Widget 1)
+        document.getElementById('generate-btn-1')?.addEventListener('click', async () => {
+            const phrase = document.getElementById('phrase-input-1').value;
+            const resultDiv = document.getElementById('generator-result-1');
+            const errorDiv = document.getElementById('generator-error-1');
+            const apiKey = document.getElementById('mypc-widget-1').dataset.apiKey;
+
+            if (!phrase) {
+                errorDiv.textContent = 'Please enter a memorable phrase';
+                errorDiv.classList.add('show');
+                resultDiv.classList.remove('show');
+                return;
+            }
+
+            errorDiv.classList.remove('show');
+
+            try {
+                const response = await fetch('https://mypasswordchecker.com/api/v1/generate-phonetic-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        word_count: phrase.split(' ').length,
+                        include_numbers: true,
+                        separator: '-'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('generated-password-1').textContent = data.password;
+                    document.getElementById('gen-entropy-1').textContent = data.entropy_bits.toFixed(2);
+                    document.getElementById('gen-words-1').textContent = data.words.join(', ');
+
+                    resultDiv.classList.add('show');
+                } else {
+                    errorDiv.textContent = data.error || 'Error generating password';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error calling API. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        });
+    </script>
+
+</body>
+</html>

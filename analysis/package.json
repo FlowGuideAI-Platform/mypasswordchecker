@@ -1,0 +1,22 @@
+{
+  "name": "mypasswordchecker-cpu-analysis",
+  "version": "1.0.0",
+  "description": "CPU usage analysis tool for MyPasswordChecker.com Cloudflare Workers",
+  "main": "cpu-analysis.js",
+  "scripts": {
+    "analyze": "node cpu-analysis.js",
+    "analyze:verbose": "DEBUG=* node cpu-analysis.js"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "analytics",
+    "cpu",
+    "optimization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

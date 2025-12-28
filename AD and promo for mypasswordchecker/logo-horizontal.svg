@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Shield Icon -->
+  <path d="M80 40 L120 55 L120 105 Q120 135 80 155 Q40 135 40 105 L40 55 Z"
+        fill="url(#shieldGrad)"
+        stroke="#667eea"
+        stroke-width="2"/>
+
+  <!-- Checkmark in Shield -->
+  <path d="M65 100 L75 110 L100 80"
+        fill="none"
+        stroke="#ffffff"
+        stroke-width="6"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Text -->
+  <text x="150" y="110" font-family="Arial, sans-serif" font-size="48" font-weight="700" fill="#2d3748">
+    MyPasswordChecker
+  </text>
+  <text x="150" y="145" font-family="Arial, sans-serif" font-size="24" font-weight="400" fill="#667eea">
+    Test Your Password Strength
+  </text>
+</svg>

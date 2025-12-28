@@ -1,0 +1,48 @@
+# Cloudflare Workers Static Assets Configuration
+#
+# File: /Users/jack/Projects - Xcode/MyPasswordChecker.com/wrangler-static.toml
+# Action: NEW FILE
+# Dependencies: Cloudflare account be1ad24bfb43615483c3a472aa134892 (SkyPathways)
+#
+# Deployment Method: Workers Static Assets
+# - Static files served FREE (no CPU charges)
+# - Modern Cloudflare recommended approach
+# - Can add Worker logic later if needed
+
+name = "mypasswordchecker-main"
+compatibility_date = "2025-12-26"
+account_id = "be1ad24bfb43615483c3a472aa134892"
+
+# Static Assets - Files served FREE, no CPU charges
+# Per Cloudflare docs: "Requests to static assets are free and unlimited"
+[assets]
+directory = "./public"
+not_found_handling = "404-page"  # Use 404.html for not found
+
+# Apply to PRIMARY domain only
+# Secondary domains (mypasswordcheck.com, etc.) handled by redirect worker
+[[routes]]
+pattern = "mypasswordchecker.com/*"
+zone_name = "mypasswordchecker.com"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# CRITICAL NOTES:
+# ================
+# 1. NO "main = ..." - We're ONLY serving static assets (no Worker script)
+# 2. Static requests are FREE and UNLIMITED (per Cloudflare documentation)
+# 3. not_found_handling = "404-page" serves 404.html for missing files
+# 4. Only route for PRIMARY domain (mypasswordchecker.com)
+# 5. Secondary domains redirect separately via mypasswordchecker-domain-redirects
+# 6. Bot protection worker (mypasswordchecker-bot-protection) runs BEFORE this
+#
+# Deployment command:
+#   wrangler deploy --config wrangler-static.toml
+#
+# Expected result:
+#   - All static files served FREE (0ms CPU time)
+#   - No $140/month CPU overage charges
+#   - Fast page loads (Cloudflare edge caching)
+#   - SEO-friendly (static HTML served immediately)

@@ -1,0 +1,80 @@
+# Cloudflare Workers Configuration - Main Site (Nov 10 Restoration)
+#
+# File: /Users/jack/Projects - Xcode/MyPasswordChecker.com/wrangler-main.toml
+# Action: NEW FILE
+# Dependencies: Cloudflare account be1ad24bfb43615483c3a472aa134892 (SkyPathways)
+#
+# IMPORTANT NOTE: This configuration is for reference only.
+# The Nov 10 backup used Cloudflare PAGES (not Workers) for static files.
+#
+# DO NOT deploy static HTML via Workers - use Cloudflare Pages instead!
+# See: /workers/DEPLOYMENT-NOTES.md for correct deployment strategy.
+#
+# This file documents what a Workers-based deployment WOULD look like,
+# but Cloudflare Pages is the correct approach for SEO and cost reasons.
+
+name = "mypasswordchecker-main"
+compatibility_date = "2025-12-26"
+account_id = "be1ad24bfb43615483c3a472aa134892"
+
+# NOTE: If using Workers Sites (NOT RECOMMENDED for this project)
+# Use Cloudflare Pages instead for better SEO and no CPU costs
+# [site]
+# bucket = "./public"
+
+# Main domain route (if using Workers - NOT RECOMMENDED)
+# [[routes]]
+# pattern = "mypasswordchecker.com/*"
+# zone_name = "mypasswordchecker.com"
+
+[vars]
+ENVIRONMENT = "production"
+
+# ============================================================================
+# CORRECT DEPLOYMENT: Use Cloudflare Pages
+# ============================================================================
+#
+# Command:
+#   cd "/Users/jack/Projects - Xcode/MyPasswordChecker.com"
+#   npx wrangler pages deploy public --project-name=mypasswordchecker-main
+#
+# Or via Cloudflare Dashboard:
+#   1. Go to Pages → Create project → Direct Upload
+#   2. Upload /public directory
+#   3. Configure custom domain: mypasswordchecker.com
+#
+# Why Pages instead of Workers?
+#   ✅ Static HTML served directly (no JavaScript execution)
+#   ✅ No Workers CPU time consumed (no overage charges)
+#   ✅ Better SEO (instant HTML delivery)
+#   ✅ Faster page loads (edge caching)
+#   ✅ This is what Nov 10 backup used (proven working)
+#
+# ============================================================================
+
+# API Worker Configuration (SEPARATE - Already Deployed)
+# The API worker handles /api/* routes only
+# See: /mypasswordchecker/wrangler.toml for API worker config
+# Deploy separately using the Nov 10 backup worker code
+
+# ============================================================================
+# Reference: Nov 10 Working Architecture
+# ============================================================================
+#
+# ┌─────────────────────────────────────────┐
+# │   Cloudflare Pages (Static HTML)        │
+# │   - Serves /public directory            │
+# │   - Routes: /*                          │
+# │   - NO Workers CPU time                 │
+# └─────────────────────────────────────────┘
+#                    +
+# ┌─────────────────────────────────────────┐
+# │   API Worker (api-d1.js)                │
+# │   - Routes: /api/* only                 │
+# │   - Handles API logic                   │
+# │   - D1 database                         │
+# └─────────────────────────────────────────┘
+#
+# This two-tier architecture kept costs low and SEO strong.
+#
+# ============================================================================

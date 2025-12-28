@@ -1,0 +1,42 @@
+# File Path: /Users/jack/Projects - Xcode/MyPasswordChecker.com/workers/wrangler-bot-protection.toml
+# Action: NEW FILE
+# Purpose: Deploy bot-protection.js to mypasswordchecker.com workers
+# 
+# This configuration file sets up the bot protection worker with required KV namespaces
+
+name = "mypasswordchecker-bot-protection"
+main = "bot-protection.js"
+compatibility_date = "2024-12-26"
+
+# Your Cloudflare account (use new SkypathwaysAccount)
+account_id = "be1ad24bfb43615483c3a472aa134892"
+
+# KV Namespaces for rate limiting and logging
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "CREATE_NEW_KV_NAMESPACE"  # Replace with actual KV namespace ID
+
+[[kv_namespaces]]
+binding = "BOT_LOGS_KV"
+id = "CREATE_NEW_KV_NAMESPACE"  # Replace with actual KV namespace ID
+
+# Routes - Apply to all mypasswordchecker domains
+[[routes]]
+pattern = "mypasswordchecker.com/*"
+zone_name = "mypasswordchecker.com"
+
+[[routes]]
+pattern = "mypasswordcheck.com/*"
+zone_name = "mypasswordcheck.com"
+
+[[routes]]
+pattern = "myquantumpasswordchecker.com/*"
+zone_name = "myquantumpasswordchecker.com"
+
+[[routes]]
+pattern = "quantumpasswordchecker.com/*"
+zone_name = "quantumpasswordchecker.com"
+
+# Environment variables (optional)
+[vars]
+ENVIRONMENT = "production"

@@ -1,0 +1,57 @@
+Element,Nov_10_Working,Current_Status,Notes
+Title_Homepage,"Password Strength Checker - Test Against Quantum Computing | Free Tool",TBD_after_deployment,"Character count: 75 chars (acceptable, slightly long)"
+Title_Premium,"Quantum Estimate - MyPasswordChecker.com",TBD_after_deployment,"Character count: 43 chars (good)"
+Title_FreeChecker,TBD_need_to_extract,TBD_after_deployment,Need to read free-password-checker.html
+Title_PasswordAPI,TBD_need_to_extract,TBD_after_deployment,Need to read password-api.html
+Title_About,TBD_need_to_extract,TBD_after_deployment,Need to read about.html
+Desc_Homepage,"Free password strength checker - test your password against quantum computers, check data breaches, and calculate crack times. Instant analysis with entropy calculation and security recommendations.",TBD_after_deployment,"Character count: 205 chars (good, comprehensive)"
+Desc_Premium,"Quantum resistance estimate for your password - theoretical crack time analysis using Grover's algorithm",TBD_after_deployment,"Character count: 106 chars (good)"
+Desc_FreeChecker,TBD_need_to_extract,TBD_after_deployment,Need to read free-password-checker.html
+Desc_PasswordAPI,TBD_need_to_extract,TBD_after_deployment,Need to read password-api.html
+Desc_About,TBD_need_to_extract,TBD_after_deployment,Need to read about.html
+H1_Homepage,"How Strong Is Your Password?",TBD_after_deployment,Single H1 (SEO best practice)
+H1_Premium,TBD_need_to_extract,TBD_after_deployment,Check premium.html H1
+H1_FreeChecker,TBD_need_to_extract,TBD_after_deployment,Check free-password-checker.html H1
+Canonical_Homepage,https://mypasswordchecker.com/,TBD_after_deployment,Correct canonical URL
+Canonical_Premium,https://mypasswordchecker.com/premium.html,TBD_after_deployment,Correct canonical URL
+Canonical_FreeChecker,TBD_need_to_extract,TBD_after_deployment,Expected: https://mypasswordchecker.com/free-password-checker.html
+Canonical_PasswordAPI,TBD_need_to_extract,TBD_after_deployment,Expected: https://mypasswordchecker.com/password-api.html
+Robots_txt_Line1,"# MyPasswordChecker.com - Robots.txt",TBD_after_deployment,First line of robots.txt
+Robots_txt_Line4,"User-agent: *",TBD_after_deployment,Allows all crawlers
+Robots_txt_Line5,"Allow: /",TBD_after_deployment,Allows crawling of all pages
+Robots_txt_Line8,"Sitemap: https://mypasswordchecker.com/sitemap.xml",TBD_after_deployment,Sitemap declaration present
+Robots_txt_Crawl_delay,"Crawl-delay: 1",TBD_after_deployment,Polite 1-second crawl delay
+Robots_txt_Allows_Googlebot,Yes,TBD_after_deployment,"Explicit Googlebot Allow: / at line 14-15"
+Robots_txt_Allows_Bingbot,Yes,TBD_after_deployment,"Explicit Bingbot Allow: / at line 17-18"
+Robots_txt_Disallows_Dashboard,Yes,TBD_after_deployment,"Disallow: /dashboard.html at line 33"
+Robots_txt_Disallows_Premium,Yes,TBD_after_deployment,"Disallow: /premium.html at line 35"
+Sitemap_xml_Total_URLs,11,TBD_after_deployment,"11 public pages listed in sitemap"
+Sitemap_xml_Homepage_Priority,1.0,TBD_after_deployment,Highest priority for homepage
+Sitemap_xml_FreeChecker_Priority,0.9,TBD_after_deployment,High priority for landing page
+Sitemap_xml_PasswordAPI_Priority,0.9,TBD_after_deployment,High priority for API page
+Sitemap_xml_Includes_Homepage,Yes,TBD_after_deployment,https://mypasswordchecker.com/
+Sitemap_xml_Includes_FreeChecker,Yes,TBD_after_deployment,https://mypasswordchecker.com/free-password-checker.html
+Sitemap_xml_Includes_PasswordAPI,Yes,TBD_after_deployment,https://mypasswordchecker.com/password-api.html
+Sitemap_xml_Excludes_Dashboard,Yes,TBD_after_deployment,dashboard.html NOT in sitemap (user-specific page)
+Sitemap_xml_Excludes_Premium_Note,Yes,TBD_after_deployment,"Comment line 26: premium.html is a payment success page, excluded"
+Meta_robots_homepage,"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",TBD_after_deployment,Full indexing enabled
+Meta_robots_premium,"index, follow",TBD_after_deployment,"Present in HTML but overridden by robots.txt Disallow"
+Meta_noindex_homepage,No,TBD_after_deployment,NO noindex tag (allows indexing)
+Meta_noindex_premium,No,TBD_after_deployment,NO noindex tag in meta (but disallowed in robots.txt)
+OG_title_homepage,"Quantum Password Checker + Phonetic Generator + PQ Crypto | MyPasswordChecker",TBD_after_deployment,"82 chars (good for social)"
+OG_description_homepage,"Free quantum-resistant password checker with phonetic generator, Grover algorithm analysis, and post-quantum crypto tools (Kyber-512, Dilithium). 100% client-side, privacy-first.",TBD_after_deployment,"177 chars (good for social)"
+OG_image_homepage,https://mypasswordchecker.com/og-image.png,TBD_after_deployment,Social sharing image present
+OG_image_width,1200,TBD_after_deployment,Correct width for Open Graph
+OG_image_height,630,TBD_after_deployment,Correct height for Open Graph
+Twitter_card_homepage,summary_large_image,TBD_after_deployment,Large image card (best for engagement)
+Schema_WebApplication,Present,TBD_after_deployment,Lines 41-117 in index.html
+Schema_FAQPage,Present,TBD_after_deployment,"Lines 120-175 in index.html, 6 questions"
+H1_count_homepage,1,TBD_after_deployment,Single H1 (SEO best practice)
+H2_count_homepage,3,TBD_after_deployment,"Premium section, How It Works, FAQ"
+H3_count_homepage,9,TBD_after_deployment,"3 features + 6 FAQ questions"
+Heading_hierarchy_correct,Yes,TBD_after_deployment,No skipped levels (H1 -> H2 -> H3 -> H4)
+Charset_UTF8,Yes,TBD_after_deployment,"<meta charset=""UTF-8"">"
+Viewport_meta,Yes,TBD_after_deployment,"<meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">"
+Language_attribute,"en",TBD_after_deployment,"<html lang=""en"">"
+CSS_external,/css/styles.css?v=1,TBD_after_deployment,Single external stylesheet with cache-busting
+Favicon_present,Yes,TBD_after_deployment,SVG emoji favicon (🔐)

@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2025-12-27T07:25:47.001Z",
+  "analysisPeriod": {
+    "days": 30,
+    "startDate": "2025-11-27T07:25:47.001Z",
+    "endDate": "2025-12-27T07:25:47.001Z"
+  },
+  "accountId": "ee34e44964865d1bccb86107d578c55a",
+  "summary": {
+    "totalCPUms": 89.22015725,
+    "totalRequests": 49181,
+    "totalErrors": 0,
+    "avgCPUPerRequest": 0.0018141184044651389,
+    "monthlyProjection": 89.22015725,
+    "freeTierLimit": 15000,
+    "overage": 0,
+    "withinLimits": true
+  },
+  "byWorker": [
+    {
+      "name": "mypasswordchecker-api",
+      "cpuMs": 89.22015725,
+      "requests": 49181,
+      "avgMs": 0.0018141184044651389,
+      "errors": 0,
+      "errorRate": 0,
+      "subrequests": 0,
+      "percentOfTotal": 100
+    }
+  ],
+  "optimizationRecommendations": [
+    {
+      "title": "Implement Cloudflare Cache API",
+      "priority": "HIGH",
+      "description": "Cache frequently accessed data to reduce CPU-intensive operations. Even short-lived caches (1-5 minutes) can significantly reduce CPU usage.",
+      "potentialSavings": "Could reduce CPU by 30-50% for cacheable content"
+    }
+  ]
+}

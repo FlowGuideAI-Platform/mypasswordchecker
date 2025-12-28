@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free password strength checker - test your password against quantum computers, check data breaches, and calculate crack times. Instant analysis with entropy calculation and security recommendations.">
+    <meta name="keywords" content="password strength checker, password checker, password tester, check password strength, how strong is my password, password strength test, quantum password checker, password breach check, password entropy calculator, quantum computing security">
+    <title>Password Strength Checker - Test Against Quantum Computing | Free Tool</title>
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:title" content="Quantum Password Checker + Phonetic Generator + PQ Crypto | MyPasswordChecker">
+    <meta property="og:description" content="Free quantum-resistant password checker with phonetic generator, Grover algorithm analysis, and post-quantum crypto tools (Kyber-512, Dilithium). 100% client-side, privacy-first.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mypasswordchecker.com/">
+    <meta property="og:image" content="https://mypasswordchecker.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="MyPasswordChecker.com - Password Strength & Quantum Resistance Analyzer">
+    <meta property="og:site_name" content="MyPasswordChecker.com">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Quantum Password Checker + Phonetic Generator + PQ Crypto">
+    <meta name="twitter:description" content="Free quantum-resistant password checker with phonetic generator, Grover analysis, and post-quantum crypto (Kyber-512, Dilithium). Privacy-first, client-side.">
+    <meta name="twitter:image" content="https://mypasswordchecker.com/og-image.png">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://mypasswordchecker.com/">
+
+    <!-- SEO & AI Agent Meta -->
+    <meta name="author" content="MyPasswordChecker.com">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+
+    <link rel="stylesheet" href="/css/styles.css?v=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+
+
+    <!-- Schema.org Structured Data for AI Agents & Search Engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "MyPasswordChecker.com",
+      "alternateName": "My Password Checker",
+      "description": "Free password strength checker with quantum computing resistance estimates. Client-side processing ensures your password never leaves your browser.",
+      "url": "https://mypasswordchecker.com",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Any (Web-based)",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "USD",
+        "lowPrice": "0",
+        "highPrice": "49",
+        "offerCount": "3",
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Free Plan",
+            "description": "25 password checks per month",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          {
+            "@type": "Offer",
+            "name": "Standard Plan",
+            "description": "12,000 password checks + 100 quantum estimates per month",
+            "price": "19",
+            "priceCurrency": "USD",
+            "billingDuration": "P1M"
+          },
+          {
+            "@type": "Offer",
+            "name": "Quantum Plan",
+            "description": "25,000 password checks + 5,000 quantum estimates per month",
+            "price": "49",
+            "priceCurrency": "USD",
+            "billingDuration": "P1M"
+          }
+        ]
+      },
+      "featureList": [
+        "Password strength analysis using zxcvbn",
+        "Quantum computing resistance estimates (Grover's algorithm)",
+        "Client-side processing (privacy-focused)",
+        "RESTful API for developers",
+        "Domain verification for fraud prevention",
+        "Rate limiting and usage tracking",
+        "Classical crack time estimation",
+        "Entropy calculation"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "All Aligned Consulting LLC",
+        "alternateName": "MyPasswordChecker",
+        "url": "https://mypasswordchecker.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "CA",
+          "addressCountry": "US"
+        }
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "All Aligned Consulting LLC",
+        "alternateName": "MyPasswordChecker",
+        "url": "https://mypasswordchecker.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "CA",
+          "addressCountry": "US"
+        }
+      }
+    }
+    </script>
+
+    <!-- FAQ Schema Markup for Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is my password strong enough?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A strong password should have at least 12 characters, include a mix of uppercase, lowercase, numbers, and symbols, and avoid common words or patterns. Our free checker analyzes your password using the zxcvbn algorithm (developed by Dropbox) to detect weak patterns. For quantum resistance, aim for 80+ bits of entropy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do hackers crack passwords?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hackers use several methods: (1) Dictionary attacks - trying common words and passwords, (2) Brute force - trying every possible combination using powerful GPUs, (3) Rainbow tables - pre-computed hashes of common passwords, and (4) Credential stuffing - using passwords leaked from other breaches. Modern GPUs can try billions of password combinations per second."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What makes a password quantum resistant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Quantum computers using Grover's algorithm can crack passwords twice as fast (effectively halving the bits of security). A password with 80 bits of classical security becomes 40 bits against quantum attacks. To be quantum-resistant, you need at least 80 bits of quantum security, which means 160+ bits classically - typically requiring 25+ random characters or a long passphrase (6+ random words)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long would it take to crack my password?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Crack time depends on password complexity and the attacker's hardware. A modern GPU can try ~10 billion passwords/second. A simple 8-character password with only letters and numbers can be cracked in minutes. However, a 16-character password with mixed case, numbers, and symbols would take thousands of years. Our tool calculates both classical (GPU) and quantum (Grover's algorithm) crack time estimates."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this password checker safe to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Your password never leaves your browser. All analysis runs client-side using JavaScript - we never transmit, store, or log your password. You can even disconnect from the internet and the tool will still work. For extra peace of mind, you can inspect the source code or test with a similar (but not identical) password."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is password entropy?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Entropy measures password randomness in bits. Each bit doubles the number of possible combinations. For example, 40 bits = 1 trillion possibilities, 60 bits = 1 quintillion. Higher entropy = stronger password. Aim for 60+ bits for good security, 80+ for excellent security, and 100+ for quantum resistance."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
+                <nav class="nav">
+                    <a href="/">Password Checker</a>
+                    <a href="/free-password-checker.html">Free Tool</a>
+                    <a href="/password-api.html">Developer API</a>
+                    <a href="/about.html">About</a>
+                    <a href="/pricing.html">Pricing</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="quantum-badge">✨ Now with Optional Quantum Resistance Estimates</div>
+                <h1>How Strong Is Your Password?</h1>
+                <p>Test your password strength for free. Upgrade to see estimated crack times against quantum computing attacks. All checks run in your browser - we never see your password.</p>
+            </section>
+
+            <!-- Affiliate Links Section -->
+            <section class="affiliate-section">
+                <div class="affiliate-title">🔒 Recommended Security Tools</div>
+                <div class="affiliate-links" id="affiliate-links-container">
+                    <!-- Affiliate links loaded from ads-config.js -->
+                </div>
+            </section>
+
+            <!-- Password Checker -->
+            <div class="checker-card">
+                <div class="input-group">
+                    <label for="password-input">Enter Your Password</label>
+                    <div class="password-input-wrapper">
+                        <input
+                            type="password"
+                            id="password-input"
+                            class="password-input"
+                            placeholder="Type your password here..."
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button type="button" class="toggle-visibility" id="toggle-btn" aria-label="Toggle password visibility">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Strength Meter -->
+                <div class="strength-meter" id="strength-meter" style="display: none;">
+                    <div class="strength-bar-container">
+                        <div class="strength-bar" id="strength-bar"></div>
+                    </div>
+                    <div class="strength-label" id="strength-label"></div>
+                </div>
+
+                <!-- Classical Crack Time Display -->
+                <div class="crack-time-display" id="crack-time-display" style="display: none;">
+                    <h3>🖥️ Classical Computing Crack Time</h3>
+                    <p>Estimated time to crack with modern GPUs:</p>
+                    <p class="crack-time-value" id="classical-time">-</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+                        <strong>Entropy:</strong> <span id="entropy-bits">-</span> bits
+                    </p>
+                    <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.8; font-style: italic;">
+                        Entropy measures randomness/unpredictability. Higher entropy = harder to guess. Each bit doubles the difficulty.
+                    </p>
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedback-section" style="display: none; margin-top: 1rem;">
+                    <div class="alert alert-info" id="feedback-warning"></div>
+                    <div id="feedback-suggestions"></div>
+                </div>
+            </div>
+
+            <!-- Premium Features CTA -->
+            <section class="quantum-cta">
+                <h2>🔮 Premium: Quantum Analysis + Password Generator + Breach Check</h2>
+                <p>Get detailed quantum resistance estimates, generate quantum-resistant passwords from memorable phrases, AND check if your password appears in 800+ million known breaches.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0; font-size: 0.9rem;">
+                    <div>
+                        <strong>✓ Quantum Crack Time Analysis</strong><br>
+                        <span style="opacity: 0.9;">Theoretical estimates using Grover's algorithm</span>
+                    </div>
+                    <div>
+                        <strong>✓ Phonetic Password Generator</strong><br>
+                        <span style="opacity: 0.9;">Turn phrases into quantum-resistant passwords</span>
+                    </div>
+                    <div>
+                        <strong>✓ Password Breach Check</strong><br>
+                        <span style="opacity: 0.9;">Check 800M+ breached passwords (HIBP)</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; opacity: 0.9; margin-top: -0.5rem;">
+                    <em>All included for just $1.00 - pay once, use all three tools!</em>
+                </p>
+                <button class="btn" onclick="window.location.href='/premium.html'" style="color: #dc2626; font-weight: 600;">
+                    Try Premium Tools - $1.00
+                </button>
+            </section>
+
+            <!-- Ad Section - Two Ads Side by Side -->
+            <section class="ad-section">
+                <div class="ad-slots">
+                    <div class="ad-slot-banner" id="index-ad-banner-1">
+                        <!-- Ad loaded from ads-config.js -->
+                    </div>
+                    <div class="ad-slot-banner" id="index-ad-banner-2">
+                        <!-- Ad loaded from ads-config.js -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section style="background: white; padding: 2rem; border-radius: 0.75rem; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">How It Works</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">🔒 100% Private</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Your password never leaves your browser. All analysis runs client-side using JavaScript.</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">🧮 Smart Analysis</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Uses an open-source library to detect patterns, common passwords, and calculate entropy.</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">⚛️ Quantum Estimates</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Premium feature provides theoretical quantum resistance estimates using Grover's algorithm modeling.</p>
+                        <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem; font-style: italic; opacity: 0.8;">⚠️ Note: Large-scale quantum computers don't yet exist. These are theoretical estimates for future-proofing, not current threats.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section with Schema Markup -->
+            <section style="background: white; padding: 2rem; border-radius: 0.75rem; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
+
+                <div style="display: grid; gap: 1.5rem;">
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">Is my password strong enough?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">A strong password should have at least 12 characters, include a mix of uppercase, lowercase, numbers, and symbols, and avoid common words or patterns. Our free checker analyzes your password using the zxcvbn algorithm (developed by Dropbox) to detect weak patterns. For quantum resistance, aim for 80+ bits of entropy.</p>
+                    </div>
+
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">How do hackers crack passwords?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Hackers use several methods: (1) <strong>Dictionary attacks</strong> - trying common words and passwords, (2) <strong>Brute force</strong> - trying every possible combination using powerful GPUs, (3) <strong>Rainbow tables</strong> - pre-computed hashes of common passwords, and (4) <strong>Credential stuffing</strong> - using passwords leaked from other breaches. Modern GPUs can try billions of password combinations per second.</p>
+                    </div>
+
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">What makes a password quantum resistant?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Quantum computers using Grover's algorithm can crack passwords twice as fast (effectively halving the bits of security). A password with 80 bits of classical security becomes 40 bits against quantum attacks. To be quantum-resistant, you need at least 80 bits of <em>quantum</em> security, which means 160+ bits classically - typically requiring 25+ random characters or a long passphrase (6+ random words).</p>
+                    </div>
+
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">How long would it take to crack my password?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Crack time depends on password complexity and the attacker's hardware. A modern GPU can try ~10 billion passwords/second. A simple 8-character password with only letters and numbers can be cracked in minutes. However, a 16-character password with mixed case, numbers, and symbols would take thousands of years. Our tool calculates both classical (GPU) and quantum (Grover's algorithm) crack time estimates.</p>
+                    </div>
+
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">Is this password checker safe to use?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Yes! Your password <strong>never leaves your browser</strong>. All analysis runs client-side using JavaScript - we never transmit, store, or log your password. You can even disconnect from the internet and the tool will still work. For extra peace of mind, you can inspect the source code or test with a similar (but not identical) password.</p>
+                    </div>
+
+                    <div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">What is password entropy?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Entropy measures password randomness in bits. Each bit doubles the number of possible combinations. For example, 40 bits = 1 trillion possibilities, 60 bits = 1 quintillion. Higher entropy = stronger password. Aim for 60+ bits for good security, 80+ for excellent security, and 100+ for quantum resistance.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>MyPasswordChecker.com</h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="/">Password Checker</a></li>
+                        <li><a href="/premium.html">Quantum Estimate</a></li>
+                        <li><a href="/api-docs.html">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacy.html">Privacy Policy</a></li>
+                        <li><a href="/terms.html">Terms of Service</a></li>
+                        <li><a href="/disclaimer.html">Quantum Estimate Disclaimer</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developer</h4>
+                    <ul>
+                        <li><a href="/dashboard.html">Dashboard</a></li>
+                        <li><a href="/pricing.html">API Pricing</a></li>
+                        <li><a href="/api-docs.html">Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy.html" style="color: inherit;">Privacy</a> | <a href="/terms.html" style="color: inherit;">Terms</a></p>
+                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
+                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
+                    This service is also available at:
+                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
+                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
+                </p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+    <script src="/js/quantum-estimator.js?v=2"></script>
+    <script src="/js/ads-config.js?v=4"></script>
+    <script>
+        // Load affiliate links and ads on page load
+        window.addEventListener('load', () => {
+            renderAffiliateLinks('affiliate-links-container');
+            renderAdSlot('index-ad-banner-1', '300x250');
+            renderAdSlot('index-ad-banner-2', '300x250');
+        });
+    </script>
+    <script>
+        // Password input handling
+        const passwordInput = document.getElementById('password-input');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const strengthMeter = document.getElementById('strength-meter');
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthLabel = document.getElementById('strength-label');
+        const crackTimeDisplay = document.getElementById('crack-time-display');
+        const classicalTime = document.getElementById('classical-time');
+        const entropyBits = document.getElementById('entropy-bits');
+        const feedbackSection = document.getElementById('feedback-section');
+        const feedbackWarning = document.getElementById('feedback-warning');
+        const feedbackSuggestions = document.getElementById('feedback-suggestions');
+
+        // Toggle password visibility
+        toggleBtn.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            toggleBtn.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // Analyze password on input
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+
+            if (password.length === 0) {
+                strengthMeter.style.display = 'none';
+                crackTimeDisplay.style.display = 'none';
+                feedbackSection.style.display = 'none';
+                return;
+            }
+
+            // Get analysis
+            const result = QuantumEstimator.estimateTimes(password);
+            const indicator = QuantumEstimator.getStrengthIndicator(result.zxcvbn.score);
+
+            // Update strength meter
+            strengthMeter.style.display = 'block';
+            strengthBar.style.width = indicator.width;
+            strengthBar.style.backgroundColor = indicator.color;
+            strengthLabel.textContent = indicator.label;
+            strengthLabel.style.color = indicator.color;
+
+            // Update crack time display with technical notation if available
+            crackTimeDisplay.style.display = 'block';
+            const humanLabel = result.classical.human.label;
+            const technicalLabel = result.classical.human.technical;
+            classicalTime.innerHTML = technicalLabel
+                ? `${humanLabel}<br><span style="font-size: 0.85em; opacity: 0.7;">(${technicalLabel})</span>`
+                : humanLabel;
+            entropyBits.textContent = result.bits.toFixed(1);
+
+            // Update feedback
+            if (result.zxcvbn.feedback.warning || result.zxcvbn.feedback.suggestions) {
+                feedbackSection.style.display = 'block';
+
+                if (result.zxcvbn.feedback.warning) {
+                    feedbackWarning.style.display = 'block';
+                    feedbackWarning.textContent = '⚠️ ' + result.zxcvbn.feedback.warning;
+                } else {
+                    feedbackWarning.style.display = 'none';
+                }
+
+                if (result.zxcvbn.feedback.suggestions && result.zxcvbn.feedback.suggestions.length > 0) {
+                    feedbackSuggestions.innerHTML = '<p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>Suggestions:</strong></p><ul style="margin-left: 1.5rem; font-size: 0.875rem;">' +
+                        result.zxcvbn.feedback.suggestions.map(s => '<li>' + s + '</li>').join('') +
+                        '</ul>';
+                } else {
+                    feedbackSuggestions.innerHTML = '';
+                }
+            } else {
+                feedbackSection.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html>

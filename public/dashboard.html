@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Developer dashboard for MyPasswordChecker.com API - manage API keys and view usage statistics">
+    <title>Developer Dashboard - MyPasswordChecker.com</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
+                <nav class="nav">
+                    <a href="/">Password Checker</a>
+                    <a href="/free-password-checker.html">Free Tool</a>
+                    <a href="/password-api.html">Developer API</a>
+                    <a href="/docs.html">Docs</a>
+                    <a href="/pricing.html">Pricing</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 style="margin-bottom: 2rem;">Developer Dashboard</h1>
+
+            <!-- Registration/Login Section -->
+            <div id="auth-section" class="checker-card" style="max-width: 600px; margin: 0 auto 2rem;">
+                <h2 style="margin-bottom: 1rem;">Get Started with API Access</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Sign in to receive your API key and start using MyPasswordChecker.com API.
+                </p>
+
+                <!-- GitHub Login Button -->
+                <a href="/api/auth/github" class="btn btn-primary" style="width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    Sign in with GitHub
+                </a>
+
+                <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;">
+                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+                    <span style="color: var(--text-secondary); font-size: 0.875rem;">or</span>
+                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="password-input" placeholder="your@email.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="name">Name (Optional)</label>
+                    <input type="text" id="name" class="password-input" placeholder="Your Name">
+                </div>
+
+                <button class="btn btn-secondary" style="width: 100%;" onclick="registerAccount()">
+                    Register with Email
+                </button>
+
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                        Already have an API key? <a href="#" onclick="showApiKeyInput(); return false;" style="color: var(--primary-color);">Enter it here</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- API Key Input Section (Hidden by default) -->
+            <div id="api-key-input-section" class="checker-card" style="max-width: 600px; margin: 0 auto 2rem; display: none;">
+                <h2 style="margin-bottom: 1rem;">Enter Your API Key</h2>
+
+                <div class="input-group">
+                    <label for="existing-api-key">API Key</label>
+                    <input type="text" id="existing-api-key" class="password-input" placeholder="pk_...">
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="loadDashboard()">
+                    Load Dashboard
+                </button>
+
+                <div style="margin-top: 1rem;">
+                    <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                        <a href="#" onclick="showRegistration(); return false;" style="color: var(--primary-color);">← Back to registration</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Dashboard Content (Hidden until API key loaded) -->
+            <div id="dashboard-content" style="display: none;">
+                <!-- Onboarding Banner for New Subscribers (Hidden by default) -->
+                <div id="onboarding-banner" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                    <h3 style="margin: 0 0 0.5rem 0; color: white;">🎉 Welcome! Your subscription is active</h3>
+                    <p style="margin: 0 0 1rem 0; opacity: 0.95;">To start using the API, you need to verify your domain. This prevents unauthorized use of your API key.</p>
+                    <a href="/domains.html" class="btn" style="background: white; color: #667eea; border: none; display: inline-block; text-decoration: none;">
+                        🔐 Verify Your Domain Now
+                    </a>
+                    <button onclick="document.getElementById('onboarding-banner').style.display='none'" style="margin-left: 1rem; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
+                        Dismiss
+                    </button>
+                </div>
+
+                <!-- API Key Display -->
+                <div class="checker-card" style="margin-bottom: 2rem;">
+                    <h2 style="margin-bottom: 1rem;">🔑 Your API Key</h2>
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 0.5rem; font-family: 'Courier New', monospace; word-break: break-all; margin-bottom: 1rem;">
+                        <span id="display-api-key">pk_...</span>
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Keep this secret!</strong> Your API key grants access to your account. Never share it publicly or commit it to version control.
+                    </div>
+                    <button class="btn btn-secondary" onclick="copyApiKey()" style="margin-top: 1rem;">
+                        📋 Copy to Clipboard
+                    </button>
+                </div>
+
+                <!-- Current Plan -->
+                <div class="checker-card" style="margin-bottom: 2rem;">
+                    <h2 style="margin-bottom: 1rem;">📊 Current Plan</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Plan</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);" id="current-plan">Free</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Monthly Cost</div>
+                            <div style="font-size: 1.5rem; font-weight: 700;" id="monthly-cost">$0</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button id="btn-standard" class="btn btn-primary" onclick="upgradePlan('standard')">
+                            ⬆️ Upgrade to Standard ($12/mo)
+                        </button>
+                        <button id="btn-basic-quantum" class="btn btn-primary" onclick="upgradePlan('basic_quantum')">
+                            ⬆️ Basic Quantum ($29/mo)
+                        </button>
+                        <button id="btn-quantum" class="btn btn-primary" onclick="upgradePlan('standard_quantum')">
+                            ⬆️ Standard Quantum ($49/mo)
+                        </button>
+                        <button id="btn-super-quantum" class="btn btn-primary" onclick="showSuperQuantumOptions()" style="background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);">
+                            ⬆️ Super Quantum
+                        </button>
+                        <button class="btn btn-secondary" onclick="upgradePlan('quantum_single')">
+                            $1 Premium (24hr)
+                        </button>
+                    </div>
+                    <div id="super-quantum-options" style="display: none; margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(30,58,138,0.1) 0%, rgba(49,46,129,0.1) 100%); border-radius: 0.5rem; border: 2px solid #1e3a8a;">
+                        <p style="margin-bottom: 1rem; font-weight: 600;">Choose Super Quantum billing:</p>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="upgradePlan('super_quantum_monthly')" style="background: #1e3a8a;">
+                                Monthly - $295/month
+                            </button>
+                            <button class="btn btn-primary" onclick="upgradePlan('super_quantum_annual')" style="background: #312e81;">
+                                Annual - $2,950/year (save $590)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overage Protection Setting -->
+                <div class="checker-card" style="margin-bottom: 2rem;">
+                    <h2 style="margin-bottom: 1rem;">🛡️ Overage Protection</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Control what happens when you exceed your monthly quota.
+                    </p>
+
+                    <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.5rem; border: 2px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span id="overage-status-icon">🔒</span>
+                                    <span id="overage-status-text">Block Overages (Recommended)</span>
+                                </h3>
+                                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;" id="overage-status-description">
+                                    API stops serving requests when quota is reached. No unexpected charges.
+                                </p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="overage-toggle" onchange="toggleOverageSetting()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div id="overage-warning" class="alert alert-warning" style="display: none; margin-bottom: 0;">
+                            ⚠️ <strong>Warning:</strong> When overage billing is enabled, you will be charged for usage beyond your quota limits.
+                        </div>
+
+                        <div id="overage-blocked-info" class="alert alert-info" style="display: none; margin-bottom: 0;">
+                            ℹ️ <strong>Protected:</strong> Your API will stop serving requests when quota limits are reached to prevent overage charges.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Statistics -->
+                <div class="checker-card">
+                    <h2 style="margin-bottom: 1rem;">📈 Usage This Month</h2>
+                    <div id="usage-loading" style="text-align: center; padding: 2rem;">
+                        <div class="loading"></div>
+                        <p style="margin-top: 1rem; color: var(--text-secondary);">Loading usage data...</p>
+                    </div>
+
+                    <div id="usage-data" style="display: none;">
+                        <!-- Tier 1 Usage -->
+                        <div style="margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h3 style="font-size: 1.125rem;">Tier 1: Password Checker</h3>
+                                <span style="font-weight: 600; color: var(--text-secondary);">
+                                    <span id="tier1-used">0</span> / <span id="tier1-quota">50</span>
+                                </span>
+                            </div>
+                            <div class="strength-bar-container" style="height: 1rem;">
+                                <div class="strength-bar" id="tier1-bar" style="background: var(--primary-color);"></div>
+                            </div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <span id="tier1-remaining">50</span> requests remaining
+                            </p>
+                        </div>
+
+                        <!-- Tier 2 Usage -->
+                        <div style="margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h3 style="font-size: 1.125rem;">Tier 2: Quantum Estimate</h3>
+                                <span style="font-weight: 600; color: var(--text-secondary);">
+                                    <span id="tier2-used">0</span> / <span id="tier2-quota">0</span>
+                                </span>
+                            </div>
+                            <div class="strength-bar-container" style="height: 1rem;">
+                                <div class="strength-bar" id="tier2-bar" style="background: #7c3aed;"></div>
+                            </div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <span id="tier2-status">Upgrade to access Tier 2</span>
+                            </p>
+                        </div>
+
+                        <!-- Tier 3 Usage -->
+                        <div style="margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h3 style="font-size: 1.125rem;">Tier 3: Phonetic Password Generator</h3>
+                                <span style="font-weight: 600; color: var(--text-secondary);">
+                                    <span id="tier3-used">0</span> / <span id="tier3-quota">0</span>
+                                </span>
+                            </div>
+                            <div class="strength-bar-container" style="height: 1rem;">
+                                <div class="strength-bar" id="tier3-bar" style="background: #10b981;"></div>
+                            </div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <span id="tier3-status">Upgrade to access Tier 3</span>
+                            </p>
+                        </div>
+
+                        <!-- Tier 4 Usage: Breach Check -->
+                        <div style="margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h3 style="font-size: 1.125rem;">🔍 Breach Check (HIBP)</h3>
+                                <span style="font-weight: 600; color: var(--text-secondary);">
+                                    <span id="breach-used">0</span> / <span id="breach-quota">0</span>
+                                </span>
+                            </div>
+                            <div class="strength-bar-container" style="height: 1rem;">
+                                <div class="strength-bar" id="breach-bar" style="background: #f59e0b;"></div>
+                            </div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <span id="breach-status">Checking breach database access...</span>
+                            </p>
+                        </div>
+
+                        <div class="alert alert-info">
+                            ℹ️ Usage resets on the 1st of each month. Current period: <strong id="current-month">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Panel for Domain Mismatch Alerts (Only for admin) -->
+                <div id="admin-panel-section" class="checker-card" style="margin-top: 2rem; display: none;">
+                    <h2 style="margin-bottom: 1rem;">⚠️ Admin Panel - Security Alerts</h2>
+
+                    <!-- Domain Mismatch Alerts -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Domain Mismatch Alerts</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.875rem;">
+                            Tracks API keys used from unexpected domains (potential theft or unauthorized sharing).
+                        </p>
+                        <div id="admin-alerts-loading" style="text-align: center; padding: 2rem;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 1rem; color: var(--text-secondary);">Loading security alerts...</p>
+                        </div>
+                        <div id="admin-alerts-data" style="display: none;"></div>
+                    </div>
+
+                    <!-- Unverified Email Users -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Unverified Email Users</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.875rem;">
+                            API users who haven't verified their email addresses yet.
+                        </p>
+                        <div id="admin-unverified-loading" style="text-align: center; padding: 2rem;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 1rem; color: var(--text-secondary);">Loading unverified users...</p>
+                        </div>
+                        <div id="admin-unverified-data" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Domain and Email Verification (Only for Quantum Tiers) -->
+                <div id="domain-verification-section" class="checker-card" style="margin-top: 2rem; display: none;">
+                    <h2 style="margin-bottom: 1rem;">🔐 Domain and Email Verification</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Quantum tier plans require domain verification to use the API. This prevents unauthorized use of your API key.
+                    </p>
+
+                    <div id="verified-domains" style="margin-bottom: 1.5rem;"></div>
+
+                    <div id="add-domain-form" style="display: none; background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem;">Add New Domain</h3>
+                        <input type="text" id="new-domain-input" placeholder="example.com" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem; margin-bottom: 1rem;">
+
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification Method:</label>
+                            <select id="verification-method" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem;">
+                                <option value="dns">DNS TXT Record (Recommended)</option>
+                                <option value="http">HTTP File Upload</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="addDomain()">Generate Verification Token</button>
+                            <button class="btn btn-secondary" onclick="cancelAddDomain()">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div id="verification-instructions" style="display: none; background: #fef3c7; border-left: 3px solid #f59e0b; padding: 1rem; border-radius: 0.25rem; margin-bottom: 1.5rem;">
+                        <h3 style="margin-bottom: 0.5rem;">Verification Instructions</h3>
+                        <div id="dns-instructions" style="display: none;">
+                            <p style="margin-bottom: 0.5rem;"><strong>Domain:</strong> <span id="verifying-domain"></span></p>
+                            <p style="margin-bottom: 0.5rem;"><strong>Add this TXT record to your DNS:</strong></p>
+                            <div style="background: white; padding: 0.75rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; margin-bottom: 0.5rem;">
+                                <strong>Name:</strong> _mypasswordchecker<br>
+                                <strong>Value:</strong> <span id="verification-token" style="word-break: break-all;"></span>
+                            </div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                                Note: Some DNS providers require the full name <code>_mypasswordchecker.yourdomain.com</code>. DNS changes can take up to 48 hours to propagate.
+                            </p>
+                        </div>
+                        <div id="http-instructions" style="display: none;">
+                            <p style="margin-bottom: 0.5rem;"><strong>Domain:</strong> <span id="verifying-domain-http"></span></p>
+                            <p style="margin-bottom: 0.5rem;"><strong>Upload a file with this content:</strong></p>
+                            <div style="background: white; padding: 0.75rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; margin-bottom: 0.5rem;">
+                                <span id="http-verification-token" style="word-break: break-all;"></span>
+                            </div>
+                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>File location:</strong></p>
+                            <div style="background: white; padding: 0.75rem; border-radius: 0.25rem; font-family: 'Courier New', monospace;">
+                                https://<span id="domain-for-file"></span>/.well-known/mypasswordchecker-verification.txt
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="verifyDomain()" style="margin-top: 1rem;">Verify Domain Now</button>
+                    </div>
+
+                    <button id="add-domain-btn" class="btn btn-secondary" onclick="showAddDomainForm()">+ Add Domain</button>
+                </div>
+
+                <!-- Quick Start Guide -->
+                <div class="checker-card" style="margin-top: 2rem;">
+                    <h2 style="margin-bottom: 1rem;">🚀 Quick Start</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Make your first API request:
+                    </p>
+
+                    <div class="code-block">
+curl -X POST https://mypasswordchecker.com/api/v1/check-password \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <span id="code-api-key">YOUR_API_KEY</span>" \
+  -d '{"password":"test123"}'</div>
+
+                    <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                        📚 <a href="/docs.html" style="color: var(--primary-color); font-weight: 600;">Developer Documentation</a> |
+                        <a href="/api-docs.html" style="color: var(--primary-color);">API Reference</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>MyPasswordChecker.com</h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="/">Password Checker</a></li>
+                        <li><a href="/premium.html">Quantum Estimate</a></li>
+                        <li><a href="/api-docs.html">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacy.html">Privacy Policy</a></li>
+                        <li><a href="/terms.html">Terms of Service</a></li>
+                        <li><a href="/disclaimer.html">Quantum Estimate Disclaimer</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developer</h4>
+                    <ul>
+                        <li><a href="/dashboard.html">Dashboard</a></li>
+                        <li><a href="/pricing.html">API Pricing</a></li>
+                        <li><a href="/api-docs.html">Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy.html" style="color: inherit;">Privacy</a> | <a href="/terms.html" style="color: inherit;">Terms</a></p>
+                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
+                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
+                    This service is also available at:
+                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
+                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
+                </p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #10b981;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #dc2626;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #10b981;
+        }
+
+        input:checked:focus + .slider {
+            box-shadow: 0 0 1px #dc2626;
+        }
+    </style>
+
+    <script>
+        let currentApiKey = '';
+
+        // Show/hide sections
+        function showApiKeyInput() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('api-key-input-section').style.display = 'block';
+        }
+
+        function showRegistration() {
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('api-key-input-section').style.display = 'none';
+        }
+
+        // Register new account
+        async function registerAccount() {
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, name })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentApiKey = data.api_key;
+                    localStorage.setItem('mypasswordchecker_api_key', currentApiKey);
+                    showDashboard();
+                } else {
+                    alert('Registration failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration failed. Please try again.');
+            }
+        }
+
+        // Load dashboard with existing API key (Login)
+        async function loadDashboard() {
+            const apiKey = document.getElementById('existing-api-key').value;
+
+            if (!apiKey) {
+                alert('Please enter your API key');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ api_key: apiKey })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Login successful, reload page to show dashboard
+                    window.location.reload();
+                } else {
+                    alert('Login failed: ' + (data.error || 'Invalid API key'));
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+            }
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('api-key-input-section').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'block';
+
+            document.getElementById('display-api-key').textContent = currentApiKey;
+            document.getElementById('code-api-key').textContent = currentApiKey;
+
+            loadUsageData();
+        }
+
+        // Load usage data
+        async function loadUsageData() {
+            document.getElementById('usage-loading').style.display = 'block';
+            document.getElementById('usage-data').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/dashboard/usage', {
+                    credentials: 'include'  // Use session cookie instead of API key
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Update plan
+                    const planNames = {
+                        'free': 'Free',
+                        'standard': 'Standard',
+                        'basic_quantum': 'Basic Quantum',
+                        'quantum_monthly': 'Standard Quantum',
+                        'standard_quantum': 'Standard Quantum',
+                        'super_quantum_monthly': 'Super Quantum (Monthly)',
+                        'super_quantum_annual': 'Super Quantum (Annual)'
+                    };
+                    document.getElementById('current-plan').textContent = planNames[data.plan] || data.plan;
+
+                    const costs = {
+                        'free': '$0',
+                        'standard': '$12',
+                        'basic_quantum': '$29',
+                        'quantum_monthly': '$49',
+                        'standard_quantum': '$49',
+                        'super_quantum_monthly': '$295',
+                        'super_quantum_annual': '$245.83'  // $2950/year = $245.83/month
+                    };
+                    document.getElementById('monthly-cost').textContent = costs[data.plan] || '$0';
+
+                    // Update subscription buttons
+                    const btnStandard = document.getElementById('btn-standard');
+                    const btnQuantum = document.getElementById('btn-quantum');
+                    const btnSuperQuantum = document.getElementById('btn-super-quantum');
+
+                    if (data.plan === 'standard') {
+                        btnStandard.textContent = '✓ Current Plan';
+                        btnStandard.disabled = true;
+                        btnStandard.style.opacity = '0.6';
+                        btnStandard.style.cursor = 'not-allowed';
+                        btnStandard.onclick = null;
+                    } else if (data.plan === 'quantum_monthly') {
+                        btnQuantum.textContent = '✓ Current Plan';
+                        btnQuantum.disabled = true;
+                        btnQuantum.style.opacity = '0.6';
+                        btnQuantum.style.cursor = 'not-allowed';
+                        btnQuantum.onclick = null;
+
+                        // Also disable Standard button (can't downgrade)
+                        btnStandard.textContent = '⬇️ Downgrade to Standard ($19/mo)';
+                    } else if (data.plan === 'super_quantum_monthly' || data.plan === 'super_quantum_annual') {
+                        btnSuperQuantum.textContent = '✓ Current Plan';
+                        btnSuperQuantum.disabled = true;
+                        btnSuperQuantum.style.opacity = '0.6';
+                        btnSuperQuantum.style.cursor = 'not-allowed';
+                        btnSuperQuantum.onclick = null;
+
+                        // Show domain verification requirement message
+                        const domainBanner = document.createElement('div');
+                        domainBanner.style.cssText = 'background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%); color: white; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;';
+                        domainBanner.innerHTML = '<strong>🔐 Domain Verification Required</strong><br>Your Super Quantum plan requires domain verification. Please verify your domain to use the API. Contact <a href="mailto:enterprise@mypasswordchecker.com" style="color: white; text-decoration: underline;">enterprise@mypasswordchecker.com</a> for setup support.';
+                        document.querySelector('.checker-card').prepend(domainBanner);
+                    }
+
+                    // Show domain verification section for all Quantum tiers
+                    const isQuantumTier = data.plan === 'basic_quantum' || data.plan === 'quantum_monthly' || data.plan === 'standard_quantum' || data.plan === 'super_quantum_monthly' || data.plan === 'super_quantum_annual';
+
+                    if (isQuantumTier) {
+                        // Show the domain verification section
+                        document.getElementById('domain-verification-section').style.display = 'block';
+
+                        // Load existing domains
+                        loadDomains();
+                    }
+
+                    // Update Tier 1
+                    document.getElementById('tier1-used').textContent = data.tier1.usage;
+                    document.getElementById('tier1-quota').textContent = data.tier1.quota;
+                    document.getElementById('tier1-remaining').textContent = data.tier1.remaining;
+
+                    const tier1Percent = Math.min(100, (data.tier1.usage / data.tier1.quota) * 100);
+                    document.getElementById('tier1-bar').style.width = tier1Percent + '%';
+
+                    // Update Tier 2
+                    if (data.tier2.quota > 0) {
+                        document.getElementById('tier2-used').textContent = data.tier2.usage;
+                        document.getElementById('tier2-quota').textContent = data.tier2.quota;
+                        document.getElementById('tier2-status').textContent = data.tier2.remaining + ' requests remaining';
+
+                        const tier2Percent = Math.min(100, (data.tier2.usage / data.tier2.quota) * 100);
+                        document.getElementById('tier2-bar').style.width = tier2Percent + '%';
+                    } else {
+                        document.getElementById('tier2-status').innerHTML = '<a href="/pricing.html" style="color: var(--primary-color);">Upgrade to access Tier 2</a>';
+                    }
+
+                    // Update Tier 3
+                    if (data.tier3 && data.tier3.quota > 0) {
+                        document.getElementById('tier3-used').textContent = data.tier3.usage;
+                        document.getElementById('tier3-quota').textContent = data.tier3.quota;
+                        document.getElementById('tier3-status').textContent = data.tier3.remaining + ' requests remaining';
+
+                        const tier3Percent = Math.min(100, (data.tier3.usage / data.tier3.quota) * 100);
+                        document.getElementById('tier3-bar').style.width = tier3Percent + '%';
+                    } else {
+                        document.getElementById('tier3-status').innerHTML = '<a href="/pricing.html" style="color: var(--primary-color);">Upgrade to access Tier 3</a>';
+                    }
+
+                    // Update Breach Check
+                    if (data.breach && data.breach.quota > 0) {
+                        document.getElementById('breach-used').textContent = data.breach.usage;
+                        document.getElementById('breach-quota').textContent = data.breach.quota;
+                        document.getElementById('breach-status').textContent = data.breach.remaining + ' breach checks remaining';
+
+                        const breachPercent = Math.min(100, (data.breach.usage / data.breach.quota) * 100);
+                        document.getElementById('breach-bar').style.width = breachPercent + '%';
+                    } else {
+                        document.getElementById('breach-status').innerHTML = '<a href="/pricing.html" style="color: var(--primary-color);">Upgrade to access breach checking</a>';
+                    }
+
+                    // Update month
+                    document.getElementById('current-month').textContent = data.month;
+
+                    document.getElementById('usage-loading').style.display = 'none';
+                    document.getElementById('usage-data').style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'Failed to load usage data');
+                }
+            } catch (error) {
+                console.error('Usage loading error:', error);
+                document.getElementById('usage-loading').innerHTML = '<div class="alert alert-error">Failed to load usage data. Please check your API key.</div>';
+            }
+        }
+
+        // Copy API key
+        function copyApiKey() {
+            navigator.clipboard.writeText(currentApiKey).then(() => {
+                alert('API key copied to clipboard!');
+            }).catch(() => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+
+        // Domain Verification Functions
+        let pendingVerificationDomain = null;
+        let pendingVerificationToken = null;
+        let pendingVerificationSecret = null;
+
+        function showAddDomainForm() {
+            document.getElementById('add-domain-form').style.display = 'block';
+            document.getElementById('add-domain-btn').style.display = 'none';
+        }
+
+        function cancelAddDomain() {
+            document.getElementById('add-domain-form').style.display = 'none';
+            document.getElementById('add-domain-btn').style.display = 'block';
+            document.getElementById('verification-instructions').style.display = 'none';
+        }
+
+        async function addDomain() {
+            const domain = document.getElementById('new-domain-input').value.trim().toLowerCase();
+            const method = document.getElementById('verification-method').value;
+
+            if (!domain) {
+                alert('Please enter a domain name');
+                return;
+            }
+
+            // Remove protocol if included
+            const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+            try {
+                const response = await fetch('/api/domains/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': currentApiKey
+                    },
+                    body: JSON.stringify({
+                        domain: cleanDomain,
+                        method: method
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    pendingVerificationDomain = cleanDomain;
+                    pendingVerificationToken = data.verification_token;
+                    pendingVerificationSecret = data.domain_secret;
+
+                    // Show verification instructions
+                    document.getElementById('verification-instructions').style.display = 'block';
+                    document.getElementById('add-domain-form').style.display = 'none';
+
+                    if (method === 'dns') {
+                        document.getElementById('dns-instructions').style.display = 'block';
+                        document.getElementById('http-instructions').style.display = 'none';
+                        document.getElementById('verifying-domain').textContent = cleanDomain;
+                        document.getElementById('verification-token').textContent = data.verification_token;
+                    } else {
+                        document.getElementById('http-instructions').style.display = 'block';
+                        document.getElementById('dns-instructions').style.display = 'none';
+                        document.getElementById('verifying-domain-http').textContent = cleanDomain;
+                        document.getElementById('http-verification-token').textContent = data.verification_token;
+                        document.getElementById('domain-for-file').textContent = cleanDomain;
+                    }
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to add domain'));
+                }
+            } catch (error) {
+                console.error('Add domain error:', error);
+                alert('Failed to add domain. Please try again.');
+            }
+        }
+
+        async function verifyDomain() {
+            if (!pendingVerificationDomain) {
+                alert('No domain pending verification');
+                return;
+            }
+
+            await retryVerification(pendingVerificationDomain);
+        }
+
+        async function retryVerification(domain) {
+            if (!domain) {
+                alert('No domain specified');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/domains/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': currentApiKey
+                    },
+                    body: JSON.stringify({
+                        domain: domain
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alert('✅ Domain verified successfully!');
+
+                    // Hide instructions if they were showing
+                    document.getElementById('verification-instructions').style.display = 'none';
+                    document.getElementById('add-domain-btn').style.display = 'block';
+                    document.getElementById('new-domain-input').value = '';
+
+                    // Clear pending variables
+                    pendingVerificationDomain = null;
+                    pendingVerificationToken = null;
+                    pendingVerificationSecret = null;
+
+                    // Reload domain list
+                    loadDomains();
+                } else {
+                    alert('❌ Verification failed: ' + (data.message || data.error || 'Could not verify domain. Please check your DNS/HTTP setup and try again.'));
+                }
+            } catch (error) {
+                console.error('Verify domain error:', error);
+                alert('Failed to verify domain. Please try again.');
+            }
+        }
+
+        async function loadDomains() {
+            try {
+                const response = await fetch('/api/domains/list', {
+                    headers: {
+                        'X-API-Key': currentApiKey
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.domains) {
+                    const container = document.getElementById('verified-domains');
+                    if (data.domains.length === 0) {
+                        container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic;">No domains verified yet.</p>';
+                    } else {
+                        container.innerHTML = data.domains.map(d => `
+                            <div style="background: ${d.status === 'verified' ? '#d1fae5' : '#fee2e2'}; border: 1px solid ${d.status === 'verified' ? '#10b981' : '#ef4444'}; padding: 1rem; border-radius: 0.25rem; margin-bottom: 0.5rem;">
+                                <strong>${d.domain}</strong> - ${d.status === 'verified' ? '✅ Verified' : '⏳ Pending'}
+                                ${d.status === 'pending' ? `<button onclick="retryVerification('${d.domain}')" class="btn btn-secondary" style="margin-left: 1rem; padding: 0.25rem 0.75rem;">Retry Verification</button>` : ''}
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Load domains error:', error);
+            }
+        }
+
+        // Show Super Quantum billing options
+        function showSuperQuantumOptions() {
+            const optionsDiv = document.getElementById('super-quantum-options');
+            optionsDiv.style.display = optionsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Upgrade to plan (Stripe Checkout)
+        async function upgradePlan(plan) {
+            const planNames = {
+                'standard': 'Standard ($12/month)',
+                'basic_quantum': 'Basic Quantum ($29/month)',
+                'quantum_monthly': 'Standard Quantum ($49/month)',
+                'standard_quantum': 'Standard Quantum ($49/month)',
+                'super_quantum_monthly': 'Super Quantum ($295/month)',
+                'super_quantum_annual': 'Super Quantum ($2,950/year - save $590)',
+                'quantum_single': '$1 Premium (24-hour access)'
+            };
+
+            let confirmMessage = `Upgrade to ${planNames[plan]}?`;
+            if (plan === 'basic_quantum' || plan === 'quantum_monthly' || plan === 'standard_quantum') {
+                confirmMessage += '\n\nNote: Quantum tiers require domain verification for API access.';
+            } else if (plan === 'super_quantum_monthly' || plan === 'super_quantum_annual') {
+                confirmMessage += '\n\nNote: Domain verification is required. Contact enterprise@mypasswordchecker.com for setup support.';
+            }
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ plan })
+                });
+
+                const data = await response.json();
+
+                if (data.checkout_url) {
+                    // Redirect to Square Checkout
+                    window.location.href = data.checkout_url;
+                } else {
+                    alert('Error creating checkout: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Failed to start checkout. Please try again.');
+            }
+        }
+
+        // Check authentication on page load
+        window.addEventListener('load', async () => {
+            // Check for OAuth messages
+            const urlParams = new URLSearchParams(window.location.search);
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentApiKey = data.api_key || '(hidden for security)';
+                    showDashboard();
+
+                    // Show success messages
+                    if (urlParams.get('success') === 'true') {
+                        // Show onboarding banner for new subscribers
+                        document.getElementById('onboarding-banner').style.display = 'block';
+                        window.history.replaceState({}, '', '/dashboard.html');
+                    } else if (urlParams.get('login') === 'success') {
+                        alert('Successfully signed in with GitHub!');
+                        window.history.replaceState({}, '', '/dashboard.html');
+                    }
+                } else {
+                    // Not authenticated - show login form
+                    document.getElementById('auth-section').style.display = 'block';
+                    document.getElementById('api-key-input-section').style.display = 'none';
+                    document.getElementById('dashboard-content').style.display = 'none';
+
+                    // Show error messages
+                    const error = urlParams.get('error');
+                    if (error === 'oauth_failed') {
+                        alert('GitHub sign-in failed. Please try again or register with email.');
+                    } else if (error === 'invalid_state') {
+                        alert('Security validation failed. Please try signing in again.');
+                    } else if (error === 'no_email') {
+                        alert('Could not retrieve your email from GitHub. Please make sure your GitHub email is public or register with email.');
+                    }
+                    if (error) {
+                        window.history.replaceState({}, '', '/dashboard.html');
+                    }
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                document.getElementById('auth-section').style.display = 'block';
+                document.getElementById('dashboard-content').style.display = 'none';
+            }
+        });
+
+        // Load overage setting on dashboard load
+        async function loadOverageSetting() {
+            try {
+                const response = await fetch('/api/dashboard/overage-setting', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const toggle = document.getElementById('overage-toggle');
+                    const statusIcon = document.getElementById('overage-status-icon');
+                    const statusText = document.getElementById('overage-status-text');
+                    const statusDesc = document.getElementById('overage-status-description');
+                    const warningDiv = document.getElementById('overage-warning');
+                    const blockedDiv = document.getElementById('overage-blocked-info');
+
+                    // Note: allow_overage = 1 means "block overages" (toggle OFF)
+                    //       allow_overage = 0 means "allow overages" (toggle ON)
+                    const blockOverages = data.allow_overage === 1;
+                    toggle.checked = !blockOverages; // Checked means "allow overages"
+
+                    if (blockOverages) {
+                        // Block overages (protected)
+                        statusIcon.textContent = '🔒';
+                        statusText.textContent = 'Block Overages (Recommended)';
+                        statusDesc.textContent = 'API stops serving requests when quota is reached. No unexpected charges.';
+                        warningDiv.style.display = 'none';
+                        blockedDiv.style.display = 'block';
+                    } else {
+                        // Allow overages
+                        statusIcon.textContent = '💳';
+                        statusText.textContent = 'Allow Overage Billing';
+                        statusDesc.textContent = 'You will be charged for usage beyond your quota at the overage rate.';
+                        warningDiv.style.display = 'block';
+                        blockedDiv.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load overage setting:', error);
+            }
+        }
+
+        // Toggle overage setting
+        async function toggleOverageSetting() {
+            const toggle = document.getElementById('overage-toggle');
+            const allowOverage = toggle.checked; // Checked means "allow overages"
+
+            // Show confirmation dialog
+            if (allowOverage) {
+                const confirmed = confirm(
+                    '⚠️ Warning: Enabling overage billing means you will be charged for API usage beyond your quota limits.\n\n' +
+                    'Your overage rate depends on your plan:\n' +
+                    '• Free tier: $0.20 per request\n' +
+                    '• Paid tiers: $0.0125 per request\n\n' +
+                    'Are you sure you want to enable overage billing?'
+                );
+
+                if (!confirmed) {
+                    // Revert toggle
+                    toggle.checked = false;
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch('/api/dashboard/overage-setting', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ allow_overage: allowOverage })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Update UI
+                    const statusIcon = document.getElementById('overage-status-icon');
+                    const statusText = document.getElementById('overage-status-text');
+                    const statusDesc = document.getElementById('overage-status-description');
+                    const warningDiv = document.getElementById('overage-warning');
+                    const blockedDiv = document.getElementById('overage-blocked-info');
+
+                    if (allowOverage) {
+                        // Allow overages
+                        statusIcon.textContent = '💳';
+                        statusText.textContent = 'Allow Overage Billing';
+                        statusDesc.textContent = 'You will be charged for usage beyond your quota at the overage rate.';
+                        warningDiv.style.display = 'block';
+                        blockedDiv.style.display = 'none';
+                        alert('✅ Overage billing enabled. You will be charged for usage beyond your quota limits.');
+                    } else {
+                        // Block overages (protected)
+                        statusIcon.textContent = '🔒';
+                        statusText.textContent = 'Block Overages (Recommended)';
+                        statusDesc.textContent = 'API stops serving requests when quota is reached. No unexpected charges.';
+                        warningDiv.style.display = 'none';
+                        blockedDiv.style.display = 'block';
+                        alert('✅ Overage protection enabled. Your API will stop serving requests when quota is reached.');
+                    }
+                } else {
+                    const error = await response.json();
+                    alert('Failed to update setting: ' + (error.error || 'Unknown error'));
+                    // Revert toggle
+                    toggle.checked = !allowOverage;
+                }
+            } catch (error) {
+                console.error('Failed to update overage setting:', error);
+                alert('Failed to update setting. Please try again.');
+                // Revert toggle
+                toggle.checked = !allowOverage;
+            }
+        }
+
+        // Load overage setting when loading usage data
+        const originalLoadUsageData = loadUsageData;
+        loadUsageData = async function() {
+            await originalLoadUsageData();
+            await loadOverageSetting();
+            await checkAdminStatus();
+        };
+
+        // Check if current user is admin and load admin panel
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/admin/check', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.is_admin) {
+                        // Show admin panel
+                        document.getElementById('admin-panel-section').style.display = 'block';
+                        // Load admin data
+                        await loadAdminAlerts();
+                        await loadUnverifiedUsers();
+                    }
+                }
+            } catch (error) {
+                console.error('Admin check error:', error);
+            }
+        }
+
+        // Load domain mismatch alerts for admin
+        async function loadAdminAlerts() {
+            try {
+                const response = await fetch('/api/admin/domain-alerts', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('admin-alerts-data');
+                    document.getElementById('admin-alerts-loading').style.display = 'none';
+                    container.style.display = 'block';
+
+                    if (!data.alerts || data.alerts.length === 0) {
+                        container.innerHTML = '<div class="alert alert-info">No domain mismatch alerts found. Great!</div>';
+                    } else {
+                        container.innerHTML = `
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                                    <thead>
+                                        <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);">
+                                            <th style="padding: 0.75rem; text-align: left;">Email</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Email Domain</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Request Domain</th>
+                                            <th style="padding: 0.75rem; text-align: center;">Count</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Last Seen</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Country</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Status</th>
+                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.alerts.map(alert => `
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 0.75rem;">${alert.email}</td>
+                                                <td style="padding: 0.75rem;"><code>${alert.email_domain}</code></td>
+                                                <td style="padding: 0.75rem;"><code style="color: #dc2626;">${alert.request_domain}</code></td>
+                                                <td style="padding: 0.75rem; text-align: center;"><strong>${alert.occurrence_count}</strong></td>
+                                                <td style="padding: 0.75rem; font-size: 0.75rem;">${new Date(alert.last_seen_at).toLocaleDateString()}</td>
+                                                <td style="padding: 0.75rem;">${alert.request_country || 'N/A'}</td>
+                                                <td style="padding: 0.75rem;">
+                                                    <span style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; background: ${alert.status === 'pending' ? '#fef3c7' : alert.status === 'reviewed' ? '#dbeafe' : '#fee2e2'}; color: ${alert.status === 'pending' ? '#92400e' : alert.status === 'reviewed' ? '#1e40af' : '#991b1b'}; font-size: 0.75rem; font-weight: 600;">
+                                                        ${alert.status}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 0.75rem; text-align: center;">
+                                                    ${alert.status === 'pending' ? `
+                                                        <button onclick="updateAlertStatus(${alert.id}, 'reviewed')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; margin-right: 0.25rem;">Review</button>
+                                                        <button onclick="updateAlertStatus(${alert.id}, 'ignored')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Ignore</button>
+                                                    ` : '-'}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Load admin alerts error:', error);
+                document.getElementById('admin-alerts-loading').innerHTML = '<div class="alert alert-error">Failed to load alerts.</div>';
+            }
+        }
+
+        // Load unverified users for admin
+        async function loadUnverifiedUsers() {
+            try {
+                const response = await fetch('/api/admin/unverified-users', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('admin-unverified-data');
+                    document.getElementById('admin-unverified-loading').style.display = 'none';
+                    container.style.display = 'block';
+
+                    if (!data.users || data.users.length === 0) {
+                        container.innerHTML = '<div class="alert alert-info">All users have verified their email addresses!</div>';
+                    } else {
+                        container.innerHTML = `
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                                    <thead>
+                                        <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);">
+                                            <th style="padding: 0.75rem; text-align: left;">Email</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Name</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Plan</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Registered</th>
+                                            <th style="padding: 0.75rem; text-align: left;">Verification Sent</th>
+                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.users.map(user => `
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 0.75rem;">${user.email}</td>
+                                                <td style="padding: 0.75rem;">${user.name || '-'}</td>
+                                                <td style="padding: 0.75rem;"><span style="text-transform: capitalize;">${user.plan}</span></td>
+                                                <td style="padding: 0.75rem; font-size: 0.75rem;">${new Date(user.created_at).toLocaleDateString()}</td>
+                                                <td style="padding: 0.75rem; font-size: 0.75rem;">${user.email_verification_sent_at ? new Date(user.email_verification_sent_at).toLocaleDateString() : '-'}</td>
+                                                <td style="padding: 0.75rem; text-align: center;">
+                                                    <button onclick="resendVerificationAdmin('${user.customer_id}')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Resend</button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                                Total unverified: <strong>${data.users.length}</strong>
+                            </p>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Load unverified users error:', error);
+                document.getElementById('admin-unverified-loading').innerHTML = '<div class="alert alert-error">Failed to load unverified users.</div>';
+            }
+        }
+
+        // Update alert status (admin action)
+        async function updateAlertStatus(alertId, newStatus) {
+            if (!confirm(`Mark this alert as "${newStatus}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/domain-alerts/${alertId}/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (response.ok) {
+                    alert('Alert status updated!');
+                    await loadAdminAlerts(); // Reload
+                } else {
+                    const error = await response.json();
+                    alert('Failed to update: ' + (error.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Update alert error:', error);
+                alert('Failed to update alert status.');
+            }
+        }
+
+        // Resend verification email (admin action)
+        async function resendVerificationAdmin(customerId) {
+            if (!confirm('Resend verification email to this user?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/resend-verification`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ customer_id: customerId })
+                });
+
+                if (response.ok) {
+                    alert('Verification email sent!');
+                } else {
+                    const error = await response.json();
+                    alert('Failed to resend: ' + (error.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Resend verification error:', error);
+                alert('Failed to resend verification email.');
+            }
+        }
+    </script>
+</body>
+</html>

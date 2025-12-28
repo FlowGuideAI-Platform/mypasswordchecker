@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2025-12-27T07:38:05.820Z",
+  "accountId": "ee34e44964865d1bccb86107d578c55a",
+  "plan": {
+    "name": "Workers Paid Plan",
+    "baseFee": 5,
+    "includedRequests": 10000000,
+    "includedCpuTime": 30000000
+  },
+  "actualBilledCharges": {
+    "august2025": 140,
+    "november2025": 140,
+    "total": 280
+  },
+  "apiEstimatedCharges": {
+    "total": 30,
+    "note": "Based on available API data (last 90 days only)"
+  },
+  "discrepancy": {
+    "actualTotal": 280,
+    "apiEstimate": 30,
+    "difference": 250,
+    "note": "Large discrepancy suggests high usage occurred before API retention period"
+  },
+  "monthlyData": [
+    {
+      "month": "2025-07",
+      "monthName": "July",
+      "duration": 0,
+      "requests": 0,
+      "errors": 0,
+      "requestsPerDay": 0,
+      "withinIncludedLimits": true,
+      "estimatedCost": 5,
+      "overageCost": 0,
+      "workerDetails": []
+    },
+    {
+      "month": "2025-08",
+      "monthName": "August",
+      "duration": 0,
+      "requests": 0,
+      "errors": 0,
+      "requestsPerDay": 0,
+      "withinIncludedLimits": true,
+      "estimatedCost": 5,
+      "overageCost": 0,
+      "workerDetails": []
+    },
+    {
+      "month": "2025-09",
+      "monthName": "September",
+      "duration": 0,
+      "requests": 0,
+      "errors": 0,
+      "requestsPerDay": 0,
+      "withinIncludedLimits": true,
+      "estimatedCost": 5,
+      "overageCost": 0,
+      "workerDetails": []
+    },
+    {
+      "month": "2025-10",
+      "monthName": "October",
+      "duration": 18.921535,
+      "requests": 5690,
+      "errors": 0,
+      "requestsPerDay": 189.66666666666666,
+      "withinIncludedLimits": true,
+      "estimatedCost": 5,
+      "overageCost": 0,
+      "workerDetails": [
+        {
+          "name": "mypasswordchecker-api",
+          "requests": 5690,
+          "duration": 18.921535,
+          "avgDuration": 0.0033254015817223196,
+          "errors": 0,
+          "subrequests": 180,
+          "p99": 0.09374625,
+          "requestsPerDay": 189.66666666666666
+        }
+      ]
+    },
+    {
+      "month": "2025-11",
+      "monthName": "November",
+      "duration": 26.128082499999998,
+      "requests": 11990,
+      "errors": 0,
+      "requestsPerDay": 399.6666666666667,
+      "withinIncludedLimits": true,
+      "estimatedCost": 5,
+      "overageCost": 0,
+      "workerDetails": [
+        {
+          "name": "mypasswordchecker-api",
+          "requests": 11990,
+          "duration": 26.128082499999998,
+          "avgDuration": 0.0021791561718098413,
+          "errors": 0,
+          "subrequests": 20,
+          "p99": 0.010669,
+          "requestsPerDay": 399.6666666666667
+        }
+      ]
+    },
+    {
+      "month": "2025-12",
+      "monthName": "December",
+      "duration": 86.06221125000002,
+      "requests": 47111,
+      "errors": 0,
+      "requestsPerDay": 1570.3666666666666,
+      "withinIncludedLimits": true,
+      "estimatedCost": 5,
+      "overageCost": 0,
+      "workerDetails": [
+        {
+          "name": "mypasswordchecker-api",
+          "requests": 47111,
+          "duration": 86.06221125000002,
+          "avgDuration": 0.001826796528411624,
+          "errors": 0,
+          "subrequests": 0,
+          "p99": 0.028883874,
+          "requestsPerDay": 1570.3666666666666
+        }
+      ]
+    }
+  ]
+}

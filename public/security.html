@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>Privacy & Security Architecture - MyPasswordChecker.com</title>
+    <meta name="description" content="Learn how MyPasswordChecker.com protects your passwords with client-side processing, k-anonymity API checks, and zero-knowledge architecture. Complete transparency on our security model.">
+    <meta name="keywords" content="password security, k-anonymity, client-side encryption, zero-knowledge architecture, privacy-first password checker, HIBP API, quantum-resistant passwords">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mypasswordchecker.com/security.html">
+    <meta property="og:title" content="Privacy & Security Architecture - MyPasswordChecker.com">
+    <meta property="og:description" content="Complete transparency on how we protect your passwords. Client-side processing, k-anonymity, and quantum-resistant security.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://mypasswordchecker.com/security.html">
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+
+    <style>
+        .security-hero {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 0.75rem;
+            margin-bottom: 3rem;
+        }
+
+        .security-hero h1 {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .security-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .security-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .security-section h3 {
+            color: #059669;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .architecture-diagram {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .feature-badge {
+            display: inline-block;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .feature-badge.premium {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .comparison-table {
+            width: 100%;
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin: 2rem 0;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .info-callout {
+            background: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-callout strong {
+            color: #0c4a6e;
+        }
+
+        .warning-callout {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+        }
+
+        .security-level {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .security-level.high {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .security-level.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .privacy-guarantee {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .privacy-guarantee h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        ul.checkmark-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul.checkmark-list li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        ul.checkmark-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+    </style>
+
+    <!-- Schema.org for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Privacy & Security Architecture - MyPasswordChecker.com",
+      "description": "Technical documentation on MyPasswordChecker's privacy-first security architecture, including client-side processing and k-anonymity breach checking.",
+      "author": {
+        "@type": "Organization",
+        "name": "All Aligned Consulting LLC"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MyPasswordChecker.com"
+      },
+      "url": "https://mypasswordchecker.com/security.html",
+      "keywords": "password security, k-anonymity, client-side encryption, zero-knowledge architecture, privacy-first"
+    }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
+                <nav class="nav">
+                    <a href="/free-password-checker.html">Free Checker</a>
+                    <a href="/password-api.html">API</a>
+                    <a href="/about.html">About</a>
+                    <a href="/pricing.html">Pricing</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Hero Section -->
+            <div class="security-hero">
+                <h1>🛡️ Privacy & Security Architecture</h1>
+                <p style="font-size: 1.125rem; margin: 0; opacity: 0.95;">
+                    Complete transparency on how we protect your passwords
+                </p>
+            </div>
+
+            <!-- Privacy Guarantee -->
+            <div class="privacy-guarantee">
+                <h3>Our Privacy Commitment</h3>
+                <p style="font-size: 1.125rem; margin: 0;">
+                    <strong>Your password never leaves your device in plain text.</strong><br>
+                    We use industry-standard privacy-preserving techniques to keep your data secure.
+                </p>
+            </div>
+
+            <!-- Security Model Overview -->
+            <div class="security-section">
+                <h2>🔒 Security Model Overview</h2>
+                <p>
+                    MyPasswordChecker.com employs a <strong>multi-layered security architecture</strong> designed around one principle:
+                    <strong>your password is your secret, not ours</strong>.
+                </p>
+
+                <h3>Three Layers of Protection</h3>
+
+                <div class="feature-badge">Layer 1: Client-Side Analysis</div>
+                <div class="feature-badge">Layer 2: Privacy-Preserving Breach Check</div>
+                <div class="feature-badge premium">Layer 3: API-Side Bloom Filter (Paid Tiers)</div>
+
+                <div class="info-callout">
+                    <strong>What makes us different?</strong> Unlike many password checkers that send your password to their servers,
+                    we perform all strength analysis in your browser's JavaScript engine. Only anonymized, hashed fragments are ever transmitted.
+                </div>
+            </div>
+
+            <!-- Layer 1: Client-Side Processing -->
+            <div class="security-section">
+                <h2>⚡ Layer 1: Client-Side Processing</h2>
+
+                <h3>What Happens in Your Browser</h3>
+                <p>All password strength analysis occurs 100% in your browser:</p>
+
+                <ul class="checkmark-list">
+                    <li><strong>Entropy Calculation</strong> - Mathematical measure of password randomness</li>
+                    <li><strong>Pattern Detection</strong> - Identifies common patterns (keyboard walks, repeated characters)</li>
+                    <li><strong>Dictionary Matching</strong> - Checks against 10,000 most common passwords (loaded locally)</li>
+                    <li><strong>Crack Time Estimation</strong> - Calculates time to crack using modern GPUs</li>
+                    <li><strong>Quantum Resistance Scoring</strong> - Theoretical future-proofing analysis</li>
+                </ul>
+
+                <div class="architecture-diagram">
+<pre>Your Browser (JavaScript)
+│
+├─ Password Input
+│  └─ Stored in memory only (never persisted)
+│
+├─ Strength Analysis Engine
+│  ├─ Shannon Entropy Calculation
+│  ├─ Zxcvbn Pattern Matching
+│  ├─ Common Password Check (10K list, 71KB local file)
+│  └─ Quantum Resistance Scoring
+│
+└─ Results Display
+   └─ Never sent to any server</pre>
+                </div>
+
+                <div class="info-callout">
+                    <strong>Tech Detail:</strong> We use the industry-standard <code>zxcvbn</code> library (developed by Dropbox)
+                    for pattern matching. The 10,000 most common passwords list (~71KB) is downloaded once and cached in your browser.
+                </div>
+
+                <h3>Privacy Guarantees</h3>
+                <ul class="checkmark-list">
+                    <li>No cookies or tracking for free password checker</li>
+                    <li>No analytics on password input</li>
+                    <li>Password never written to disk or browser storage</li>
+                    <li>No server-side logging of password data</li>
+                    <li>Open source JavaScript - you can audit our code</li>
+                </ul>
+            </div>
+
+            <!-- Layer 2: k-Anonymity Breach Check -->
+            <div class="security-section">
+                <h2>🕵️ Layer 2: Privacy-Preserving Breach Check (k-Anonymity)</h2>
+
+                <p>
+                    When checking if your password appears in data breaches, we use the <strong>k-anonymity model</strong>
+                    developed by Have I Been Pwned (HIBP). This ensures your password remains private even during the breach check.
+                </p>
+
+                <h3>How k-Anonymity Works</h3>
+
+                <div class="architecture-diagram">
+<pre>Step 1: Hash Your Password (SHA-1)
+   Password: "MyP@ssw0rd"
+   SHA-1 Hash: "21BD1...9A3F" (40 characters)
+
+Step 2: Extract First 5 Characters (Prefix)
+   Prefix: "21BD1"
+   ↓
+   Send to HIBP API
+
+Step 3: HIBP Returns ALL Hashes Starting with "21BD1"
+   21BD1...0001: 1234 breaches
+   21BD1...0002: 567 breaches
+   21BD1...9A3F: 42 breaches  ← Your hash
+   21BD1...FFFF: 89 breaches
+   (Typically ~500 hash suffixes per prefix)
+
+Step 4: Your Browser Searches Locally
+   Finds "21BD1...9A3F" in the list
+   Reports: "Found in 42 data breaches"</pre>
+                </div>
+
+                <div class="info-callout">
+                    <strong>Why is this secure?</strong> We only send the first 5 characters of your password's hash.
+                    Since there are 16^5 = 1,048,576 possible prefixes, and each prefix matches ~500 passwords,
+                    the server has no way to know which of those 500 passwords is yours. This is called "k-anonymity"
+                    where k ≈ 500.
+                </div>
+
+                <h3>Privacy Mathematics</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Privacy Impact</th>
+                    </tr>
+                    <tr>
+                        <td>Prefix Length</td>
+                        <td>5 characters</td>
+                        <td>1 in 1,048,576 possible prefixes</td>
+                    </tr>
+                    <tr>
+                        <td>Average Matches per Prefix</td>
+                        <td>~500 passwords</td>
+                        <td>Server cannot distinguish which one is yours</td>
+                    </tr>
+                    <tr>
+                        <td>Anonymity Set Size (k)</td>
+                        <td>~500</td>
+                        <td><span class="security-level high">HIGH PRIVACY</span></td>
+                    </tr>
+                    <tr>
+                        <td>Data Transmitted</td>
+                        <td>5 chars (2.5 bytes)</td>
+                        <td>99.9875% of hash kept private</td>
+                    </tr>
+                </table>
+
+                <h3>Breach Database Coverage</h3>
+                <ul class="checkmark-list">
+                    <li><strong>800+ million passwords</strong> from verified data breaches</li>
+                    <li>Sourced from Have I Been Pwned (HIBP) - trusted by Microsoft, 1Password, etc.</li>
+                    <li>Updated regularly as new breaches are discovered</li>
+                    <li>Includes passwords from major breaches (LinkedIn, Adobe, Yahoo, etc.)</li>
+                </ul>
+            </div>
+
+            <!-- Layer 3: API Bloom Filter -->
+            <div class="security-section">
+                <h2>🚀 Layer 3: API-Side Bloom Filter (Premium Feature)</h2>
+
+                <p>
+                    For our <strong>paid API customers</strong>, we offer an even more privacy-preserving option:
+                    <strong>server-side Bloom Filter checking</strong> with zero external API calls.
+                </p>
+
+                <div class="feature-badge premium">Available in Pro, Quantum, and Enterprise tiers</div>
+                <div class="feature-badge premium">Coming Soon: Q1 2026</div>
+
+                <h3>How It Works</h3>
+                <ul class="checkmark-list">
+                    <li>We host a 500MB-1GB Bloom Filter of all breached passwords on our edge servers</li>
+                    <li>Your API request sends the full SHA-256 hash (never plain text)</li>
+                    <li>We check locally against our Bloom Filter (no external API calls)</li>
+                    <li>Response in ~10-50ms (vs. ~200ms for HIBP API)</li>
+                    <li>Complete privacy - your hash never leaves our infrastructure</li>
+                </ul>
+
+                <h3>Bloom Filter Advantages</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Feature</th>
+                        <th>k-Anonymity (Free)</th>
+                        <th>Bloom Filter (Paid API)</th>
+                    </tr>
+                    <tr>
+                        <td>Privacy Level</td>
+                        <td><span class="security-level high">High (k≈500)</span></td>
+                        <td><span class="security-level high">Maximum (1:1)</span></td>
+                    </tr>
+                    <tr>
+                        <td>Latency</td>
+                        <td>~200ms</td>
+                        <td>~10-50ms</td>
+                    </tr>
+                    <tr>
+                        <td>External Dependencies</td>
+                        <td>HIBP API</td>
+                        <td>None (self-hosted)</td>
+                    </tr>
+                    <tr>
+                        <td>False Positive Rate</td>
+                        <td>0%</td>
+                        <td>~0.0001% (negligible)</td>
+                    </tr>
+                    <tr>
+                        <td>Uptime Guarantee</td>
+                        <td>HIBP SLA</td>
+                        <td>99.9% SLA (Enterprise)</td>
+                    </tr>
+                </table>
+
+                <div class="warning-callout">
+                    <strong>Note:</strong> Even with Bloom Filter, you should always send the <strong>SHA-256 hash</strong> of the password,
+                    never the plain text. Our API will reject any plain text password submissions.
+                </div>
+            </div>
+
+            <!-- MSP & Enterprise Use Cases -->
+            <div class="security-section">
+                <h2>🏢 MSP & Enterprise Use Cases</h2>
+
+                <p>
+                    For Managed Service Providers (MSPs) and enterprises, we offer specialized deployment options:
+                </p>
+
+                <h3>Enterprise Features</h3>
+                <ul class="checkmark-list">
+                    <li><strong>White-label API</strong> - Brand it as your own security tool</li>
+                    <li><strong>Multi-tenant dashboard</strong> - Manage multiple client organizations</li>
+                    <li><strong>Custom breach lists</strong> - Add your own threat intelligence feeds</li>
+                    <li><strong>Air-gapped deployment option</strong> - For highly regulated industries</li>
+                    <li><strong>SOC 2 Type 2 compliance</strong> - Audit logs and compliance reports</li>
+                </ul>
+
+                <h3>On-Premise / Private Cloud Options</h3>
+                <p>
+                    For organizations that require complete data sovereignty:
+                </p>
+                <ul class="checkmark-list">
+                    <li>Self-hosted Bloom Filter (Docker container)</li>
+                    <li>Monthly breach database updates via secure transfer</li>
+                    <li>No internet connectivity required after initial setup</li>
+                    <li>Perfect for defense, financial services, healthcare sectors</li>
+                </ul>
+
+                <div class="info-callout">
+                    <strong>Interested in MSP or Enterprise partnership?</strong> Contact us at
+                    <a href="mailto:sales@mypasswordchecker.com">sales@mypasswordchecker.com</a>
+                    for custom pricing and deployment options.
+                </div>
+            </div>
+
+            <!-- Comparison with Competitors -->
+            <div class="security-section">
+                <h2>⚖️ How We Compare to Competitors</h2>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>Feature</th>
+                        <th>MyPasswordChecker</th>
+                        <th>Typical Competitor</th>
+                    </tr>
+                    <tr>
+                        <td>Client-Side Processing</td>
+                        <td>✅ Yes (100% browser)</td>
+                        <td>❌ Sends to server</td>
+                    </tr>
+                    <tr>
+                        <td>Breach Check Privacy</td>
+                        <td>✅ k-Anonymity (k≈500)</td>
+                        <td>⚠️ Varies (often full hash)</td>
+                    </tr>
+                    <tr>
+                        <td>Common Password List</td>
+                        <td>✅ 10K local (71KB)</td>
+                        <td>❌ Limited or server-side</td>
+                    </tr>
+                    <tr>
+                        <td>Quantum Resistance Scoring</td>
+                        <td>✅ Yes (unique feature)</td>
+                        <td>❌ Not offered</td>
+                    </tr>
+                    <tr>
+                        <td>API Bloom Filter Option</td>
+                        <td>✅ Yes (paid tiers)</td>
+                        <td>❌ Not offered</td>
+                    </tr>
+                    <tr>
+                        <td>Open Source Client</td>
+                        <td>✅ Yes (auditable)</td>
+                        <td>⚠️ Varies</td>
+                    </tr>
+                    <tr>
+                        <td>MSP/Enterprise Options</td>
+                        <td>✅ Yes</td>
+                        <td>⚠️ Limited</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Security Best Practices -->
+            <div class="security-section">
+                <h2>📚 Security Best Practices</h2>
+
+                <h3>For Users</h3>
+                <ul class="checkmark-list">
+                    <li>Use our tool to test passwords <strong>before</strong> using them on real accounts</li>
+                    <li>Never reuse passwords across different services</li>
+                    <li>Aim for 80+ bits of entropy (our tool shows this)</li>
+                    <li>If your password appears in breaches, change it immediately</li>
+                    <li>Consider using a password manager for unique passwords</li>
+                </ul>
+
+                <h3>For Developers (API Users)</h3>
+                <ul class="checkmark-list">
+                    <li>Always hash passwords client-side before sending to our API</li>
+                    <li>Use SHA-256 for hashing (SHA-1 accepted for HIBP compatibility)</li>
+                    <li>Implement rate limiting on your end (our API has quotas)</li>
+                    <li>Cache common password checks to reduce API calls</li>
+                    <li>Follow our API documentation for best practices</li>
+                </ul>
+
+                <div class="code-block">
+// Example: Secure API usage
+const password = userInput; // Never log this!
+
+// Hash client-side
+const hash = await crypto.subtle.digest('SHA-256',
+    new TextEncoder().encode(password)
+);
+const hashHex = Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+
+// Send only hash to API
+const response = await fetch('https://api.mypasswordchecker.com/v1/check', {
+    method: 'POST',
+    headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ hash: hashHex })
+});
+                </div>
+            </div>
+
+            <!-- Technical Specifications -->
+            <div class="security-section">
+                <h2>🔧 Technical Specifications</h2>
+
+                <h3>Cryptographic Standards</h3>
+                <ul>
+                    <li><strong>Hashing:</strong> SHA-1 (HIBP compatibility), SHA-256 (recommended), SHA-512 (future)</li>
+                    <li><strong>Entropy Calculation:</strong> Shannon entropy (bits)</li>
+                    <li><strong>Pattern Matching:</strong> Zxcvbn v4.4.2</li>
+                    <li><strong>Common Passwords:</strong> Top 10K from SecLists (danielmiessler)</li>
+                    <li><strong>Bloom Filter:</strong> BinaryFuse8 (planned), FPR ~0.0001%</li>
+                </ul>
+
+                <h3>Infrastructure</h3>
+                <ul>
+                    <li><strong>Hosting:</strong> Cloudflare Pages (CDN distribution)</li>
+                    <li><strong>API:</strong> Cloudflare Workers (edge computing)</li>
+                    <li><strong>Database:</strong> Cloudflare D1 (SQLite)</li>
+                    <li><strong>Storage:</strong> Cloudflare R2 (Bloom filters, future)</li>
+                    <li><strong>Uptime:</strong> 99.9% SLA (Enterprise tier)</li>
+                </ul>
+
+                <h3>Compliance & Certifications</h3>
+                <ul class="checkmark-list">
+                    <li>SOC 2 Type 2 (in progress - Q2 2026)</li>
+                    <li>GDPR compliant (EU data residency available)</li>
+                    <li>CCPA compliant (California privacy rights)</li>
+                    <li>HIPAA-ready (BAA available for Enterprise)</li>
+                    <li>ISO 27001 (planned - 2026)</li>
+                </ul>
+            </div>
+
+            <!-- FAQs -->
+            <div class="security-section">
+                <h2>❓ Security & Privacy FAQs</h2>
+
+                <h3>Can you see my password?</h3>
+                <p>
+                    <strong>No.</strong> For the free password checker, your password never leaves your browser.
+                    For API users, only cryptographic hashes are transmitted, never plain text passwords.
+                </p>
+
+                <h3>How is k-anonymity different from just hashing?</h3>
+                <p>
+                    Hashing alone isn't enough because the same password always produces the same hash.
+                    k-anonymity goes further by only revealing the first 5 characters of the hash, making it
+                    impossible to determine which specific password you're checking.
+                </p>
+
+                <h3>What if HIBP API is down?</h3>
+                <p>
+                    Our free tool will continue to work for strength analysis and common password checks.
+                    The breach check feature will show an error. Paid API tiers will use our Bloom Filter
+                    (when available) with zero dependency on external services.
+                </p>
+
+                <h3>Do you store API requests?</h3>
+                <p>
+                    We log metadata (timestamp, API key, endpoint, response code) for billing and abuse prevention,
+                    but <strong>never log password hashes or any password-related data</strong>.
+                    See our <a href="/privacy.html">Privacy Policy</a> for details.
+                </p>
+
+                <h3>Is quantum resistance real?</h3>
+                <p>
+                    Our "quantum resistance" scoring is <strong>theoretical and educational</strong>.
+                    Current quantum computers cannot crack passwords (they target encryption keys).
+                    However, longer passwords with higher entropy will be more resistant to future quantum attacks.
+                    We provide this scoring to future-proof your security posture.
+                </p>
+
+                <h3>Can I audit your code?</h3>
+                <p>
+                    Yes! Our client-side JavaScript is unminified and readable. You can view the source code
+                    in your browser's developer tools. We plan to open-source our client library on GitHub in 2026.
+                </p>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="privacy-guarantee">
+                <h3>Ready to Test Your Password Security?</h3>
+                <p style="margin: 1rem 0;">
+                    Experience privacy-first password checking with complete transparency.
+                </p>
+                <div style="margin-top: 1.5rem;">
+                    <a href="/free-password-checker.html" style="background: white; color: #059669; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; display: inline-block; margin: 0.5rem;">
+                        Try Free Checker
+                    </a>
+                    <a href="/password-api.html" style="background: rgba(255,255,255,0.2); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; display: inline-block; margin: 0.5rem; border: 2px solid white;">
+                        Explore API
+                    </a>
+                </div>
+            </div>
+
+            <!-- Additional Resources -->
+            <div class="security-section">
+                <h2>📖 Additional Resources</h2>
+                <ul>
+                    <li><a href="/about.html">About & FAQ</a> - General information and common questions</li>
+                    <li><a href="/privacy.html">Privacy Policy</a> - Legal privacy commitments</li>
+                    <li><a href="/terms.html">Terms of Service</a> - Usage terms and limitations</li>
+                    <li><a href="/api-docs.html">API Documentation</a> - Technical integration guides</li>
+                    <li><a href="https://haveibeenpwned.com/API/v3#PwnedPasswords" target="_blank">HIBP k-Anonymity Model</a> - Learn more about k-anonymity</li>
+                    <li><a href="https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/" target="_blank">Troy Hunt's Pwned Passwords</a> - The source of our breach data</li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container" style="text-align: center; padding: 2rem 0; color: var(--text-secondary); border-top: 1px solid var(--border-color); margin-top: 4rem;">
+            <p>&copy; 2025 <a href="https://aac2.com" style="color: inherit; text-decoration: underline;">All Aligned Consulting LLC</a>. All rights reserved.</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="/privacy.html" style="color: inherit; margin: 0 1rem;">Privacy</a> |
+                <a href="/terms.html" style="color: inherit; margin: 0 1rem;">Terms</a> |
+                <a href="/security.html" style="color: inherit; margin: 0 1rem;">Security</a> |
+                <a href="/about.html" style="color: inherit; margin: 0 1rem;">About</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "mypasswordchecker",
+  "version": "1.0.0",
+  "description": "MyPasswordChecker.com - Password strength analysis with quantum resistance estimates",
+  "scripts": {
+    "dev": "wrangler pages dev public --port 8080",
+    "deploy": "wrangler pages deploy public",
+    "deploy:workers": "wrangler deploy"
+  },
+  "keywords": [
+    "password",
+    "security",
+    "quantum",
+    "checker"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "sharp": "^0.34.4",
+    "wrangler": "^3.78.0"
+  }
+}

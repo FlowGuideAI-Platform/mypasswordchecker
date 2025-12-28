@@ -1,0 +1,85 @@
+name = "mypasswordchecker-api"
+main = "workers/api-d1.js"
+compatibility_date = "2024-10-11"
+compatibility_flags = ["nodejs_compat"]
+account_id = "ee34e44964865d1bccb86107d578c55a"
+
+# D1 Database (primary data store - SOC 2 compliant)
+[[d1_databases]]
+binding = "DB"
+database_name = "mypasswordchecker-db"
+database_id = "b85d3188-2c9b-4fa8-89b6-81d3a1861f97"
+
+# R2 Bucket (audit log storage - 7 year retention)
+[[r2_buckets]]
+binding = "AUDIT_LOGS"
+bucket_name = "mypasswordchecker-audit-logs"
+
+# KV Namespaces (caching only - migrating away from KV for primary storage)
+[[kv_namespaces]]
+binding = "API_KEYS"
+id = "abc93d05a370492aabbee14b2d58f26f"
+
+[[kv_namespaces]]
+binding = "USAGE_TRACKING"
+id = "be5ec99ec61e45c6b2d48cf18c77889e"
+
+[[kv_namespaces]]
+binding = "SESSION_CACHE"
+id = "acee2dfd237545babb617439e6a86db6"
+
+# Environment variables (set via wrangler secret put)
+[vars]
+DOMAIN = "https://mypasswordchecker.com"
+STRIPE_ENVIRONMENT = "production"
+PAYPAL_ENVIRONMENT = "production"
+TIER1_FREE_QUOTA = "25"
+TIER1_PAID_PRICE = "1900"
+TIER1_PAID_QUOTA = "3000"
+TIER1_QUANTUM_MONTHLY_QUOTA = "15000"
+TIER1_OVERAGE_PRICE = "9"
+TIER2_PER_REQUEST_PRICE = "100"
+TIER2_MONTHLY_PRICE = "15000"
+TIER2_MONTHLY_QUOTA = "1500"
+TIER2_OVERAGE_PRICE = "9"
+
+# Secrets (set separately via Cloudflare dashboard or wrangler secret put)
+# STRIPE_SECRET_KEY = "sk_live_..."
+# STRIPE_SANDBOX_SECRET_KEY = "sk_test_..."
+# STRIPE_PUBLISHABLE_KEY = "pk_live_..."
+# STRIPE_SANDBOX_PUBLISHABLE_KEY = "pk_test_..."
+# STRIPE_WEBHOOK_SECRET = "whsec_..."
+
+# Routes - Main domain (API only)
+[[routes]]
+pattern = "mypasswordchecker.com/api/*"
+zone_name = "mypasswordchecker.com"
+
+[[routes]]
+pattern = "www.mypasswordchecker.com/api/*"
+zone_name = "mypasswordchecker.com"
+
+# Routes - Alternate domains (redirect all traffic)
+[[routes]]
+pattern = "mypasswordcheck.com/*"
+zone_name = "mypasswordcheck.com"
+
+[[routes]]
+pattern = "www.mypasswordcheck.com/*"
+zone_name = "mypasswordcheck.com"
+
+[[routes]]
+pattern = "myquantumpasswordchecker.com/*"
+zone_name = "myquantumpasswordchecker.com"
+
+[[routes]]
+pattern = "www.myquantumpasswordchecker.com/*"
+zone_name = "myquantumpasswordchecker.com"
+
+[[routes]]
+pattern = "quantumpasswordchecker.com/*"
+zone_name = "quantumpasswordchecker.com"
+
+[[routes]]
+pattern = "www.quantumpasswordchecker.com/*"
+zone_name = "quantumpasswordchecker.com"
