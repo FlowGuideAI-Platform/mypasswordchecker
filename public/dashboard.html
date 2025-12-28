@@ -133,13 +133,13 @@
                     </div>
                     <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
                         <button id="btn-standard" class="btn btn-primary" onclick="upgradePlan('standard')">
-                            ⬆️ Upgrade to Standard ($12/mo)
+                            ⬆️ Upgrade to Standard ($5/mo)
                         </button>
                         <button id="btn-basic-quantum" class="btn btn-primary" onclick="upgradePlan('basic_quantum')">
-                            ⬆️ Basic Quantum ($29/mo)
+                            ⬆️ Basic Quantum ($10/mo)
                         </button>
                         <button id="btn-quantum" class="btn btn-primary" onclick="upgradePlan('standard_quantum')">
-                            ⬆️ Standard Quantum ($49/mo)
+                            ⬆️ Standard Quantum ($40/mo)
                         </button>
                         <button id="btn-super-quantum" class="btn btn-primary" onclick="showSuperQuantumOptions()" style="background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);">
                             ⬆️ Super Quantum
@@ -886,10 +886,10 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         // Upgrade to plan (Stripe Checkout)
         async function upgradePlan(plan) {
             const planNames = {
-                'standard': 'Standard ($12/month)',
-                'basic_quantum': 'Basic Quantum ($29/month)',
-                'quantum_monthly': 'Standard Quantum ($49/month)',
-                'standard_quantum': 'Standard Quantum ($49/month)',
+                'standard': 'Standard ($5/month)',
+                'basic_quantum': 'Basic Quantum ($10/month)',
+                'quantum_monthly': 'Standard Quantum ($40/month)',
+                'standard_quantum': 'Standard Quantum ($40/month)',
                 'super_quantum_monthly': 'Super Quantum ($295/month)',
                 'super_quantum_annual': 'Super Quantum ($2,950/year - save $590)',
                 'quantum_single': '$1 Premium (24-hour access)'
