@@ -19,10 +19,14 @@ account_id = "be1ad24bfb43615483c3a472aa134892"
 directory = "./public"
 not_found_handling = "404-page"  # Use 404.html for not found
 
-# Apply to PRIMARY domain only
+# Apply to PRIMARY domain (both www and non-www)
 # Secondary domains (mypasswordcheck.com, etc.) handled by redirect worker
 [[routes]]
 pattern = "mypasswordchecker.com/*"
+zone_name = "mypasswordchecker.com"
+
+[[routes]]
+pattern = "www.mypasswordchecker.com/*"
 zone_name = "mypasswordchecker.com"
 
 # Environment variables

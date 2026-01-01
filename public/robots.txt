@@ -34,5 +34,8 @@ Disallow: /dashboard.html
 Disallow: /domains.html
 Disallow: /premium.html
 
+# Disallow API endpoints (programmatic use only, not for indexing)
+Disallow: /api/
+
 # Disallow data files (programmatic use only, not for indexing)
 Disallow: /data/

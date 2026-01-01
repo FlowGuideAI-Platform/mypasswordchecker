@@ -87,7 +87,8 @@ API_TIER_1_PRICE = "5.00"    # Standard: 12K password checks/mo
 API_TIER_2_PRICE = "10.00"   # Basic Quantum
 API_TIER_3_PRICE = "40.00"   # Standard Quantum (+ Breach Check)
 API_TIER_4_PRICE = "80.00"   # Large Quantum (+ Breach Check)
-API_TIER_5_PRICE = "150.00"  # Super Quantum (+ Breach Check)
+API_TIER_5_PRICE = "150.00"  # XL Quantum (+ Breach Check)
+API_TIER_6_PRICE = "299.00"  # Super Quantum (+ Breach Check)
 
 # Quota Limits per Tier (monthly)
 # TIER 1: Standard ($5/mo)
@@ -114,19 +115,26 @@ API_TIER_4_QUANTUM = "25000"      # 25K quantum estimates
 API_TIER_4_PHONETIC = "25000"     # 25K phonetic generations
 API_TIER_4_BREACH = "5000"        # 5K breach checks
 
-# TIER 5: Super Quantum ($150/mo)
+# TIER 5: XL Quantum ($150/mo)
 API_TIER_5_QUOTA = "1000000"      # 1M password checks
 API_TIER_5_QUANTUM = "100000"     # 100K quantum estimates
 API_TIER_5_PHONETIC = "100000"    # 100K phonetic generations
 API_TIER_5_BREACH = "20000"       # 20K breach checks
+
+# TIER 6: Super Quantum ($299/mo)
+API_TIER_6_QUOTA = "3000000"      # 3M password checks
+API_TIER_6_QUANTUM = "300000"     # 300K quantum estimates
+API_TIER_6_PHONETIC = "300000"    # 300K phonetic generations
+API_TIER_6_BREACH = "200000"      # 200K breach checks
 
 # Overage Pricing
 OVERAGE_PRICE_FREE = "0.20"       # Free tier overage (expensive to discourage)
 OVERAGE_PRICE_TIER_1 = "0.0125"   # $0.0125 per request
 OVERAGE_PRICE_TIER_2 = "0.0125"
 OVERAGE_PRICE_TIER_3 = "0.0125"
-OVERAGE_PRICE_TIER_4 = "0.0115"
-OVERAGE_PRICE_TIER_5 = "0.0111"
+OVERAGE_PRICE_TIER_4 = "0.0100"   # $0.0100 per request (reduced)
+OVERAGE_PRICE_TIER_5 = "0.0090"   # $0.0090 per request (reduced)
+OVERAGE_PRICE_TIER_6 = "0.0075"   # $0.0075 per request (reduced)
 
 # Secrets (DO NOT PUT ACTUAL VALUES HERE - Use wrangler secret put)
 #

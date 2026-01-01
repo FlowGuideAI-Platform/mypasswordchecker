@@ -759,7 +759,13 @@ async function handleStripeWebhook(request, env, corsHeaders) {
 			let phonetic_limit = 100;       // Phonetic generations
 			let breach_limit = 0;           // Breach checks (tier 3+)
 
-			if (amount >= 15000) {          // $150+ = Tier 5 (Super Quantum)
+			if (amount >= 29900) {          // $299+ = Tier 6 (Super Quantum)
+				tier = 6;
+				quota_limit = 3000000;
+				quantum_limit = 300000;
+				phonetic_limit = 300000;
+				breach_limit = 200000;
+			} else if (amount >= 15000) {   // $150+ = Tier 5 (XL Quantum)
 				tier = 5;
 				quota_limit = 1000000;
 				quantum_limit = 100000;
