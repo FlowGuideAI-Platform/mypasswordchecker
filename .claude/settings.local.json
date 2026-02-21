@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && git add public/css/styles.css public/index.html public/password-api.html public/premium.html public/pricing.html \"Docs/MyPasswordChecker sale till March 30, 2026.txt\" && git commit -m \"$\\(cat <<'EOF'\nLaunch promo: premium tools FREE + 50% off all API tiers through March 31, 2026\n\n- Add promo banners with countdown to index, premium, pricing, and API pages\n- Bypass $1 paywall on premium.html during promo period \\(free access\\)\n- Show 50% off API prices with strikethrough original prices on pricing + API pages\n- Add promo CSS styles \\(banner, badges, countdown, animations\\)\n- All changes auto-revert after April 1, 2026 via client-side date checks\n- Include grandfathering FAQ for early API subscribers\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && npx wrangler pages project list 2>&1 && echo \"===\" && npx wrangler deployments list 2>&1 | head -20)",
+      "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && npx wrangler pages project create mypasswordchecker-main --production-branch main 2>&1)",
+      "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && npx wrangler pages deploy public --project-name=mypasswordchecker-main --commit-dirty=true 2>&1)",
+      "Bash(curl -sL https://7c66c57b.mypasswordchecker-main.pages.dev/ | grep -A2 \"promo-banner\" | head -5 && echo \"---\" && curl -sL https://7c66c57b.mypasswordchecker-main.pages.dev/ | grep \"Try Premium Tools\" | head -3)",
+      "Bash(curl -sL \"https://7c66c57b.mypasswordchecker-main.pages.dev/\" | head -30)",
+      "Bash(curl -v \"https://7c66c57b.mypasswordchecker-main.pages.dev/\" 2>&1 | head -30)",
+      "WebSearch",
+      "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && npx wrangler pages project delete mypasswordchecker-main --yes 2>&1)",
+      "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && git add workers/mypasswordchecker-api.js wrangler-static.toml wrangler.toml && git commit -m \"$\\(cat <<'EOF'\nEnforce domain verification for all API tiers and fix wrangler.toml\n\n- Move domain verification check from Free tier only to all tiers \\(0-6\\) to prevent phishing abuse\n- Fix wrangler.toml entry point from non-existent api-d1.js to mypasswordchecker-api.js\n- Fix KV namespace IDs to match actual Cloudflare account namespaces\n- Remove temporary wrangler-static.toml deployment config\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}
