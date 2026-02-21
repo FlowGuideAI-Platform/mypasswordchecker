@@ -190,6 +190,36 @@
         </div>
     </header>
 
+    <!-- Promotional Banner -->
+    <div id="promo-banner" class="promo-banner">
+        <div class="promo-banner-content">
+            <span class="promo-badge">LIMITED TIME</span>
+            <h3>All Premium Features FREE Through March 31, 2026!</h3>
+            <p>
+                Quantum analysis, phonetic generator, and breach checking &mdash;
+                <strong>completely free</strong> during our launch promotion.
+                <span id="promo-countdown" class="promo-countdown"></span>
+            </p>
+            <p class="promo-fine-print">
+                APIs 50% off all tiers &bull; Price reverts to $1.00 on April 1, 2026
+            </p>
+        </div>
+    </div>
+    <script>
+    (function() {
+        var promoEnd = new Date('2026-04-01T00:00:00Z');
+        var now = new Date();
+        var diff = promoEnd - now;
+        var days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+        var el = document.getElementById('promo-countdown');
+        if (days > 0) {
+            el.textContent = days + ' days left!';
+        } else {
+            document.getElementById('promo-banner').style.display = 'none';
+        }
+    })();
+    </script>
+
     <main>
         <div class="container">
             <!-- Hero Section -->
@@ -272,12 +302,30 @@
                         <span style="opacity: 0.9;">Check 800M+ breached passwords (HIBP)</span>
                     </div>
                 </div>
-                <p style="font-size: 0.85rem; opacity: 0.9; margin-top: -0.5rem;">
+                <!-- Promo: FREE access -->
+                <p id="premium-cta-promo" style="font-size: 0.85rem; opacity: 0.9; margin-top: -0.5rem;">
+                    <em>FREE through March 31, 2026! <span style="text-decoration: line-through; opacity: 0.7;">Normally $1.00</span></em>
+                </p>
+                <!-- Post-promo: $1 access -->
+                <p id="premium-cta-paid" style="font-size: 0.85rem; opacity: 0.9; margin-top: -0.5rem; display: none;">
                     <em>All included for just $1.00 - pay once, use all three tools!</em>
                 </p>
-                <button class="btn" onclick="window.location.href='/premium.html'" style="color: #dc2626; font-weight: 600;">
+                <button id="premium-cta-btn-promo" class="btn" onclick="window.location.href='/premium.html'" style="color: #059669; font-weight: 600;">
+                    Try Premium Tools - FREE
+                </button>
+                <button id="premium-cta-btn-paid" class="btn" onclick="window.location.href='/premium.html'" style="color: #dc2626; font-weight: 600; display: none;">
                     Try Premium Tools - $1.00
                 </button>
+                <script>
+                (function() {
+                    if (new Date() >= new Date('2026-04-01T00:00:00Z')) {
+                        document.getElementById('premium-cta-promo').style.display = 'none';
+                        document.getElementById('premium-cta-btn-promo').style.display = 'none';
+                        document.getElementById('premium-cta-paid').style.display = '';
+                        document.getElementById('premium-cta-btn-paid').style.display = '';
+                    }
+                })();
+                </script>
             </section>
 
             <!-- Ad Section - Two Ads Side by Side -->
