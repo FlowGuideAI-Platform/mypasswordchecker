@@ -1,5 +1,5 @@
 name = "mypasswordchecker-api"
-main = "workers/api-d1.js"
+main = "workers/mypasswordchecker-api.js"
 compatibility_date = "2024-10-11"
 compatibility_flags = ["nodejs_compat"]
 account_id = "be1ad24bfb43615483c3a472aa134892"
@@ -18,15 +18,15 @@ bucket_name = "mypasswordchecker-audit-logs"
 # KV Namespaces (caching only - migrating away from KV for primary storage)
 [[kv_namespaces]]
 binding = "API_KEYS"
-id = "abc93d05a370492aabbee14b2d58f26f"
+id = "51ae7a6e8bf84e1a8f6d94b630a7f30d"
 
 [[kv_namespaces]]
 binding = "USAGE_TRACKING"
-id = "be5ec99ec61e45c6b2d48cf18c77889e"
+id = "345ef42a47164293bf9bfd0779da5e5d"
 
 [[kv_namespaces]]
 binding = "SESSION_CACHE"
-id = "acee2dfd237545babb617439e6a86db6"
+id = "8c1d651ce8cc4e87a4f30912e0d52ddb"
 
 # Environment variables (set via wrangler secret put)
 [vars]

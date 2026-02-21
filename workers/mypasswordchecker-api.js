@@ -3147,24 +3147,27 @@ async function validateAPIRequest(apiKey, request, env) {
 		}
 
 		// ────────────────────────────────────────────────────────
+		// DOMAIN VERIFICATION (ALL TIERS)
+		// ────────────────────────────────────────────────────────
+
+		if (!apiKeyData.allowed_domains || JSON.parse(apiKeyData.allowed_domains).length === 0) {
+			return {
+				valid: false,
+				error: 'Domain verification required. Please verify your domain in the dashboard at https://mypasswordchecker.com/dashboard',
+				status: 403,
+			};
+		}
+
+		// ────────────────────────────────────────────────────────
 		// FREE TIER SPECIFIC CHECKS
 		// ────────────────────────────────────────────────────────
 
 		if (apiKeyData.tier === 0) {
-			// Free tier MUST have domain verified
-			if (!apiKeyData.allowed_domains || JSON.parse(apiKeyData.allowed_domains).length === 0) {
-				return {
-					valid: false,
-					error: 'Free tier requires domain verification. Please verify your domain in the dashboard.',
-					status: 403,
-				};
-			}
-
 			// Free tier CANNOT use premium features
 			const endpoint = url.pathname;
 
-			if (endpoint.includes('quantum') || 
-					endpoint.includes('phonetic') || 
+			if (endpoint.includes('quantum') ||
+					endpoint.includes('phonetic') ||
 					endpoint.includes('breach')) {
 				return {
 					valid: false,
