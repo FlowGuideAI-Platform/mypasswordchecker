@@ -1,41 +1,20 @@
 # MyPasswordChecker.com - Robots.txt
-# Allow all search engines to index our site
+# Allow all search engines to index our public pages
 
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://mypasswordchecker.com/sitemap.xml
-
-# Crawl-delay (be nice to our server)
-Crawl-delay: 1
-
-# Allow common bots explicitly
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /
-
-User-agent: Baiduspider
-Allow: /
-
-User-agent: YandexBot
-Allow: /
-
-# Disallow user-specific pages (require authentication/payment)
-Disallow: /dashboard.html
-Disallow: /domains.html
-Disallow: /premium.html
+# Disallow user-specific / paywalled pages (require authentication or payment).
+# Paths are extension-less prefixes, so they also cover the .html form.
+Disallow: /dashboard
+Disallow: /domains
+Disallow: /premium
 
 # Disallow API endpoints (programmatic use only, not for indexing)
 Disallow: /api/
 
 # Disallow data files (programmatic use only, not for indexing)
 Disallow: /data/
+
+# Sitemap location
+Sitemap: https://mypasswordchecker.com/sitemap.xml
