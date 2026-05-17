@@ -25,6 +25,34 @@ export default {
 	async fetch(request, env, ctx) {
 		const url = new URL(request.url);
 
+		// ═══════════════════════════════════════════════
+		// ALTERNATE DOMAIN 301 REDIRECTS (SEO consolidation)
+		// ═══════════════════════════════════════════════
+		// Alternate domains route all traffic (/*) to this worker.
+		// 301-redirect them to the canonical domain instead of 404ing,
+		// which preserves link equity and avoids SEO penalties.
+		// All alternate domains (apex + www) 301 directly to the canonical
+		// apex so search engines see a single hop to one canonical URL.
+		const ALTERNATE_DOMAINS = {
+			'mypasswordcheck.com': 'mypasswordchecker.com',
+			'www.mypasswordcheck.com': 'mypasswordchecker.com',
+			'myquantumpasswordchecker.com': 'mypasswordchecker.com',
+			'www.myquantumpasswordchecker.com': 'mypasswordchecker.com',
+			'quantumpasswordchecker.com': 'mypasswordchecker.com',
+			'www.quantumpasswordchecker.com': 'mypasswordchecker.com',
+		};
+		const canonicalHost = ALTERNATE_DOMAINS[url.hostname];
+		if (canonicalHost) {
+			const target = `https://${canonicalHost}${url.pathname}${url.search}`;
+			return new Response(null, {
+				status: 301,
+				headers: {
+					'Location': target,
+					'Cache-Control': 'public, max-age=3600',
+				},
+			});
+		}
+
 		// Only handle /api/* routes
 		if (!url.pathname.startsWith('/api/')) {
 			return new Response('Not Found - This worker handles /api/* routes only', {
