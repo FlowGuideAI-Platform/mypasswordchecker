@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<!--
+  ForgeMCP — Display Ad Unit
+  Dimensions: 300 × 250 px (medium rectangle)
+  Target: mypasswordchecker.com mid-page placement
+  Replaces: FlowGuideAI ad in same position
+  Links to: https://forgemcp.ai
+  Audience: Security-conscious engineers / technical users
+  File: NEW — forgemcp-ad-300x250.html
+  Note: If actual ad slot is a different size, adjust only the
+        #ad-root width/height. All internal layout is proportional.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:300px;height:250px;overflow:hidden;background:transparent}
+
+  #ad-root{
+    width:300px;height:250px;
+    background:#0B0E13;
+    font-family:'Epilogue','Segoe UI',system-ui,sans-serif;
+    position:relative;overflow:hidden;cursor:pointer;
+    display:flex;flex-direction:column;
+    border:1px solid rgba(217,90,20,0.25);
+  }
+
+  /* ── Engineering grid texture ─────────────────────────────── */
+  #grid{
+    position:absolute;inset:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.032) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,0.032) 1px,transparent 1px);
+    background-size:24px 24px;
+  }
+
+  /* ── Forge orange corner accent ───────────────────────────── */
+  #corner{
+    position:absolute;top:0;right:0;width:0;height:0;
+    border-style:solid;
+    border-width:0 52px 52px 0;
+    border-color:transparent #D95A14 transparent transparent;
+  }
+  #corner-lock{
+    position:absolute;top:5px;right:5px;
+    font-size:13px;color:#fff;
+    line-height:1;pointer-events:none;
+  }
+
+  /* ── Live badge ───────────────────────────────────────────── */
+  #badge{
+    position:relative;z-index:1;
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:9px;letter-spacing:0.08em;text-transform:uppercase;
+    color:#D95A14;border:0.5px solid rgba(217,90,20,0.55);
+    padding:3px 8px;border-radius:2px;
+    font-family:'JetBrains Mono','Fira Code',monospace;
+    margin:16px 0 0 16px;
+    width:fit-content;
+  }
+  #live-dot{
+    width:5px;height:5px;border-radius:50%;
+    background:#D95A14;
+    animation:blink 2s ease-in-out infinite;
+  }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+  /* ── Headline ─────────────────────────────────────────────── */
+  #headline{
+    position:relative;z-index:1;
+    font-weight:700;font-size:20px;line-height:1.1;
+    letter-spacing:-0.6px;color:#EEF0F4;
+    margin:10px 16px 0;
+  }
+  #headline em{font-style:normal;color:#D95A14}
+
+  /* ── Sub copy ─────────────────────────────────────────────── */
+  #sub{
+    position:relative;z-index:1;
+    font-size:11px;line-height:1.55;
+    color:rgba(255,255,255,0.45);
+    margin:7px 16px 0;
+  }
+
+  /* ── Tool pills ───────────────────────────────────────────── */
+  #pills{
+    position:relative;z-index:1;
+    display:flex;gap:5px;flex-wrap:wrap;
+    margin:10px 16px 0;
+  }
+  .pill{
+    font-size:9px;font-family:'JetBrains Mono','Fira Code',monospace;
+    color:rgba(255,255,255,0.4);
+    border:0.5px solid rgba(255,255,255,0.12);
+    padding:3px 7px;border-radius:2px;letter-spacing:0.04em;
+  }
+  .pill-live{color:#1D9E75;border-color:rgba(29,158,117,0.35)}
+
+  /* ── Security line ────────────────────────────────────────── */
+  #sec{
+    position:relative;z-index:1;
+    display:flex;align-items:center;gap:5px;
+    font-size:9px;font-family:'JetBrains Mono','Fira Code',monospace;
+    color:rgba(255,255,255,0.25);
+    margin:10px 16px 0;
+  }
+  #sec svg{flex-shrink:0}
+
+  /* ── Spacer ───────────────────────────────────────────────── */
+  #spacer{flex:1}
+
+  /* ── CTA bar ──────────────────────────────────────────────── */
+  #cta-bar{
+    position:relative;z-index:1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;
+    border-top:0.5px solid rgba(217,90,20,0.2);
+    background:rgba(217,90,20,0.08);
+    transition:background 0.2s;
+  }
+  #ad-root:hover #cta-bar{background:rgba(217,90,20,0.16)}
+
+  #cta-left{display:flex;flex-direction:column;gap:2px}
+  #cta-domain{
+    font-size:10px;font-family:'JetBrains Mono','Fira Code',monospace;
+    color:rgba(255,255,255,0.35);letter-spacing:0.03em;
+  }
+  #cta-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:#D95A14;color:#fff;
+    border:none;border-radius:3px;
+    font-size:11px;font-weight:600;
+    font-family:'Epilogue','Segoe UI',system-ui,sans-serif;
+    padding:7px 13px;cursor:pointer;
+    letter-spacing:-0.2px;
+    transition:background 0.15s;
+    white-space:nowrap;
+  }
+  #ad-root:hover #cta-btn{background:#c24f12}
+  #cta-btn svg{flex-shrink:0}
+
+  /* ── Hover reveal: faint "MCP" watermark ─────────────────── */
+  #watermark{
+    position:absolute;bottom:48px;right:-8px;
+    font-size:72px;font-weight:700;letter-spacing:-4px;
+    color:rgba(217,90,20,0.04);
+    font-family:'Epilogue','Segoe UI',system-ui,sans-serif;
+    pointer-events:none;user-select:none;
+    transition:opacity 0.4s;
+  }
+</style>
+</head>
+<body>
+<a href="https://forgemcp.ai/?utm_source=mypasswordchecker&utm_medium=display&utm_campaign=mid-page-300x250"
+   target="_blank" rel="noopener sponsored"
+   style="display:block;text-decoration:none"
+   aria-label="ForgeMCP — Engineering MCP servers for Claude. Visit forgemcp.ai">
+
+  <div id="ad-root" role="img" aria-hidden="true">
+    <div id="grid"></div>
+
+    <!-- Orange corner accent with lock icon — nods to the security audience -->
+    <div id="corner"></div>
+    <div id="corner-lock">
+      <!-- lock icon -->
+      <svg width="11" height="13" viewBox="0 0 11 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="5.5" width="9" height="7" rx="1.5" stroke="white" stroke-width="1.2"/>
+        <path d="M3 5.5V3.5C3 2.12 4.12 1 5.5 1C6.88 1 8 2.12 8 3.5V5.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="5.5" cy="9" r="1" fill="white"/>
+      </svg>
+    </div>
+
+    <!-- Live badge -->
+    <div id="badge">
+      <span id="live-dot"></span>
+      Live now
+    </div>
+
+    <!-- ForgeMCP logo / brand -->
+    <div id="brand" style="padding:6px 16px 0;position:relative;z-index:1">
+      <svg width="176" height="38" viewBox="0 0 176 38"
+           xmlns="http://www.w3.org/2000/svg"
+           aria-label="ForgeMCP logo"
+           style="display:block;overflow:visible">
+        <!-- Hex mark: flat-top, forge orange fill, white border -->
+        <polygon points="19,2 32,9.5 32,24.5 19,32 6,24.5 6,9.5"
+          fill="#D95A14" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+        <!-- Hub dot (MCP center node) -->
+        <circle cx="19" cy="17" r="2.8" fill="white"/>
+        <!-- MCP spokes: 3 of 6 vertices (alternating) with small nodes -->
+        <line x1="19" y1="14.2" x2="19" y2="2" stroke="rgba(255,255,255,0.35)" stroke-width="0.8"/>
+        <line x1="19" y1="19.8" x2="32" y2="24.5" stroke="rgba(255,255,255,0.35)" stroke-width="0.8"/>
+        <line x1="19" y1="19.8" x2="6" y2="24.5" stroke="rgba(255,255,255,0.35)" stroke-width="0.8"/>
+        <circle cx="19" cy="2" r="1.5" fill="rgba(255,255,255,0.55)"/>
+        <circle cx="32" cy="24.5" r="1.5" fill="rgba(255,255,255,0.55)"/>
+        <circle cx="6" cy="24.5" r="1.5" fill="rgba(255,255,255,0.55)"/>
+        <!-- "ForgeMCP" wordmark -->
+        <text x="41" y="22"
+          font-family="Epilogue,-apple-system,system-ui,sans-serif"
+          font-weight="700" font-size="18" letter-spacing="-0.6"
+          fill="white">ForgeMCP</text>
+        <!-- ".ai" suffix in mono -->
+        <text x="41" y="34"
+          font-family="JetBrains Mono,Fira Code,monospace"
+          font-size="10" letter-spacing="0.02em"
+          fill="rgba(255,255,255,0.45)">forgemcp.ai</text>
+      </svg>
+    </div>
+
+    <!-- Headline with rotating AI platform -->
+    <h2 id="headline" style="margin-top:5px" aria-label="Engineering MCP servers for Claude, ChatGPT, Gemini, and Perplexity">
+      Engineering MCP<br>servers for <span id="fm-ai-wrap" style="transition:opacity 0.32s ease,transform 0.32s ease"><em id="fm-ai-name">Claude</em><span id="fm-ai-soon" style="font-size:14px;font-weight:400;font-style:normal;opacity:0.5;display:none"> soon</span></span>
+    </h2>
+
+    <!-- Sub copy — security angle for this audience -->
+    <p id="sub">
+      Connect to Maple, GD&amp;T, Creo &amp; SolidWorks.<br>
+      First-party only — no third-party code in your session.
+    </p>
+
+    <!-- Tool pills -->
+    <div id="pills">
+      <span class="pill pill-live">● Maple</span>
+      <span class="pill pill-live">● GD&amp;T</span>
+      <span class="pill">Creo Q3</span>
+      <span class="pill">SolidWorks Q4</span>
+    </div>
+
+    <!-- AI platform chip -->
+    <div id="fm-ai-row" style="display:flex;align-items:center;gap:6px;margin:4px 0 0 0;padding:0 0 0 0">
+      <span style="font-size:9px;font-family:'JetBrains Mono','Fira Code',monospace;color:rgba(255,255,255,0.25)">Works with</span>
+      <span id="fm-ai-chip-wrap" style="display:inline-flex;align-items:center;gap:4px;transition:opacity 0.3s ease,transform 0.3s ease" aria-live="polite" aria-atomic="true">
+        <span id="fm-dot" style="width:5px;height:5px;border-radius:50%;background:#1D9E75;flex-shrink:0;transition:background 0.3s"></span>
+        <span id="fm-chip-name" style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.65)">Claude</span>
+        <span id="fm-chip-soon" style="font-size:9px;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.28);display:none"> · soon</span>
+      </span>
+    </div>
+
+    <!-- Security credibility line -->
+    <div id="sec">
+      <svg width="10" height="11" viewBox="0 0 10 11" fill="none">
+        <path d="M5 1L9 2.5V5.5C9 7.5 7.2 9.3 5 10C2.8 9.3 1 7.5 1 5.5V2.5L5 1Z" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+        <path d="M3 5.3L4.2 6.5L7 4" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Passkeys · TOTP 2FA · owner-operated infrastructure
+    </div>
+
+    <div id="spacer"></div>
+
+    <!-- Watermark -->
+    <div id="watermark">MCP</div>
+
+    <!-- CTA bar -->
+    <div id="cta-bar">
+      <div id="cta-left">
+        <span id="cta-domain">forgemcp.ai</span>
+      </div>
+      <button id="cta-btn" tabindex="-1">
+        Start free
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M2 5H8M8 5L5.5 2.5M8 5L5.5 7.5" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</a>
+<script>
+/* ── AI platform rotator — headline + chip ─────────────────────────────── */
+const FM_AIS=[
+  {label:'Claude.',    dot:'#1D9E75',soon:false},
+  {label:'ChatGPT.',   dot:'#7F77DD',soon:true},
+  {label:'Gemini.',    dot:'#378ADD',soon:true},
+  {label:'Perplexity.',dot:'#FF6B35',soon:true}
+];
+let fmI=0;
+const fmHWrap=document.getElementById('fm-ai-wrap');
+const fmHName=document.getElementById('fm-ai-name');
+const fmHSoon=document.getElementById('fm-ai-soon');
+const fmCWrap=document.getElementById('fm-ai-chip-wrap');
+const fmCDot=document.getElementById('fm-dot');
+const fmCName=document.getElementById('fm-chip-name');
+const fmCSoon=document.getElementById('fm-chip-soon');
+function fmSlide(el,cb){
+  el.style.opacity='0';el.style.transform='translateY(-8px)';
+  setTimeout(()=>{
+    cb();
+    el.style.transition='none';el.style.transform='translateY(8px)';el.style.opacity='0';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      el.style.transition='opacity 0.32s ease,transform 0.32s ease';
+      el.style.transform='translateY(0)';el.style.opacity='1';
+    }));
+  },340);
+}
+setInterval(()=>{
+  fmSlide(fmHWrap,()=>{
+    fmI=(fmI+1)%FM_AIS.length;
+    const p=FM_AIS[fmI];
+    fmHName.textContent=p.label;
+    fmHSoon.style.display=p.soon?'inline':'none';
+  });
+  fmSlide(fmCWrap,()=>{
+    const p=FM_AIS[fmI];
+    fmCDot.style.background=p.dot;
+    fmCName.textContent=p.label.replace('.','');
+    fmCSoon.style.display=p.soon?'inline':'none';
+  });
+},2800);
+</script>
+</body>
+</html>

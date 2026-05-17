@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--
+  FlowGuideAI — Display Ad Unit REDESIGN v2
+  Dimensions: 300 × 250 px (medium rectangle)
+  Target: mypasswordchecker.com mid-page placement
+  Links to: https://flowguideai.com
+  Rotator 1: Doc type in headline (6 items, 3s each)
+  Rotator 2: AI platform chip (4 items, 4s each, 1.5s offset)
+  Attorney review badge: appears only when Legal docs is active
+  File: REPLACEMENT — fgai-ad-300x250-redesigned.html
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:300px;height:250px;overflow:hidden;background:transparent}
+#ad{width:300px;height:250px;background:#0D1628;font-family:-apple-system,'Segoe UI',system-ui,sans-serif;position:relative;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;border:1px solid rgba(245,158,11,0.2)}
+#grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,212,184,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,184,0.04) 1px,transparent 1px);background-size:20px 20px}
+#topbar{height:3px;flex-shrink:0;position:relative;z-index:2;background:linear-gradient(90deg,#F59E0B 0%,#00D4B8 100%)}
+#badges{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 0;position:relative;z-index:1}
+#ad-label{font-size:9px;color:rgba(255,255,255,0.3);border:0.5px solid rgba(255,255,255,0.15);padding:2px 6px;border-radius:2px;letter-spacing:0.04em}
+#tmpl-badge{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;color:#00D4B8;border:0.5px solid rgba(0,212,184,0.35);padding:2px 7px;border-radius:2px}
+#brand{display:flex;align-items:center;gap:8px;padding:7px 12px 0;position:relative;z-index:1}
+
+
+#hl-wrap{position:relative;z-index:1;margin:7px 12px 0;min-height:50px}
+#dt-wrap{display:inline-block;transition:opacity 0.32s ease,transform 0.32s ease}
+#doc-type{font-weight:700;font-size:18px;line-height:1.12;letter-spacing:-0.5px;color:#F5F7FA;display:block}
+#hl-static{font-weight:700;font-size:18px;line-height:1.12;letter-spacing:-0.5px;color:rgba(255,255,255,0.38)}
+#hl-em{font-style:normal;color:#F59E0B;font-weight:700;font-size:18px;letter-spacing:-0.5px}
+#atty{display:none;align-items:center;gap:4px;font-size:9px;font-family:'JetBrains Mono',monospace;color:#F59E0B;border:0.5px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.08);padding:2px 7px;border-radius:2px;margin:4px 0 0;width:fit-content;letter-spacing:0.03em}
+#sub{position:relative;z-index:1;font-size:11px;line-height:1.5;color:rgba(255,255,255,0.38);margin:5px 12px 0}
+#pills{position:relative;z-index:1;display:flex;gap:4px;flex-wrap:wrap;margin:6px 12px 0}
+.pill{font-size:9px;font-family:'JetBrains Mono',monospace;padding:3px 7px;border-radius:2px;letter-spacing:0.03em}
+.pt{color:#00D4B8;border:0.5px solid rgba(0,212,184,0.3);background:rgba(0,212,184,0.06)}
+.pa{color:#F59E0B;border:0.5px solid rgba(245,158,11,0.3);background:rgba(245,158,11,0.06)}
+.pd{color:rgba(255,255,255,0.28);border:0.5px solid rgba(255,255,255,0.1)}
+#ai-row{position:relative;z-index:1;display:flex;align-items:center;gap:6px;margin:6px 12px 0}
+#ai-label{font-size:9px;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.25)}
+#ai-wrap{display:inline-flex;align-items:center;gap:4px;transition:opacity 0.3s ease,transform 0.3s ease}
+#ai-dot{width:5px;height:5px;border-radius:50%;background:#1D9E75;flex-shrink:0;transition:background 0.3s}
+#ai-name{font-size:10px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:-0.1px}
+#ai-soon{font-size:9px;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.28);display:none}
+#spacer{flex:1}
+#cred{position:relative;z-index:1;padding:0 12px;margin-bottom:5px;font-size:9px;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.18)}
+#cta-bar{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-top:0.5px solid rgba(245,158,11,0.15);background:rgba(245,158,11,0.06);transition:background 0.2s;flex-shrink:0}
+#ad:hover #cta-bar{background:rgba(245,158,11,0.13)}
+#cta-domain{font-size:10px;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.25)}
+#cta-btn{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#0D1628;border:none;border-radius:3px;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;letter-spacing:-0.2px;transition:background 0.15s;font-family:-apple-system,'Segoe UI',system-ui,sans-serif}
+#ad:hover #cta-btn{background:#E08E00}
+#scanline{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,184,0.12),transparent);animation:scan 5s ease-in-out infinite;pointer-events:none;z-index:3}
+@keyframes scan{0%{top:0;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:250px;opacity:0}}
+</style>
+</head>
+<body>
+<a href="https://flowguideai.com?utm_source=mypasswordchecker&utm_medium=display&utm_campaign=mid-page-300x250&utm_content=rotating-docs"
+   target="_blank" rel="noopener sponsored"
+   style="display:block;text-decoration:none"
+   aria-label="FlowGuideAI — Generate compliance, HR, IT, operations, finance, and legal documents with AI. Start free.">
+  <div id="ad" role="img" aria-hidden="true">
+    <div id="grid"></div>
+    <div id="scanline"></div>
+    <div id="topbar"></div>
+    <div id="badges">
+      <span id="ad-label">Ad</span>
+      <span id="tmpl-badge">100+ templates</span>
+    </div>
+    <div id="brand" style="padding:6px 12px 0">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 80" width="216" height="40" aria-label="FlowGuideAI logo">
+        <rect x="16" y="10" width="48" height="60" fill="none" stroke="white" stroke-width="1.333" stroke-linejoin="miter"/>
+        <line x1="50" y1="10" x2="64" y2="24" stroke="white" stroke-width="0.667"/>
+        <polygon points="16,10 50,10 64,24 64,70 16,70" fill="#1A2744"/>
+        <polygon points="50,10 64,10 64,24" fill="#F59E0B"/>
+        <rect x="26" y="37" width="26" height="2.8" fill="#FFFFFF" opacity="0.20"/>
+        <rect x="26" y="47" width="21" height="2.8" fill="#FFFFFF" opacity="0.20"/>
+        <rect x="26" y="57" width="16" height="2.8" fill="#FFFFFF" opacity="0.20"/>
+        <path d="M1078 640V450H320V365H940V195H320V0H70V640Z" fill="#00D4B8" transform="translate(20.584,34.000) scale(0.009000,-0.009000)"/>
+        <path d="M653 -20Q523 -20 414.5 -4.5Q306 11 226.5 48.5Q147 86 103.5 151.0Q60 216 60 315Q60 414 104.0 480.5Q148 547 230.5 586.5Q313 626 427.5 643.0Q542 660 683 660Q868 660 993.5 626.0Q1119 592 1185.0 529.5Q1251 467 1256 381H996Q984 403 952.0 423.5Q920 444 856.0 457.0Q792 470 683 470Q555 470 475.0 454.5Q395 439 358.0 405.0Q321 371 321 315Q321 266 359.0 234.0Q397 202 481.0 186.0Q565 170 703 170Q800 170 871.5 178.5Q943 187 1001.5 205.0Q1060 223 1118 250L1142 221Q1080 104 958.0 42.0Q836 -20 653 -20ZM1074 0Q1074 30 1082.0 68.0Q1090 106 1102.5 147.5Q1115 189 1127 226H737V331H1270V0Z" fill="#F59E0B" transform="translate(31.536,34.000) scale(0.009000,-0.009000)"/>
+        <path d="M234 97V247H918V97ZM10 0 439 640H717L1150 0H875L504 573H653L285 0Z" fill="#00D4B8" transform="translate(44.396,34.000) scale(0.009000,-0.009000)"/>
+        <path d="M85 640H335V0H85Z" fill="#F59E0B" transform="translate(55.636,34.000) scale(0.009000,-0.009000)"/>
+        <path d="M708 647V536H210V362H618V258H210V0H77V647Z" fill="#00D4B8" transform="translate(80.000,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M70 697H200V0H70Z" fill="#FFFFFF" transform="translate(99.266,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M353 -12Q259 -12 187.5 18.0Q116 48 76.0 105.5Q36 163 36 247Q36 331 76.0 389.5Q116 448 187.5 478.0Q259 508 353 508Q447 508 517.5 478.0Q588 448 628.0 389.5Q668 331 668 247Q668 163 628.0 105.5Q588 48 517.5 18.0Q447 -12 353 -12ZM353 88Q405 88 446.5 106.5Q488 125 512.0 160.5Q536 196 536 247Q536 298 512.0 334.5Q488 371 447.0 390.0Q406 409 353 409Q301 409 259.0 390.0Q217 371 192.5 335.0Q168 299 168 247Q168 196 192.0 160.5Q216 125 258.0 106.5Q300 88 353 88Z" fill="#FFFFFF" transform="translate(106.312,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M708 90 667 91 829 497H972L753 0H631L471 401H515L350 0H228L15 497H158L314 90H273L419 497H568Z" fill="#FFFFFF" transform="translate(124.616,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M449 -13Q359 -13 286.5 8.0Q214 29 161.5 71.0Q109 113 81.0 175.0Q53 237 53 318Q53 400 82.5 463.5Q112 527 166.5 571.0Q221 615 296.5 637.5Q372 660 464 660Q573 660 652.0 629.5Q731 599 776.5 544.0Q822 489 828 413H700Q687 453 657.5 482.5Q628 512 580.0 528.5Q532 545 464 545Q377 545 315.5 517.0Q254 489 222.0 438.0Q190 387 190 318Q190 251 218.0 202.5Q246 154 304.5 128.0Q363 102 454 102Q524 102 577.5 120.5Q631 139 667.0 170.5Q703 202 718 241L770 260Q757 131 672.5 59.0Q588 -13 449 -13ZM736 0Q736 31 740.0 71.5Q744 112 750.0 153.5Q756 195 761 230H465V315H851V0Z" fill="#F59E0B" transform="translate(150.304,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M635 0H505V497H635ZM512 239 513 205Q511 191 503.0 164.5Q495 138 478.5 108.0Q462 78 436.0 50.5Q410 23 372.0 5.5Q334 -12 282 -12Q241 -12 201.5 -2.0Q162 8 130.0 31.5Q98 55 79.0 95.0Q60 135 60 196V497H190V218Q190 170 205.5 142.5Q221 115 251.0 104.0Q281 93 322 93Q376 93 415.0 116.5Q454 140 478.5 174.0Q503 208 512 239Z" fill="#FFFFFF" transform="translate(174.068,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M209 715V601H58V715ZM68 497H198V0H68Z" fill="#FFFFFF" transform="translate(192.086,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M302 -11Q227 -11 166.5 21.5Q106 54 71.0 112.5Q36 171 36 248Q36 327 70.5 385.0Q105 443 165.0 475.5Q225 508 302 508Q369 508 416.0 488.0Q463 468 492.0 432.5Q521 397 534.5 350.0Q548 303 548 248Q548 204 534.0 158.5Q520 113 491.0 74.5Q462 36 415.0 12.5Q368 -11 302 -11ZM344 89Q403 89 446.0 109.0Q489 129 512.0 165.0Q535 201 535 248Q535 299 511.5 334.5Q488 370 445.5 389.0Q403 408 344 408Q261 408 215.0 364.0Q169 320 169 248Q169 200 191.0 164.5Q213 129 252.5 109.0Q292 89 344 89ZM535 697H665V0H544Q541 23 538.0 59.5Q535 96 535 128Z" fill="#FFFFFF" transform="translate(199.054,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M513 165H639Q631 114 596.5 74.0Q562 34 503.0 11.0Q444 -12 359 -12Q264 -12 191.0 18.5Q118 49 77.0 107.0Q36 165 36 247Q36 329 76.0 387.5Q116 446 187.5 477.0Q259 508 355 508Q453 508 518.0 477.0Q583 446 614.5 383.5Q646 321 641 224H167Q172 186 195.5 155.0Q219 124 259.5 106.0Q300 88 356 88Q418 88 459.5 109.5Q501 131 513 165ZM349 409Q277 409 232.0 377.5Q187 346 174 300H512Q507 350 464.5 379.5Q422 409 349 409Z" fill="#FFFFFF" transform="translate(218.424,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M178 141V252H606V141ZM17 0 321 647H465L772 0H627L361 583H425L161 0Z" fill="#00D4B8" transform="translate(236.052,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+        <path d="M96 647H229V0H96Z" fill="#F59E0B" transform="translate(256.566,46.000) scale(0.026000,-0.026000)" stroke="white" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+      </svg>
+    </div>
+    <div id="hl-wrap">
+      <div id="dt-wrap" aria-live="polite" aria-atomic="true">
+        <span id="doc-type">Compliance docs</span>
+      </div>
+      <div><span id="hl-static">— in </span><span id="hl-em">minutes.</span></div>
+    </div>
+    <p id="sub">From your notes — structured, formatted, audit-ready.</p>
+    <div id="atty" style="display:none;align-items:center;gap:4px;font-size:9px;font-family:'JetBrains Mono',monospace;color:#F59E0B;border:0.5px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.08);padding:2px 7px;border-radius:2px;margin:4px 12px 0;width:fit-content;letter-spacing:0.03em">⚖ Attorney review required</div>
+    <div id="pills">
+      <span class="pill pt">SOC 2</span>
+      <span class="pill pt">HIPAA</span>
+      <span class="pill pa">ISO 27001</span>
+      <span class="pill pd">GDPR</span>
+      <span class="pill pd">HR · Ops · Legal</span>
+    </div>
+    <div id="ai-row">
+      <span id="ai-label">Works with</span>
+      <div id="ai-wrap" aria-live="polite" aria-atomic="true">
+        <span id="ai-dot"></span>
+        <span id="ai-name">Claude</span>
+        <span id="ai-soon"></span>
+      </div>
+    </div>
+    <div id="spacer"></div>
+    <div id="cred">Built on Cloudflare · Privacy-first · No screen recorder</div>
+    <div id="cta-bar">
+      <span id="cta-domain">flowguideai.com</span>
+      <button id="cta-btn" tabindex="-1">
+        Try free
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M2 5H8M8 5L5.5 2.5M8 5L5.5 7.5" stroke="#0D1628" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</a>
+<script>
+const DOCS=[
+  {label:'Compliance docs',atty:false},
+  {label:'HR docs',atty:false},
+  {label:'Operations docs',atty:false},
+  {label:'IT docs',atty:false},
+  {label:'Finance docs',atty:false},
+  {label:'Legal docs',atty:true}
+];
+const AIS=[
+  {label:'Claude',    dot:'#1D9E75',soon:false},
+  {label:'ChatGPT',   dot:'#7F77DD',soon:true},
+  {label:'Gemini',    dot:'#378ADD',soon:true},
+  {label:'Perplexity',dot:'#FF6B35',soon:true}
+];
+let di=0,ai=0;
+const dtW=document.getElementById('dt-wrap');
+const dtE=document.getElementById('doc-type');
+const atE=document.getElementById('atty');
+const aiW=document.getElementById('ai-wrap');
+const aiD=document.getElementById('ai-dot');
+const aiN=document.getElementById('ai-name');
+const aiS=document.getElementById('ai-soon');
+function slide(el,cb){
+  el.style.opacity='0';el.style.transform='translateY(-8px)';
+  setTimeout(()=>{
+    cb();
+    el.style.transition='none';
+    el.style.transform='translateY(8px)';el.style.opacity='0';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      el.style.transition='opacity 0.32s ease,transform 0.32s ease';
+      el.style.transform='translateY(0)';el.style.opacity='1';
+    }));
+  },340);
+}
+setInterval(()=>slide(dtW,()=>{
+  di=(di+1)%DOCS.length;
+  dtE.textContent=DOCS[di].label;
+  atE.style.display=DOCS[di].atty?'flex':'none';
+}),3000);
+setTimeout(()=>setInterval(()=>slide(aiW,()=>{
+  ai=(ai+1)%AIS.length;
+  const p=AIS[ai];
+  aiN.textContent=p.label;
+  aiD.style.background=p.dot;
+  aiS.textContent=p.soon?' · soon':'';
+  aiS.style.display=p.soon?'inline':'none';
+}),4000),1500);
+</script>
+</body>
+</html>

@@ -332,10 +332,12 @@
             <section class="ad-section">
                 <div class="ad-slots">
                     <div class="ad-slot-banner" id="index-ad-banner-1">
-                        <!-- Ad loaded from ads-config.js -->
+                        <!-- Ad: ForgeMCP — self-contained 300x250 creative -->
+                        <iframe src="/ads/forgemcp-ad-300x250.html" width="300" height="250" frameborder="0" scrolling="no" style="display:block;border:none;overflow:hidden;border-radius:12px" title="ForgeMCP — Engineering MCP servers for Claude" loading="lazy"></iframe>
                     </div>
                     <div class="ad-slot-banner" id="index-ad-banner-2">
-                        <!-- Ad loaded from ads-config.js -->
+                        <!-- Ad: FlowGuideAI — self-contained 300x250 creative -->
+                        <iframe src="/ads/fgai-ad-300x250-redesigned.html" width="300" height="250" frameborder="0" scrolling="no" style="display:block;border:none;overflow:hidden;border-radius:12px" title="FlowGuideAI — AI compliance document generator" loading="lazy"></iframe>
                     </div>
                 </div>
             </section>
@@ -450,11 +452,10 @@
     <script src="/js/quantum-estimator.js?v=2"></script>
     <script src="/js/ads-config.js?v=4"></script>
     <script>
-        // Load affiliate links and ads on page load
+        // Load affiliate links on page load.
+        // Ad slots use static iframes (see .ad-slot-banner markup) — no JS render.
         window.addEventListener('load', () => {
             renderAffiliateLinks('affiliate-links-container');
-            renderAdSlot('index-ad-banner-1', '300x250');
-            renderAdSlot('index-ad-banner-2', '300x250');
         });
     </script>
     <script>
