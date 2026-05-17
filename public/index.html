@@ -332,14 +332,34 @@
             <section class="ad-section">
                 <div class="ad-slots">
                     <div class="ad-slot-banner" id="index-ad-banner-1">
-                        <!-- Ad: ForgeMCP — self-contained 300x250 creative -->
-                        <iframe src="/ads/forgemcp-ad-300x250" width="300" height="250" frameborder="0" scrolling="no" style="display:block;border:none;overflow:hidden;border-radius:12px" title="ForgeMCP — Engineering MCP servers for Claude" loading="lazy"></iframe>
+                        <!-- Ad: ForgeMCP — fixed 300x250 creative, scaled to fill the slot -->
+                        <iframe src="/ads/forgemcp-ad-300x250" title="ForgeMCP — Engineering MCP servers for Claude" loading="lazy"></iframe>
                     </div>
                     <div class="ad-slot-banner" id="index-ad-banner-2">
-                        <!-- Ad: FlowGuideAI — self-contained 300x250 creative -->
-                        <iframe src="/ads/fgai-ad-300x250-redesigned" width="300" height="250" frameborder="0" scrolling="no" style="display:block;border:none;overflow:hidden;border-radius:12px" title="FlowGuideAI — AI compliance document generator" loading="lazy"></iframe>
+                        <!-- Ad: FlowGuideAI — fixed 300x250 creative, scaled to fill the slot -->
+                        <iframe src="/ads/fgai-ad-300x250-redesigned" title="FlowGuideAI — AI compliance document generator" loading="lazy"></iframe>
                     </div>
                 </div>
+                <script>
+                    // Ad creatives are locked to 300x250 internally; scale each iframe up so
+                    // the ad fills the full (fluid) width of its .ad-slot-banner column.
+                    (function () {
+                        const NATIVE_WIDTH = 300;
+                        const fit = (slot) => {
+                            const frame = slot.querySelector('iframe');
+                            if (frame) frame.style.transform = 'scale(' + (slot.clientWidth / NATIVE_WIDTH) + ')';
+                        };
+                        const slots = document.querySelectorAll('.ad-section .ad-slot-banner');
+                        if ('ResizeObserver' in window) {
+                            const observer = new ResizeObserver((entries) => entries.forEach((e) => fit(e.target)));
+                            slots.forEach((slot) => observer.observe(slot));
+                        } else {
+                            const run = () => slots.forEach(fit);
+                            run();
+                            window.addEventListener('resize', run);
+                        }
+                    })();
+                </script>
             </section>
 
             <!-- How It Works -->

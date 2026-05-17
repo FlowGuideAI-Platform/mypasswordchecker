@@ -329,11 +329,23 @@ main {
 
 .ad-slot-banner {
     flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     position: relative;
     max-width: 550px; /* Max width for each ad slot when side by side */
+    aspect-ratio: 300 / 350; /* lock the slot to the ad creative's ratio */
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.ad-slot-banner iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 350px;
+    border: none;
+    display: block;
+    transform-origin: top left;
+    transform: scale(1.8333); /* fallback for the 550px desktop slot; JS refines per slot */
 }
 
 .ad-slot-banner::before {
@@ -373,7 +385,8 @@ main {
     }
 
     .ad-slot-banner {
-        overflow-x: auto; /* Allow horizontal scroll if ad is wider than screen */
+        flex: none;
+        width: 100%; /* full-width slot when stacked; JS rescales the ad to fit */
     }
 }
 
