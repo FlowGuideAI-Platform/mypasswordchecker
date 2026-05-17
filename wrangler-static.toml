@@ -1,0 +1,19 @@
+# Cloudflare Workers Static Assets - Main Site
+#
+# File: wrangler-static.toml
+# Action: NEW FILE
+# Purpose: Deploy config for the `mypasswordchecker-main` worker, which
+#          serves the static site in ./public via Workers Static Assets.
+# Account: be1ad24bfb43615483c3a472aa134892 (SkyPathways)
+#
+# Deploy without disturbing existing routes/custom domains:
+#   npx wrangler versions upload --config wrangler-static.toml
+#   npx wrangler versions deploy <version-id> -y --config wrangler-static.toml
+
+name = "mypasswordchecker-main"
+compatibility_date = "2025-12-26"
+account_id = "be1ad24bfb43615483c3a472aa134892"
+
+[assets]
+directory = "./public"
+not_found_handling = "404-page"
