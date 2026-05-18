@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="API pricing for MyPasswordChecker.com - flexible plans for password strength checking and quantum resistance estimates. Free tier available.">
+    <meta name="description" content="Password API pricing: Free tier (50/mo), Standard ($2.50), Quantum ($20+). Includes entropy analysis, quantum estimates, breach checking.">
     <title>API Pricing - MyPasswordChecker.com</title>
 
     <!-- Open Graph -->
     <meta property="og:title" content="MyPasswordChecker.com API Pricing">
-    <meta property="og:description" content="Flexible API pricing: Free tier (50 requests/month), Standard ($5/mo), Quantum ($40/mo). Integrate password checking into your applications.">
+    <meta property="og:description" content="Flexible API pricing: Free tier (50/month), Standard $2.50/mo, Quantum tiers from $20/mo. Entropy analysis, quantum estimates, breach checking.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mypasswordchecker.com/pricing.html">
     <meta property="og:image" content="https://mypasswordchecker.com/og-image.png">
@@ -16,7 +16,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="MyPasswordChecker.com API Pricing">
-    <meta name="twitter:description" content="Free tier available. Standard $5/mo, Quantum $40/mo with 5,000 quantum estimates.">
+    <meta name="twitter:description" content="Free tier available. Standard $2.50/mo, Quantum tiers from $20/mo with breach checking.">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://mypasswordchecker.com/pricing">
@@ -92,77 +92,35 @@
         </div>
     </header>
 
-    <!-- Promotional Banner -->
-    <div id="promo-banner" class="promo-banner">
-        <div class="promo-banner-content">
-            <span class="promo-badge">LIMITED TIME</span>
-            <h3>50% OFF All API Plans + Premium Tools FREE!</h3>
-            <p>
-                Through March 31, 2026 &mdash; lock in promotional rates.
-                Early adopters keep their discounted rate as long as subscription stays active.
-                <span id="promo-countdown" class="promo-countdown"></span>
-            </p>
-        </div>
-    </div>
-    <script>
-    (function() {
-        var promoEnd = new Date('2026-04-01T00:00:00Z');
-        var now = new Date();
-        var diff = promoEnd - now;
-        var days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-        var el = document.getElementById('promo-countdown');
-        if (days > 0) {
-            el.textContent = days + ' days left!';
-        } else {
-            document.getElementById('promo-banner').style.display = 'none';
-        }
-    })();
-    </script>
-
     <main>
         <div class="container">
             <div class="pricing-section">
                 <h1 style="text-align: center; margin-bottom: 1rem;">API Pricing</h1>
-                <p style="text-align: center; font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 3rem;">
-                    Choose the plan that fits your needs. All plans include the same powerful password analysis.
+                <p style="text-align: center; font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 0.5rem;">
+                    Simple, transparent pricing. Pay only for what you use.
+                </p>
+                <p style="text-align: center; font-size: 0.95rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 3rem;">
+                    Free web tool available - no API key needed for basic checking.
                 </p>
 
-                <!-- $1 Premium (24-Hour Access) - First -->
+                <!-- Premium Tools - free browser-based tools -->
                 <div style="margin-bottom: 3rem;">
                     <div class="pricing-card featured" style="max-width: 600px; margin: 0 auto;">
-                        <div id="premium-badge-promo" class="featured-badge" style="background: #059669;">FREE During Promo!</div>
-                        <div id="premium-badge-paid" class="featured-badge" style="display: none;">Popular Choice</div>
-                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Premium Tools (24-Hour Access)</h3>
-                        <div id="premium-subtitle-promo" style="font-size: 1.125rem; color: #059669; margin-bottom: 1rem; font-weight: 600;">FREE through March 31, 2026</div>
-                        <div id="premium-subtitle-paid" style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1rem; display: none;">$1 Premium</div>
-                        <div id="premium-price-promo" class="price" style="color: #059669;">FREE<span class="price-period"> &bull; <span style="text-decoration: line-through; opacity: 0.6;">$1.00</span></span></div>
-                        <div id="premium-price-paid" class="price" style="display: none;">$1.00<span class="price-period">/24 hours</span></div>
+                        <div class="featured-badge" style="background: #059669;">Free for Everyone</div>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Premium Tools</h3>
+                        <div style="font-size: 1.125rem; color: #059669; margin-bottom: 1rem; font-weight: 600;">Quantum analysis &bull; password generator &bull; breach check</div>
+                        <div class="price" style="color: #059669;">FREE</div>
                         <ul class="pricing-features">
                             <li>Quantum resistance analysis (unlimited)</li>
                             <li>Phonetic password generator (unlimited)</li>
                             <li>Password breach check (HIBP)</li>
                             <li>Grover algorithm estimates</li>
                             <li>3 quantum scenario calculations</li>
-                            <li>No API access &bull; No PQ key generation</li>
+                            <li>No sign-up &bull; runs in your browser</li>
                         </ul>
-                        <a id="premium-btn-promo" href="/premium.html" class="btn btn-primary" style="width: 100%; background: #059669;">Access Premium Tools - FREE</a>
-                        <a id="premium-btn-paid" href="/premium.html" class="btn btn-primary" style="width: 100%; display: none;">Get 24-Hour Access - $1</a>
+                        <a href="/premium.html" class="btn btn-primary" style="width: 100%; background: #059669;">Open Premium Tools</a>
                     </div>
                 </div>
-                <script>
-                (function() {
-                    if (new Date() >= new Date('2026-04-01T00:00:00Z')) {
-                        document.getElementById('premium-badge-promo').style.display = 'none';
-                        document.getElementById('premium-subtitle-promo').style.display = 'none';
-                        document.getElementById('premium-price-promo').style.display = 'none';
-                        document.getElementById('premium-btn-promo').style.display = 'none';
-                        document.getElementById('premium-badge-paid').style.display = '';
-                        document.getElementById('premium-subtitle-paid').style.display = '';
-                        document.getElementById('premium-price-paid').style.display = '';
-                        document.getElementById('premium-btn-paid').style.display = '';
-                    }
-                })();
-                </script>
 
                 <!-- API Pricing Tiers -->
                 <h2 style="margin-bottom: 1.5rem;">API Access Plans</h2>
@@ -183,8 +141,7 @@
 
                     <div class="pricing-card">
                         <h3>Standard</h3>
-                        <div class="price promo-api-price" data-promo="$2.50" data-full="$5">$2.50<span class="price-period">/month</span></div>
-                        <div class="promo-api-note" style="font-size: 0.8rem; color: #059669; font-weight: 600; margin-top: -0.5rem; margin-bottom: 0.5rem;">50% OFF! <span style="text-decoration: line-through; color: var(--text-secondary); font-weight: 400;">$5/mo</span></div>
+                        <div class="price">$2.50<span class="price-period">/month</span></div>
                         <ul class="pricing-features">
                             <li><strong>12,000</strong> password checks/mo</li>
                             <li><strong>100</strong> quantum estimates/mo</li>
@@ -195,14 +152,12 @@
                             <li>99.9% uptime SLA</li>
                         </ul>
                         <a href="/dashboard.html" class="btn btn-primary" style="width: 100%;">Upgrade to Standard</a>
-                        <p class="promo-api-note" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">*$5/mo after March 31, 2026</p>
                     </div>
 
                     <div class="pricing-card featured">
                         <div class="featured-badge">Best Value</div>
                         <h3>Basic Quantum</h3>
-                        <div class="price promo-api-price" data-promo="$5" data-full="$10">$5<span class="price-period">/month</span></div>
-                        <div class="promo-api-note" style="font-size: 0.8rem; color: #059669; font-weight: 600; margin-top: -0.5rem; margin-bottom: 0.5rem;">50% OFF! <span style="text-decoration: line-through; color: var(--text-secondary); font-weight: 400;">$10/mo</span></div>
+                        <div class="price">$5<span class="price-period">/month</span></div>
                         <ul class="pricing-features">
                             <li><strong>50,000</strong> password checks/mo</li>
                             <li><strong>1,000</strong> quantum estimates/mo</li>
@@ -214,18 +169,17 @@
                             <li>Priority support</li>
                         </ul>
                         <a href="/dashboard.html" class="btn btn-primary" style="width: 100%;">Get Basic Quantum</a>
-                        <p class="promo-api-note" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">*$10/mo after March 31, 2026</p>
                     </div>
 
                     <div class="pricing-card">
                         <h3>Standard Quantum</h3>
-                        <div class="price promo-api-price" data-promo="$20" data-full="$40">$20<span class="price-period">/month</span></div>
-                        <div class="promo-api-note" style="font-size: 0.8rem; color: #059669; font-weight: 600; margin-top: -0.5rem; margin-bottom: 0.5rem;">50% OFF! <span style="text-decoration: line-through; color: var(--text-secondary); font-weight: 400;">$40/mo</span></div>
+                        <div class="price">$20<span class="price-period">/month</span></div>
                         <ul class="pricing-features">
-                            <li><strong>150,000</strong> password checks/mo</li>
-                            <li><strong>5,000</strong> quantum estimates/mo</li>
-                            <li><strong>5,000</strong> phonetic generations/mo</li>
-                            <li><strong>1,000</strong> PQ key generations/mo</li>
+                            <li><strong>300,000</strong> password checks/mo</li>
+                            <li><strong>10,000</strong> quantum estimates/mo</li>
+                            <li><strong>10,000</strong> phonetic generations/mo</li>
+                            <li><strong>2,000</strong> PQ key generations/mo</li>
+                            <li><strong>2,000</strong> breach checks/mo</li>
                             <li>Post-quantum cryptography</li>
                             <li>Domain verification + IP allowlist</li>
                             <li>Overage: $0.0125/request</li>
@@ -233,43 +187,38 @@
                             <li>99.9% uptime SLA</li>
                         </ul>
                         <a href="/dashboard.html" class="btn btn-primary" style="width: 100%;">Get Standard Quantum</a>
-                        <p class="promo-api-note" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">*$40/mo after March 31, 2026</p>
                     </div>
 
                     <div class="pricing-card">
                         <h3>Large Quantum</h3>
-                        <div class="price promo-api-price" data-promo="$40" data-full="$80">$40<span class="price-period">/month</span></div>
-                        <div class="promo-api-note" style="font-size: 0.8rem; color: #059669; font-weight: 600; margin-top: -0.5rem; margin-bottom: 0.5rem;">50% OFF! <span style="text-decoration: line-through; color: var(--text-secondary); font-weight: 400;">$80/mo</span></div>
+                        <div class="price">$40<span class="price-period">/month</span></div>
                         <ul class="pricing-features">
-                            <li><strong>400,000</strong> standard checks/mo</li>
-                            <li><strong>25,000</strong> quantum estimates/mo</li>
-                            <li><strong>25,000</strong> phonetic generations/mo</li>
-                            <li><strong>5,000</strong> breach checks/mo</li>
+                            <li><strong>800,000</strong> standard checks/mo</li>
+                            <li><strong>50,000</strong> quantum estimates/mo</li>
+                            <li><strong>50,000</strong> phonetic generations/mo</li>
+                            <li><strong>10,000</strong> breach checks/mo</li>
                             <li>Post-quantum crypto (Kyber + Dilithium)</li>
                             <li>Overage: $0.0100 per request</li>
                             <li>Dedicated priority support</li>
                             <li>99.99% uptime SLA</li>
                         </ul>
                         <a href="/dashboard.html" class="btn btn-primary" style="width: 100%;">Get Large Quantum</a>
-                        <p class="promo-api-note" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">*$80/mo after March 31, 2026</p>
                     </div>
 
                     <div class="pricing-card">
                         <h3>XL Quantum</h3>
-                        <div class="price promo-api-price" data-promo="$75" data-full="$150">$75<span class="price-period">/month</span></div>
-                        <div class="promo-api-note" style="font-size: 0.8rem; color: #059669; font-weight: 600; margin-top: -0.5rem; margin-bottom: 0.5rem;">50% OFF! <span style="text-decoration: line-through; color: var(--text-secondary); font-weight: 400;">$150/mo</span></div>
+                        <div class="price">$75<span class="price-period">/month</span></div>
                         <ul class="pricing-features">
-                            <li><strong>1,000,000</strong> standard checks/mo</li>
-                            <li><strong>100,000</strong> quantum estimates/mo</li>
-                            <li><strong>100,000</strong> phonetic generations/mo</li>
-                            <li><strong>20,000</strong> breach checks/mo</li>
+                            <li><strong>2,000,000</strong> standard checks/mo</li>
+                            <li><strong>200,000</strong> quantum estimates/mo</li>
+                            <li><strong>200,000</strong> phonetic generations/mo</li>
+                            <li><strong>40,000</strong> breach checks/mo</li>
                             <li>Post-quantum crypto (Kyber + Dilithium)</li>
                             <li>Overage: $0.0090 per request</li>
                             <li>Dedicated priority support</li>
                             <li>99.99% uptime SLA</li>
                         </ul>
                         <a href="/dashboard.html" class="btn btn-primary" style="width: 100%;">Get XL Quantum</a>
-                        <p class="promo-api-note" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">*$150/mo after March 31, 2026</p>
                     </div>
                 </div>
 
@@ -281,18 +230,8 @@
                                 ENTERPRISE
                             </div>
                             <h3 style="font-size: 2rem; margin-bottom: 0.5rem; color: white;">Super Quantum</h3>
-                            <div id="super-price-promo" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                            <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem;">
                                 $150<span style="font-size: 1.25rem; font-weight: 400; opacity: 0.9;">/month</span>
-                                <span style="font-size: 1rem; text-decoration: line-through; opacity: 0.6;">$299/mo</span>
-                            </div>
-                            <div id="super-price-paid" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; display: none;">
-                                $299<span style="font-size: 1.25rem; font-weight: 400; opacity: 0.9;">/month</span>
-                            </div>
-                            <div id="super-annual-promo" style="font-size: 1rem; opacity: 0.85; margin-bottom: 1.5rem;">
-                                50% OFF launch promo &bull; $150/mo through March 31, 2026
-                            </div>
-                            <div id="super-annual-paid" style="font-size: 1rem; opacity: 0.85; margin-bottom: 1.5rem; display: none;">
-                                or $2,990/year (save $598)
                             </div>
                             <p style="opacity: 0.9; line-height: 1.6; margin-bottom: 1.5rem;">
                                 Ultimate tier for extreme-volume use. Perfect for enterprises processing millions of password checks daily.
@@ -303,19 +242,19 @@
                             <ul style="list-style: none; padding: 0; margin: 0 0 1.5rem 0;">
                                 <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>3,000,000</strong> standard checks/month</span>
+                                    <span><strong>6,000,000</strong> standard checks/month</span>
                                 </li>
                                 <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>300,000</strong> quantum estimates/month</span>
+                                    <span><strong>600,000</strong> quantum estimates/month</span>
                                 </li>
                                 <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>300,000</strong> phonetic generations/month</span>
+                                    <span><strong>600,000</strong> phonetic generations/month</span>
                                 </li>
                                 <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>200,000</strong> breach checks/month</span>
+                                    <span><strong>400,000</strong> breach checks/month</span>
                                 </li>
                                 <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="font-size: 1.25rem;">✓</span>
@@ -353,12 +292,12 @@
                                 <tr style="background: var(--bg-secondary);">
                                     <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color);">Feature</th>
                                     <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Free</th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);" class="compare-header" data-promo="$2.50/mo" data-full="$5/mo">Standard<br><span style="font-size: 0.75rem; font-weight: normal; color: #059669;">$2.50/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);" class="compare-header" data-promo="$5/mo" data-full="$10/mo">Basic<br><span style="font-size: 0.75rem; font-weight: normal; color: #059669;">$5/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);" class="compare-header" data-promo="$20/mo" data-full="$40/mo">Std Quantum<br><span style="font-size: 0.75rem; font-weight: normal; color: #059669;">$20/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);" class="compare-header" data-promo="$40/mo" data-full="$80/mo">Large<br><span style="font-size: 0.75rem; font-weight: normal; color: #059669;">$40/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);" class="compare-header" data-promo="$75/mo" data-full="$150/mo">XL<br><span style="font-size: 0.75rem; font-weight: normal; color: #059669;">$75/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color); background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%); color: white;" class="compare-header" data-promo="$150/mo" data-full="$299/mo">Super<br><span style="font-size: 0.75rem; font-weight: normal; opacity: 0.9;">$150/mo</span></th>
+                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Standard<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$2.50/mo</span></th>
+                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Basic<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$5/mo</span></th>
+                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Std Quantum<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$20/mo</span></th>
+                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Large<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$40/mo</span></th>
+                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">XL<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$75/mo</span></th>
+                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color); background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%); color: white;">Super<br><span style="font-size: 0.75rem; font-weight: normal; opacity: 0.9;">$150/mo</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -367,40 +306,40 @@
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50/month</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">12K/mo</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">150K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">400K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">1M/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">3M/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">300K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">800K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">2M/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">6M/mo</td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Quantum Estimates</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">100/mo</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">1K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">5K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">25K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">100K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">300K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">10K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">200K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">600K/mo</td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Phonetic Password Gen</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">100/mo</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">1K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">5K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">25K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">100K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">300K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">10K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">200K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">600K/mo</td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Breach Checks</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
                                     <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">1K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">5K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">20K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">200K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">2K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">10K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">40K/mo</td>
+                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">400K/mo</td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Domain Verification</td>
@@ -476,46 +415,8 @@
                         <p style="color: var(--text-secondary);">Yes! The Free plan includes 50 requests per month forever. No credit card required to start.</p>
                     </div>
 
-                    <div id="promo-faq" style="background: white; padding: 1.5rem; border-radius: 0.5rem; margin-top: 1rem;">
-                        <h3 style="margin-bottom: 0.5rem;">What happens after the promotional period?</h3>
-                        <p style="color: var(--text-secondary);">If you subscribe during the promotional period (before March 31, 2026), you keep your discounted rate as long as your subscription stays active. Cancel and re-subscribe later? You'll pay the full price.</p>
-                    </div>
                 </div>
 
-                <!-- Auto-revert pricing after promo ends -->
-                <script>
-                (function() {
-                    if (new Date() >= new Date('2026-04-01T00:00:00Z')) {
-                        // Revert API card prices to full
-                        var cards = document.querySelectorAll('.promo-api-price');
-                        for (var i = 0; i < cards.length; i++) {
-                            var full = cards[i].getAttribute('data-full');
-                            cards[i].childNodes[0].textContent = full;
-                        }
-                        // Hide promo notes
-                        var notes = document.querySelectorAll('.promo-api-note');
-                        for (var j = 0; j < notes.length; j++) {
-                            notes[j].style.display = 'none';
-                        }
-                        // Revert Super Quantum
-                        document.getElementById('super-price-promo').style.display = 'none';
-                        document.getElementById('super-annual-promo').style.display = 'none';
-                        document.getElementById('super-price-paid').style.display = '';
-                        document.getElementById('super-annual-paid').style.display = '';
-                        // Hide promo FAQ
-                        document.getElementById('promo-faq').style.display = 'none';
-                        // Revert comparison table headers
-                        var headers = document.querySelectorAll('.compare-header');
-                        for (var k = 0; k < headers.length; k++) {
-                            var span = headers[k].querySelector('span');
-                            if (span) {
-                                span.textContent = headers[k].getAttribute('data-full');
-                                span.style.color = '';
-                            }
-                        }
-                    }
-                })();
-                </script>
             </div>
         </div>
     </main>

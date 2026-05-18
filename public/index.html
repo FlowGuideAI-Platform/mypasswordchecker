@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free password strength checker: test entropy, crack time, and breach exposure instantly. Includes quantum-resistance analysis. 100% private, in-browser.">
+    <meta name="description" content="Free password strength checker with quantum resistance analysis. Test entropy, crack time instantly. 100% private, runs in your browser.">
     <meta name="keywords" content="password strength checker, password checker, password tester, check password strength, how strong is my password, password strength test, quantum password checker, password breach check, password entropy calculator, quantum computing security">
     <title>Password Strength Checker - Free Online Tool & Quantum Test</title>
 
@@ -190,51 +190,15 @@
         </div>
     </header>
 
-    <!-- Promotional Banner -->
-    <div id="promo-banner" class="promo-banner">
-        <div class="promo-banner-content">
-            <span class="promo-badge">LIMITED TIME</span>
-            <h3>All Premium Features FREE Through March 31, 2026!</h3>
-            <p>
-                Quantum analysis, phonetic generator, and breach checking &mdash;
-                <strong>completely free</strong> during our launch promotion.
-                <span id="promo-countdown" class="promo-countdown"></span>
-            </p>
-            <p class="promo-fine-print">
-                APIs 50% off all tiers &bull; Price reverts to $1.00 on April 1, 2026
-            </p>
-        </div>
-    </div>
-    <script>
-    (function() {
-        var promoEnd = new Date('2026-04-01T00:00:00Z');
-        var now = new Date();
-        var diff = promoEnd - now;
-        var days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-        var el = document.getElementById('promo-countdown');
-        if (days > 0) {
-            el.textContent = days + ' days left!';
-        } else {
-            document.getElementById('promo-banner').style.display = 'none';
-        }
-    })();
-    </script>
-
     <main>
         <div class="container">
             <!-- Hero Section -->
             <section class="hero">
                 <div class="quantum-badge">✨ Now with Optional Quantum Resistance Estimates</div>
                 <h1>How Strong Is Your Password?</h1>
-                <p>Test your password strength for free. Upgrade to see estimated crack times against quantum computing attacks. All checks run in your browser - we never see your password.</p>
-            </section>
-
-            <!-- Affiliate Links Section -->
-            <section class="affiliate-section">
-                <div class="affiliate-title">🔒 Recommended Security Tools</div>
-                <div class="affiliate-links" id="affiliate-links-container">
-                    <!-- Affiliate links loaded from ads-config.js -->
-                </div>
+                <p>Test your password strength for free.</p>
+                <p>See estimated crack times against quantum computing attacks.</p>
+                <p>All checks run in your browser - we never see your password.</p>
             </section>
 
             <!-- Password Checker -->
@@ -284,9 +248,17 @@
                 </div>
             </div>
 
+            <!-- Recommended Security Tools (moved below the checker) -->
+            <section class="affiliate-section">
+                <div class="affiliate-title">🔒 Recommended Security Tools</div>
+                <div class="affiliate-links" id="affiliate-links-container">
+                    <!-- Affiliate links loaded from ads-config.js -->
+                </div>
+            </section>
+
             <!-- Premium Features CTA -->
             <section class="quantum-cta">
-                <h2>🔮 Premium: Quantum Analysis + Password Generator + Breach Check</h2>
+                <h2>🔮 Quantum Analysis + Password Generator + Breach Check</h2>
                 <p>Get detailed quantum resistance estimates, generate quantum-resistant passwords from memorable phrases, AND check if your password appears in 800+ million known breaches.</p>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0; font-size: 0.9rem;">
                     <div>
@@ -302,30 +274,18 @@
                         <span style="opacity: 0.9;">Check 800M+ breached passwords (HIBP)</span>
                     </div>
                 </div>
-                <!-- Promo: FREE access -->
-                <p id="premium-cta-promo" style="font-size: 0.85rem; opacity: 0.9; margin-top: -0.5rem;">
-                    <em>FREE through March 31, 2026! <span style="text-decoration: line-through; opacity: 0.7;">Normally $1.00</span></em>
+                <p style="font-size: 0.9rem; opacity: 0.9; margin-top: -0.25rem;">
+                    <em>Free for everyone — no sign-up required.</em>
                 </p>
-                <!-- Post-promo: $1 access -->
-                <p id="premium-cta-paid" style="font-size: 0.85rem; opacity: 0.9; margin-top: -0.5rem; display: none;">
-                    <em>All included for just $1.00 - pay once, use all three tools!</em>
-                </p>
-                <button id="premium-cta-btn-promo" class="btn" onclick="window.location.href='/premium.html'" style="color: #059669; font-weight: 600;">
-                    Try Premium Tools - FREE
+                <button class="btn" onclick="window.location.href='/premium.html'" style="font-weight: 600;">
+                    🔬 Open Quantum Analysis
                 </button>
-                <button id="premium-cta-btn-paid" class="btn" onclick="window.location.href='/premium.html'" style="color: #dc2626; font-weight: 600; display: none;">
-                    Try Premium Tools - $1.00
+                <button class="btn" onclick="window.location.href='/generate-phonetic.html'" style="font-weight: 600;">
+                    🔤 Generate a Password
                 </button>
-                <script>
-                (function() {
-                    if (new Date() >= new Date('2026-04-01T00:00:00Z')) {
-                        document.getElementById('premium-cta-promo').style.display = 'none';
-                        document.getElementById('premium-cta-btn-promo').style.display = 'none';
-                        document.getElementById('premium-cta-paid').style.display = '';
-                        document.getElementById('premium-cta-btn-paid').style.display = '';
-                    }
-                })();
-                </script>
+                <button class="btn" onclick="window.location.href='/premium.html'" style="font-weight: 600;">
+                    🔍 Check Breaches
+                </button>
             </section>
 
             <!-- Ad Section - Two Ads Side by Side -->

@@ -43,22 +43,6 @@
         </div>
     </header>
 
-    <!-- Promotional Banner -->
-    <div id="promo-banner" class="promo-banner">
-        <div class="promo-banner-content">
-            <span class="promo-badge">FREE ACCESS</span>
-            <h3>All Premium Tools FREE Through March 31, 2026!</h3>
-            <p>No payment required during our launch promotion. Quantum analysis, phonetic generator, and breach checking are all free.</p>
-        </div>
-    </div>
-    <script>
-    (function() {
-        if (new Date() >= new Date('2026-04-01T00:00:00Z')) {
-            document.getElementById('promo-banner').style.display = 'none';
-        }
-    })();
-    </script>
-
     <main>
         <div class="container">
             <!-- Verification State -->
@@ -251,18 +235,9 @@
                     <!-- Phonetic Password Generator (Included in $1 Purchase) -->
                     <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #10b981, #059669); border-radius: 0.75rem; color: white;">
                         <h2 style="color: white; margin-bottom: 0.5rem;">✨ Phonetic Password Generator</h2>
-                        <p id="phonetic-promo-msg" style="opacity: 0.9; margin-bottom: 1.5rem;">
-                            FREE during our launch promotion (through March 31, 2026)! Turn memorable phrases into quantum-resistant passwords.
+                        <p style="opacity: 0.9; margin-bottom: 1.5rem;">
+                            Turn memorable phrases into quantum-resistant passwords — free for everyone.
                         </p>
-                        <p id="phonetic-paid-msg" style="opacity: 0.9; margin-bottom: 1.5rem; display: none;">
-                            Included with your $1.00 purchase! Turn memorable phrases into quantum-resistant passwords.
-                        </p>
-                        <script>
-                        if (new Date() >= new Date('2026-04-01T00:00:00Z')) {
-                            document.getElementById('phonetic-promo-msg').style.display = 'none';
-                            document.getElementById('phonetic-paid-msg').style.display = '';
-                        }
-                        </script>
 
                         <!-- Phrase Input -->
                         <div style="margin-bottom: 1.5rem;">
@@ -325,18 +300,9 @@
                     <!-- Breach Check (Included in $1 Purchase) -->
                     <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 0.75rem; color: white;">
                         <h2 style="color: white; margin-bottom: 0.5rem;">🔍 Password Breach Check</h2>
-                        <p id="breach-promo-msg" style="opacity: 0.9; margin-bottom: 1.5rem;">
-                            FREE during our launch promotion (through March 31, 2026)! Check if your password appears in 800+ million known data breaches using Have I Been Pwned.
+                        <p style="opacity: 0.9; margin-bottom: 1.5rem;">
+                            Check if your password appears in 800+ million known data breaches using Have I Been Pwned — free for everyone.
                         </p>
-                        <p id="breach-paid-msg" style="opacity: 0.9; margin-bottom: 1.5rem; display: none;">
-                            Included with your $1.00 purchase! Check if your password appears in 800+ million known data breaches using Have I Been Pwned.
-                        </p>
-                        <script>
-                        if (new Date() >= new Date('2026-04-01T00:00:00Z')) {
-                            document.getElementById('breach-promo-msg').style.display = 'none';
-                            document.getElementById('breach-paid-msg').style.display = '';
-                        }
-                        </script>
 
                         <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border-left: 4px solid rgba(255,255,255,0.5);">
                             <strong>🔒 Privacy First:</strong> Your password is hashed using SHA-1 in your browser. Only the first 5 characters of the hash are sent (k-anonymity model), ensuring 99.9875% of your password hash remains completely private. Neither we nor HIBP ever see your actual password.
@@ -471,6 +437,14 @@
 
         // Verify payment
         async function verifyPayment() {
+            // ── PAYWALL DISABLED ──────────────────────────────────────
+            // Premium tools are free for all users. To restore the gate:
+            // delete the 3 lines below and un-comment the original logic.
+            verificationLoading.style.display = 'none';
+            premiumContent.style.display = 'block';
+            return;
+
+            /* ORIGINAL PAYWALL LOGIC — preserved for restoration:
             // PROMOTIONAL PERIOD: Free access through March 31, 2026
             var promoEndDate = new Date('2026-04-01T00:00:00Z');
             if (new Date() < promoEndDate) {
@@ -549,6 +523,7 @@
                 verificationLoading.style.display = 'none';
                 paymentRequired.style.display = 'block';
             }
+            */
         }
 
         // Track tool usage
