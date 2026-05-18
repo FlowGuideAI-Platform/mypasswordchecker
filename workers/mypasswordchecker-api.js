@@ -788,37 +788,39 @@ async function handleStripeWebhook(request, env, corsHeaders) {
 			let phonetic_limit = 100;       // Phonetic generations
 			let breach_limit = 0;           // Breach checks (tier 3+)
 
-			if (amount >= 29900) {          // $299+ = Tier 6 (Super Quantum)
+			// Tier thresholds keyed off the permanent prices (amount in cents).
+			// Quantum tiers (3-6) carry the doubled quotas.
+			if (amount >= 15000) {          // $150+ = Tier 6 (Super Quantum)
 				tier = 6;
-				quota_limit = 3000000;
-				quantum_limit = 300000;
-				phonetic_limit = 300000;
-				breach_limit = 200000;
-			} else if (amount >= 15000) {   // $150+ = Tier 5 (XL Quantum)
+				quota_limit = 6000000;
+				quantum_limit = 600000;
+				phonetic_limit = 600000;
+				breach_limit = 400000;
+			} else if (amount >= 7500) {    // $75+ = Tier 5 (XL Quantum)
 				tier = 5;
-				quota_limit = 1000000;
-				quantum_limit = 100000;
-				phonetic_limit = 100000;
-				breach_limit = 20000;
-			} else if (amount >= 8000) {    // $80+ = Tier 4 (Large Quantum)
+				quota_limit = 2000000;
+				quantum_limit = 200000;
+				phonetic_limit = 200000;
+				breach_limit = 40000;
+			} else if (amount >= 4000) {    // $40+ = Tier 4 (Large Quantum)
 				tier = 4;
-				quota_limit = 400000;
-				quantum_limit = 25000;
-				phonetic_limit = 25000;
-				breach_limit = 5000;
-			} else if (amount >= 4000) {    // $40+ = Tier 3 (Standard Quantum)
+				quota_limit = 800000;
+				quantum_limit = 50000;
+				phonetic_limit = 50000;
+				breach_limit = 10000;
+			} else if (amount >= 2000) {    // $20+ = Tier 3 (Standard Quantum)
 				tier = 3;
-				quota_limit = 150000;
-				quantum_limit = 5000;
-				phonetic_limit = 5000;
-				breach_limit = 1000;
-			} else if (amount >= 1000) {    // $10+ = Tier 2 (Basic Quantum)
+				quota_limit = 300000;
+				quantum_limit = 10000;
+				phonetic_limit = 10000;
+				breach_limit = 2000;
+			} else if (amount >= 500) {     // $5+ = Tier 2 (Basic Quantum)
 				tier = 2;
 				quota_limit = 50000;
 				quantum_limit = 1000;
 				phonetic_limit = 1000;
 				breach_limit = 0;
-			} else if (amount >= 500) {     // $5+ = Tier 1 (Standard)
+			} else if (amount >= 250) {     // $2.50+ = Tier 1 (Standard)
 				tier = 1;
 				quota_limit = 12000;
 				quantum_limit = 100;
