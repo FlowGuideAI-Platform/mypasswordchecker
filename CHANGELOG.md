@@ -16,7 +16,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - `/about`: API tier pricing in the "Can I use this for my business?"
   FAQ refreshed to the permanent rates and doubled Quantum-tier quotas;
   "Premium Tools ($1)" feature box commented out (preserved for
-  restoration).
+  restoration); "Why does the premium version cost $1?" FAQ rewritten
+  as "What's included in the Premium tools?" — pricing language stripped,
+  tool descriptions kept and expanded to cover all three tools (quantum
+  analysis, phonetic generator, breach check) for AEO/SEO clarity.
 - `/premium`: title and meta description rewritten to cover all three
   tools (quantum, phonetic, breach); og / twitter tags refreshed;
   JSON-LD `WebApplication` schema added; added to `sitemap.xml`; removed
