@@ -128,6 +128,22 @@ export default {
 			}
 
 			// ═══════════════════════════════════════════════
+			// AD CLICK TRACKING + /numbers ANALYTICS
+			// ═══════════════════════════════════════════════
+
+			if (url.pathname === '/api/track-click' && request.method === 'POST') {
+				return await handleTrackClick(request, env, corsHeaders);
+			}
+
+			if (url.pathname === '/api/numbers-auth' && request.method === 'POST') {
+				return await handleNumbersAuth(request, env, corsHeaders);
+			}
+
+			if (url.pathname === '/api/ad-analytics' && request.method === 'POST') {
+				return await handleAdAnalytics(request, env, corsHeaders);
+			}
+
+			// ═══════════════════════════════════════════════
 			// DEVELOPER DASHBOARD
 			// ═══════════════════════════════════════════════
 
@@ -1202,6 +1218,151 @@ async function handleTrackUsage(request, env, corsHeaders) {
 			error: 'Failed to track usage',
 			message: error.message
 		}, 500, corsHeaders);
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AD CLICK TRACKING + /numbers ANALYTICS
+// ═══════════════════════════════════════════════════════════════
+
+// Operators allowed into the hidden /numbers analytics page.
+const NUMBERS_ALLOWED_EMAILS = ['jack@flowguideai.com', 'jack@forgemcp.ai'];
+const AD_BANNER_IDS = ['flowguideai', 'forgemcp'];
+
+/**
+ * Record an ad banner click. Privacy-respecting — no IP, no identifiers.
+ */
+async function handleTrackClick(request, env, corsHeaders) {
+	try {
+		const data = await request.json();
+		if (!data || !AD_BANNER_IDS.includes(data.banner_id) || !data.placement) {
+			return jsonResponse({ error: 'Invalid click data' }, 400, corsHeaders);
+		}
+		const timeOnSite = Number.isFinite(data.time_on_site) ? Math.trunc(data.time_on_site) : null;
+		await env.DB.prepare(`
+			INSERT INTO ad_clicks (banner_id, placement, timestamp, user_agent_type, traffic_source, time_on_site)
+			VALUES (?, ?, ?, ?, ?, ?)
+		`).bind(
+			data.banner_id,
+			String(data.placement).slice(0, 64),
+			data.timestamp || new Date().toISOString(),
+			String(data.user_agent_type || 'unknown').slice(0, 32),
+			String(data.traffic_source || 'unknown').slice(0, 96),
+			timeOnSite
+		).run();
+		return jsonResponse({ ok: true }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Track click error:', error);
+		return jsonResponse({ error: 'Failed to track click' }, 500, corsHeaders);
+	}
+}
+
+/**
+ * True only if apiKey exists in api_keys and is active.
+ */
+async function isActiveApiKey(env, apiKey) {
+	if (!apiKey || typeof apiKey !== 'string') return false;
+	try {
+		const row = await env.DB.prepare(
+			`SELECT status FROM api_keys WHERE api_key = ?`
+		).bind(apiKey).first();
+		return !!row && row.status === 'active';
+	} catch (e) {
+		return false;
+	}
+}
+
+/**
+ * /numbers step 1 — verify API key + allowed email, then email a 6-digit code.
+ * Failure responses are uniform so neither factor is revealed.
+ */
+async function handleNumbersAuth(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const email = String(body.email || '').trim().toLowerCase();
+		const apiKey = body.apiKey || body.api_key;
+		if (!NUMBERS_ALLOWED_EMAILS.includes(email) || !(await isActiveApiKey(env, apiKey))) {
+			return jsonResponse({ error: 'Not authorized' }, 403, corsHeaders);
+		}
+		const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
+		const sent = await sendEmail(
+			env, email, 'Your /numbers access code',
+			`<p>Your MyPasswordChecker analytics access code is <strong style="font-size:20px">${code}</strong>.</p><p>It expires in 10 minutes.</p>`,
+			`Your MyPasswordChecker analytics access code is ${code}. It expires in 10 minutes.`
+		);
+		if (!sent) {
+			return jsonResponse({ error: 'Could not send the access-code email. Try again later.' }, 502, corsHeaders);
+		}
+		await env.SESSION_CACHE.put(`numbers_code:${email}`, code, { expirationTtl: 600 });
+		return jsonResponse({ ok: true, message: 'A 6-digit code has been emailed to you.' }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Numbers auth error:', error);
+		return jsonResponse({ error: 'Auth request failed' }, 500, corsHeaders);
+	}
+}
+
+/**
+ * /numbers step 2 — verify API key + email + emailed code, return aggregated
+ * ad-click analytics (no PII).
+ */
+async function handleAdAnalytics(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const email = String(body.email || '').trim().toLowerCase();
+		const apiKey = body.apiKey || body.api_key;
+		const code = String(body.code || '').trim();
+		if (!NUMBERS_ALLOWED_EMAILS.includes(email) || !(await isActiveApiKey(env, apiKey))) {
+			return jsonResponse({ error: 'Not authorized' }, 403, corsHeaders);
+		}
+		const storedCode = await env.SESSION_CACHE.get(`numbers_code:${email}`);
+		if (!storedCode || !code || code !== storedCode) {
+			return jsonResponse({ error: 'Invalid or expired code' }, 403, corsHeaders);
+		}
+
+		const totalsRows = await env.DB.prepare(
+			`SELECT banner_id, COUNT(*) AS clicks FROM ad_clicks GROUP BY banner_id`
+		).all();
+		const totals = { flowguideai: 0, forgemcp: 0 };
+		(totalsRows.results || []).forEach(r => { totals[r.banner_id] = r.clicks; });
+
+		const placementRows = await env.DB.prepare(
+			`SELECT placement, banner_id, COUNT(*) AS clicks FROM ad_clicks GROUP BY placement, banner_id`
+		).all();
+		const byPlacement = {};
+		(placementRows.results || []).forEach(r => {
+			byPlacement[r.placement] = byPlacement[r.placement] || {};
+			byPlacement[r.placement][r.banner_id] = r.clicks;
+		});
+
+		const sourceRows = await env.DB.prepare(
+			`SELECT banner_id, traffic_source, COUNT(*) AS clicks FROM ad_clicks GROUP BY banner_id, traffic_source`
+		).all();
+		const bySource = {
+			flowguideai: { total: 0, sources: {} },
+			forgemcp: { total: 0, sources: {} },
+		};
+		(sourceRows.results || []).forEach(r => {
+			const b = bySource[r.banner_id];
+			if (!b) return;
+			b.sources[r.traffic_source || 'unknown'] = r.clicks;
+			b.total += r.clicks;
+		});
+
+		const recentRows = await env.DB.prepare(
+			`SELECT banner_id, placement, timestamp, user_agent_type, traffic_source, time_on_site
+			 FROM ad_clicks ORDER BY id DESC LIMIT 50`
+		).all();
+
+		return jsonResponse({
+			totals,
+			byPlacement,
+			bySource,
+			recentClicks: recentRows.results || [],
+			generatedAt: new Date().toISOString(),
+		}, 200, corsHeaders);
+	} catch (error) {
+		console.error('Ad analytics error:', error);
+		return jsonResponse({ error: 'Failed to load analytics' }, 500, corsHeaders);
 	}
 }
 

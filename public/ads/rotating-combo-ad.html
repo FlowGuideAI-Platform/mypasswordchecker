@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<!--
+  Rotating combo ad — wide horizontal banner
+  File: rotating-combo-ad.html (NEW)
+  Placement: mypasswordchecker.com/premium — replaces existing FGAI horizontal ad
+  Dimensions: width 100% (fills container) × height 120px
+  iframe usage: <iframe src="/ads/rotating-combo-ad.html" width="100%" height="120"
+                        frameborder="0" scrolling="no" style="display:block;border:none"
+                        title="Sponsored — ForgeMCP and FlowGuideAI"></iframe>
+
+  Rotation sequence:
+    FGAI phase:    6 doc types × 3 000ms = 18 000ms
+    → 500ms cross-fade →
+    ForgeMCP phase: 4 AI platforms × 2 800ms = 11 200ms
+    → 500ms cross-fade →
+    repeat
+
+  FGAI doc types: Compliance → HR → Operations → IT → Finance → Legal
+  Attorney badge: shown only when Legal docs is active
+  ForgeMCP AIs:   Claude → ChatGPT (soon) → Gemini (soon) → Perplexity (soon)
+
+  Links:
+    FGAI     → https://flowguideai.com (UTM below)
+    ForgeMCP → https://forgemcp.ai    (UTM below)
+
+  No backticks in JS (safe for Worker template-literal embedding).
+  No external font dependencies — system stack with Epilogue via fontsource.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/epilogue@5.0.16/700.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/epilogue@5.0.16/400.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.17/400.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:120px;overflow:hidden;background:transparent}
+
+.ad-root{position:relative;width:100%;height:120px;overflow:hidden;cursor:pointer}
+
+/* ── Both panels sit on top of each other ───────────────── */
+.ad-panel{
+  position:absolute;inset:0;
+  display:flex;align-items:center;
+  padding:0 22px;gap:0;
+  font-family:'Epilogue',system-ui,sans-serif;
+  text-decoration:none;
+  transition:opacity 0.5s ease;
+}
+
+/* ── FGAI panel ─────────────────────────────────────────── */
+.panel-fgai{
+  background:#0D1628;
+  border-top:3px solid transparent;
+  border-image:linear-gradient(90deg,#F59E0B,#00D4B8) 1;
+  opacity:1;
+  z-index:2;
+}
+/* ── ForgeMCP panel ─────────────────────────────────────── */
+.panel-fmcp{
+  background:#0B0E13;
+  border-top:3px solid #D95A14;
+  border-image:none;
+  opacity:0;
+  z-index:1;
+}
+
+/* ── Shared column layout ───────────────────────────────── */
+.brand-col{
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;width:190px;padding-right:18px;
+  border-right:0.5px solid rgba(255,255,255,0.08);
+}
+.brand-text{min-width:0}
+.brand-name{
+  font-weight:700;font-size:14px;letter-spacing:-0.3px;
+  color:rgba(255,255,255,0.9);display:block;
+}
+.brand-url{
+  font-size:10px;font-family:'JetBrains Mono',monospace;
+  color:rgba(255,255,255,0.3);letter-spacing:0.02em;
+}
+.brand-tag{
+  font-size:9px;font-family:'JetBrains Mono',monospace;
+  letter-spacing:0.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:3px;margin-top:3px;
+  display:inline-block;
+}
+
+.content-col{
+  flex:1;padding:0 22px;min-width:0;
+}
+.headline{
+  font-weight:700;font-size:18px;letter-spacing:-0.4px;
+  line-height:1.15;color:#EEF0F4;margin-bottom:4px;
+  display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;
+}
+.headline-static{white-space:nowrap}
+.headline-rotate{
+  transition:opacity 0.3s ease,transform 0.3s ease;
+  display:inline-block;
+}
+.subline{
+  font-size:11px;color:rgba(255,255,255,0.4);line-height:1.55;
+  font-family:'JetBrains Mono',monospace;
+}
+.atty-badge{
+  display:none;align-items:center;gap:4px;
+  font-size:9px;font-family:'JetBrains Mono',monospace;
+  color:#F59E0B;border:0.5px solid rgba(245,158,11,0.4);
+  background:rgba(245,158,11,0.08);
+  padding:2px 7px;border-radius:2px;margin-top:4px;
+  width:fit-content;letter-spacing:0.03em;
+}
+.ai-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-family:'JetBrains Mono',monospace;
+  color:rgba(255,255,255,0.4);margin-top:5px;
+}
+.ai-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;transition:background 0.3s}
+.ai-chip-name{font-weight:500;color:rgba(255,255,255,0.65);transition:opacity 0.3s,transform 0.3s;display:inline-block}
+.ai-chip-soon{color:rgba(255,255,255,0.3);display:none}
+
+/* ForgeMCP tool pills */
+.fm-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.fm-pill{
+  font-size:9px;font-family:'JetBrains Mono',monospace;
+  padding:2px 8px;border-radius:2px;letter-spacing:0.03em;
+}
+.fm-pill-live{color:#1D9E75;border:0.5px solid rgba(29,158,117,0.35)}
+.fm-pill-dim{color:rgba(255,255,255,0.3);border:0.5px solid rgba(255,255,255,0.1)}
+
+.cta-col{
+  flex-shrink:0;width:140px;display:flex;
+  flex-direction:column;align-items:flex-end;gap:6px;
+}
+.cta-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  color:#fff;border:none;border-radius:4px;
+  font-size:12px;font-weight:600;padding:9px 16px;
+  cursor:pointer;font-family:'Epilogue',system-ui,sans-serif;
+  letter-spacing:-0.1px;white-space:nowrap;
+}
+.cta-domain{
+  font-size:9px;font-family:'JetBrains Mono',monospace;
+  color:rgba(255,255,255,0.3);letter-spacing:0.03em;
+}
+
+/* FGAI accent colors */
+.fgai-em{color:#F59E0B}
+.fgai-cta{background:#F59E0B;color:#0D1628}
+.fgai-tag{color:#00D4B8;background:rgba(0,212,184,0.08);border:0.5px solid rgba(0,212,184,0.3)}
+
+/* ForgeMCP accent colors */
+.fm-em{color:#D95A14}
+.fm-cta{background:#D95A14;color:#fff}
+.fm-tag{color:#D95A14;background:rgba(217,90,20,0.08);border:0.5px solid rgba(217,90,20,0.3)}
+
+/* Scanline animation on FGAI panel */
+.scanline{
+  position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,184,0.1),transparent);
+  animation:scan 6s ease-in-out infinite;pointer-events:none;
+}
+@keyframes scan{
+  0%{top:0;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:120px;opacity:0}
+}
+
+/* Ad label */
+.ad-label{
+  position:absolute;top:5px;right:8px;
+  font-size:8px;font-family:'JetBrains Mono',monospace;
+  color:rgba(255,255,255,0.18);letter-spacing:0.08em;
+  pointer-events:none;
+}
+
+/* Grid texture overlay */
+.grid-texture{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-size:30px 30px;
+}
+</style>
+</head>
+<body>
+<div class="ad-root" role="img" aria-label="Sponsored content — ForgeMCP and FlowGuideAI">
+
+  <!-- ════════════════════════════════════════════════════
+       FGAI PANEL
+       ════════════════════════════════════════════════════ -->
+  <a class="ad-panel panel-fgai" id="panel-fgai"
+     href="https://flowguideai.com?utm_source=mypasswordchecker&utm_medium=display&utm_campaign=premium-rotating&utm_content=fgai-docs"
+     target="_blank" rel="noopener sponsored"
+     aria-label="FlowGuideAI — AI compliance and HR document generator. Try free.">
+    <div class="scanline" aria-hidden="true"></div>
+    <div class="grid-texture" aria-hidden="true"></div>
+    <div class="ad-label">Ad</div>
+
+    <!-- Brand -->
+    <div class="brand-col">
+      <!-- FGAI document icon (simplified) -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" width="42" height="42" aria-hidden="true" style="flex-shrink:0">
+        <rect x="4" y="2" width="36" height="48" rx="2" fill="#1A2744" stroke="rgba(245,158,11,0.5)" stroke-width="1"/>
+        <polygon points="28,2 40,2 40,14" fill="#F59E0B"/>
+        <path d="M1078 640V450H320V365H940V195H320V0H70V640Z" fill="#00D4B8" transform="translate(7.5,16) scale(0.012,-0.012)"/>
+        <path d="M653 -20Q523 -20 414.5 -4.5Q306 11 226.5 48.5Q147 86 103.5 151Q60 216 60 315Q60 414 104 480.5Q148 547 230.5 586.5Q313 626 427.5 643Q542 660 683 660Q868 660 993.5 626Q1119 592 1185 529.5Q1251 467 1256 381H996Q984 403 952 423.5Q920 444 856 457Q792 470 683 470Q555 470 475 454.5Q395 439 358 405Q321 371 321 315Q321 266 359 234Q397 202 481 186Q565 170 703 170Q800 170 871.5 178.5Q943 187 1001.5 205Q1060 223 1118 250L1142 221Q1080 104 958 42Q836 -20 653 -20ZM1074 0Q1074 30 1082 68Q1090 106 1102.5 147.5Q1115 189 1127 226H737V331H1270V0Z" fill="#F59E0B" transform="translate(14,16) scale(0.012,-0.012)"/>
+        <path d="M234 97V247H918V97ZM10 0L439 640H717L1150 0H875L504 573H653L285 0Z" fill="#00D4B8" transform="translate(21.6,16) scale(0.012,-0.012)"/>
+        <path d="M85 640H335V0H85Z" fill="#F59E0B" transform="translate(28.4,16) scale(0.012,-0.012)"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">Flow<span style="color:#00D4B8">Guide</span>AI</span>
+        <span class="brand-url">flowguideai.com</span>
+        <span class="brand-tag fgai-tag">100+ templates</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-col">
+      <div class="headline">
+        <span class="headline-static" style="color:rgba(255,255,255,0.6)">Any</span>
+        <span class="headline-rotate" id="fgai-doctype"><span class="fgai-em">Compliance docs</span></span>
+        <span class="headline-static" style="color:rgba(255,255,255,0.6)">— in</span>
+        <span class="fgai-em">minutes.</span>
+      </div>
+      <div id="fgai-atty" class="atty-badge">&#9878; Attorney review required</div>
+      <div class="subline">From your notes — structured, formatted, audit-ready.</div>
+      <div class="ai-chip">
+        <span style="color:rgba(255,255,255,0.25);margin-right:2px">Works with</span>
+        <span class="ai-dot" id="fgai-ai-dot" style="background:#1D9E75"></span>
+        <span class="ai-chip-name" id="fgai-ai-name">Claude</span>
+        <span class="ai-chip-soon" id="fgai-ai-soon"></span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-col">
+      <button class="cta-btn fgai-cta" tabindex="-1">
+        Try free
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M2 5H8M8 5L5.5 2.5M8 5L5.5 7.5" stroke="#0D1628" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="cta-domain">flowguideai.com</span>
+    </div>
+  </a>
+
+  <!-- ════════════════════════════════════════════════════
+       FORGEMCP PANEL
+       ════════════════════════════════════════════════════ -->
+  <a class="ad-panel panel-fmcp" id="panel-fmcp"
+     href="https://forgemcp.ai?utm_source=mypasswordchecker&utm_medium=display&utm_campaign=premium-rotating&utm_content=forgemcp"
+     target="_blank" rel="noopener sponsored"
+     aria-label="ForgeMCP — Engineering MCP servers for Claude and ChatGPT. Start free.">
+    <div class="grid-texture" aria-hidden="true"></div>
+    <div class="ad-label" style="color:rgba(217,90,20,0.45)">Ad</div>
+
+    <!-- Brand -->
+    <div class="brand-col">
+      <!-- ForgeMCP hex mark -->
+      <svg viewBox="0 0 38 44" width="36" height="42" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0">
+        <polygon points="19,2 33,10 33,34 19,42 5,34 5,10" fill="#D95A14" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+        <circle cx="19" cy="22" r="4" fill="white"/>
+        <line x1="19" y1="18" x2="19" y2="2" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/>
+        <line x1="22.5" y1="24" x2="33" y2="34" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/>
+        <line x1="15.5" y1="24" x2="5" y2="34" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/>
+        <circle cx="19" cy="2" r="2" fill="rgba(255,255,255,0.55)"/>
+        <circle cx="33" cy="34" r="2" fill="rgba(255,255,255,0.55)"/>
+        <circle cx="5" cy="34" r="2" fill="rgba(255,255,255,0.55)"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">ForgeMCP</span>
+        <span class="brand-url">forgemcp.ai</span>
+        <span class="brand-tag fm-tag">First-party only</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-col">
+      <div class="headline">
+        <span class="headline-static" style="color:rgba(255,255,255,0.6)">Engineering MCP servers for</span>
+        <span class="headline-rotate" id="fm-ainame"><span class="fm-em">Claude.</span></span>
+        <span class="ai-chip-soon" id="fm-ai-soon-hl" style="font-size:12px;color:rgba(255,255,255,0.35);display:none">soon</span>
+      </div>
+      <div class="fm-pills">
+        <span class="fm-pill fm-pill-live">&#9679; Maple</span>
+        <span class="fm-pill fm-pill-live">&#9679; GD&amp;T</span>
+        <span class="fm-pill fm-pill-dim">Creo Q3</span>
+        <span class="fm-pill fm-pill-dim">SolidWorks Q4</span>
+        <span class="fm-pill fm-pill-dim">FlowGuideAI</span>
+      </div>
+      <div class="ai-chip" style="margin-top:4px">
+        <span style="color:rgba(255,255,255,0.25);margin-right:2px">Works with</span>
+        <span class="ai-dot" id="fm-ai-dot" style="background:#1D9E75"></span>
+        <span class="ai-chip-name" id="fm-ai-chip">Claude</span>
+        <span class="ai-chip-soon" id="fm-ai-chip-soon"></span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-col">
+      <button class="cta-btn fm-cta" tabindex="-1">
+        Start free
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M2 5H8M8 5L5.5 2.5M8 5L5.5 7.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="cta-domain">forgemcp.ai</span>
+    </div>
+  </a>
+
+</div>
+
+<script>
+/* ── DATA ─────────────────────────────────────────────────────────── */
+var DOCS = [
+  { label: 'Compliance docs', atty: false },
+  { label: 'HR docs',         atty: false },
+  { label: 'Operations docs', atty: false },
+  { label: 'IT docs',         atty: false },
+  { label: 'Finance docs',    atty: false },
+  { label: 'Legal docs',      atty: true  }
+];
+
+var AIS = [
+  { label: 'Claude.',     dot: '#1D9E75', soon: false },
+  { label: 'ChatGPT.',    dot: '#7F77DD', soon: true  },
+  { label: 'Gemini.',     dot: '#378ADD', soon: true  },
+  { label: 'Perplexity.', dot: '#FF6B35', soon: true  }
+];
+
+/* FGAI AI chip rotates independently from the doc type,
+   on a 4.5s cycle offset by 1.5s */
+var FGAI_AIS = [
+  { label: 'Claude',     dot: '#1D9E75', soon: false },
+  { label: 'ChatGPT',    dot: '#7F77DD', soon: true  },
+  { label: 'Gemini',     dot: '#378ADD', soon: true  },
+  { label: 'Perplexity', dot: '#FF6B35', soon: true  }
+];
+
+/* ── ELEMENT REFS ────────────────────────────────────────────────── */
+var panelFgai    = document.getElementById('panel-fgai');
+var panelFmcp    = document.getElementById('panel-fmcp');
+var fgaiDocEl    = document.getElementById('fgai-doctype');
+var fgaiAttyEl   = document.getElementById('fgai-atty');
+var fgaiAiDotEl  = document.getElementById('fgai-ai-dot');
+var fgaiAiNameEl = document.getElementById('fgai-ai-name');
+var fgaiAiSoonEl = document.getElementById('fgai-ai-soon');
+var fmAiNameEl   = document.getElementById('fm-ainame');
+var fmAiSoonHl   = document.getElementById('fm-ai-soon-hl');
+var fmAiDotEl    = document.getElementById('fm-ai-dot');
+var fmAiChipEl   = document.getElementById('fm-ai-chip');
+var fmAiChipSoon = document.getElementById('fm-ai-chip-soon');
+
+var docIdx   = 0;
+var fmAiIdx  = 0;
+var fgAiIdx  = 0;
+var docTimer = null;
+var fmAiTimer= null;
+var fgAiTimer= null;
+
+/* ── SLIDE HELPER — slide out + update + slide in ─────────────────── */
+function slideUpdate(el, updateFn) {
+  el.style.opacity   = '0';
+  el.style.transform = 'translateY(-6px)';
+  setTimeout(function() {
+    updateFn();
+    el.style.transition = 'none';
+    el.style.transform  = 'translateY(6px)';
+    el.style.opacity    = '0';
+    setTimeout(function() {
+      el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      el.style.transform  = 'translateY(0)';
+      el.style.opacity    = '1';
+    }, 20);
+  }, 320);
+}
+
+/* ── FGAI: DOC TYPE ROTATOR ─────────────────────────────────────── */
+function showDoc(idx) {
+  var d = DOCS[idx];
+  slideUpdate(fgaiDocEl, function() {
+    fgaiDocEl.innerHTML = '<span class="fgai-em">' + d.label + '</span>';
+    fgaiAttyEl.style.display = d.atty ? 'flex' : 'none';
+  });
+}
+
+/* ── FGAI: AI CHIP ROTATOR (independent, 4.5s cycle) ───────────── */
+function rotateFgaiAi() {
+  fgAiIdx = (fgAiIdx + 1) % FGAI_AIS.length;
+  var p = FGAI_AIS[fgAiIdx];
+  slideUpdate(fgaiAiNameEl, function() {
+    fgaiAiDotEl.style.background = p.dot;
+    fgaiAiNameEl.textContent     = p.label;
+    fgaiAiSoonEl.textContent     = p.soon ? ' \u00B7 soon' : '';
+    fgaiAiSoonEl.style.display   = p.soon ? 'inline' : 'none';
+  });
+}
+
+/* ── FORGEMCP: AI HEADLINE + CHIP ROTATOR ───────────────────────── */
+function showFmAi(idx) {
+  var p = AIS[idx];
+  slideUpdate(fmAiNameEl, function() {
+    fmAiNameEl.innerHTML = '<span class="fm-em">' + p.label + '</span>';
+    fmAiSoonHl.style.display = p.soon ? 'inline' : 'none';
+  });
+  slideUpdate(fmAiChipEl, function() {
+    fmAiDotEl.style.background = p.dot;
+    fmAiChipEl.textContent     = p.label.replace('.', '');
+    fmAiChipSoon.textContent   = p.soon ? ' \u00B7 soon' : '';
+    fmAiChipSoon.style.display = p.soon ? 'inline' : 'none';
+  });
+}
+
+/* ── FADE HELPER ─────────────────────────────────────────────────── */
+function fadeTo(showId, hideId, callback) {
+  var showEl = document.getElementById(showId);
+  var hideEl = document.getElementById(hideId);
+  hideEl.style.opacity = '0';
+  showEl.style.opacity = '1';
+  /* bring show panel to front */
+  showEl.style.zIndex  = '2';
+  hideEl.style.zIndex  = '1';
+  setTimeout(callback, 500);
+}
+
+/* ── PHASE: FGAI ─────────────────────────────────────────────────── */
+function startFgai() {
+  docIdx = 0;
+  showDoc(0);
+
+  docTimer = setInterval(function() {
+    docIdx++;
+    if (docIdx < DOCS.length) {
+      showDoc(docIdx);
+    } else {
+      clearInterval(docTimer);
+      docTimer = null;
+      /* All doc types shown — hand off to ForgeMCP */
+      fadeTo('panel-fmcp', 'panel-fgai', startFmcp);
+    }
+  }, 3000);
+}
+
+/* ── PHASE: FORGEMCP ─────────────────────────────────────────────── */
+function startFmcp() {
+  fmAiIdx = 0;
+  showFmAi(0);
+
+  fmAiTimer = setInterval(function() {
+    fmAiIdx++;
+    if (fmAiIdx < AIS.length) {
+      showFmAi(fmAiIdx);
+    } else {
+      clearInterval(fmAiTimer);
+      fmAiTimer = null;
+      /* All AI platforms shown — hand back to FGAI */
+      fadeTo('panel-fgai', 'panel-fmcp', startFgai);
+    }
+  }, 2800);
+}
+
+/* ── INIT ────────────────────────────────────────────────────────── */
+/* Start FGAI AI chip rotator independently of doc type cycle */
+setTimeout(function() {
+  fgAiTimer = setInterval(rotateFgaiAi, 4500);
+}, 1500);
+
+/* Start the main phase cycle */
+startFgai();
+</script>
+<!-- Click tracking — privacy-respecting, no PII. Two panels: FGAI + ForgeMCP -->
+<script>
+(function () {
+  function uaType() {
+    var ua = navigator.userAgent;
+    if (/bot|crawler|spider|scraper/i.test(ua)) return 'bot';
+    if (/iPad|tablet/i.test(ua)) return 'tablet';
+    if (/Mobile|Android|iPhone|iPod/i.test(ua)) return 'mobile';
+    return 'desktop';
+  }
+  function ctx() {
+    var c = { source: 'unknown', timeOnSite: null, placement: 'unknown' };
+    try {
+      c.source = parent.sessionStorage.getItem('mpc_traffic_source') || 'unknown';
+      var t = parent.sessionStorage.getItem('mpc_traffic_source_time');
+      if (t) c.timeOnSite = Math.floor((Date.now() - new Date(t).getTime()) / 1000);
+      var p = parent.location.pathname.replace(/^\/+|\/+$/g, '');
+      c.placement = (p === '' || p === 'index') ? 'homepage' : p;
+    } catch (e) {}
+    return c;
+  }
+  function track(bannerId, anchor) {
+    var c = ctx();
+    try {
+      var payload = {
+        banner_id: bannerId, placement: c.placement,
+        timestamp: new Date().toISOString(), user_agent_type: uaType(),
+        traffic_source: c.source, time_on_site: c.timeOnSite
+      };
+      navigator.sendBeacon('/api/track-click',
+        new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+    } catch (e) {}
+    if (anchor && c.source && c.source !== 'unknown' && anchor.href.indexOf('utm_term=') === -1) {
+      anchor.href += '&utm_term=' + encodeURIComponent(c.source);
+    }
+  }
+  var panels = [
+    { el: document.getElementById('panel-fgai'), id: 'flowguideai' },
+    { el: document.getElementById('panel-fmcp'), id: 'forgemcp' }
+  ];
+  panels.forEach(function (p) {
+    if (p.el) p.el.addEventListener('click', function () { track(p.id, p.el); });
+  });
+})();
+</script>
+</body>
+</html>

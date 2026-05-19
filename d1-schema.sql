@@ -206,3 +206,20 @@ AFTER UPDATE ON domain_verifications
 BEGIN
     UPDATE domain_verifications SET updated_at = datetime('now') WHERE id = NEW.id;
 END;
+
+-- Ad click tracking (privacy-respecting — no IP, no identifiers, no cookies)
+CREATE TABLE IF NOT EXISTS ad_clicks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    banner_id TEXT NOT NULL,          -- 'flowguideai' or 'forgemcp'
+    placement TEXT NOT NULL,          -- page the ad was on (e.g. 'homepage', 'premium')
+    timestamp TEXT NOT NULL,          -- client ISO timestamp of the click
+    user_agent_type TEXT,             -- 'desktop' | 'mobile' | 'tablet' | 'bot'
+    traffic_source TEXT,              -- origin category (google, claude_ai, direct, ...)
+    time_on_site INTEGER,             -- seconds on site before the click
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ad_clicks_banner ON ad_clicks(banner_id);
+CREATE INDEX IF NOT EXISTS idx_ad_clicks_placement ON ad_clicks(placement);
+CREATE INDEX IF NOT EXISTS idx_ad_clicks_source ON ad_clicks(traffic_source);
+CREATE INDEX IF NOT EXISTS idx_ad_clicks_banner_source ON ad_clicks(banner_id, traffic_source);

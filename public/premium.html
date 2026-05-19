@@ -360,11 +360,9 @@
                     </div>
                 </div>
 
-                <!-- Premium Ad Section - Single Large Ad -->
+                <!-- Premium Ad Section - Rotating combo banner (ForgeMCP + FlowGuideAI) -->
                 <section class="ad-section">
-                    <div class="ad-slot-banner" id="premium-ad-large" style="width: 100%; max-width: none;">
-                        <!-- Ad loaded from ads-config.js -->
-                    </div>
+                    <iframe src="/ads/rotating-combo-ad.html" width="100%" height="120" frameborder="0" scrolling="no" style="display:block;border:none" title="Sponsored — ForgeMCP and FlowGuideAI" loading="lazy"></iframe>
                 </section>
             </div>
         </div>
@@ -420,12 +418,7 @@
     <script src="/js/quantum-estimator.js?v=3"></script>
     <script src="/js/phonetic-generator.js?v=8"></script>
     <script src="/js/ads-config.js?v=4"></script>
-    <script>
-        // Load ads on page load
-        window.addEventListener('load', () => {
-            renderAdSlot('premium-ad-large', '970x250');  // Single large billboard ad
-        });
-    </script>
+    <script src="/js/ad-tracking.js"></script>
     <script>
         // Get session_id from URL
         const urlParams = new URLSearchParams(window.location.search);
