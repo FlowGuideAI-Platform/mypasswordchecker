@@ -8,7 +8,6 @@ Allow: /
 # Paths are extension-less prefixes, so they also cover the .html form.
 Disallow: /dashboard
 Disallow: /domains
-Disallow: /premium
 Disallow: /numbers
 
 # Disallow API endpoints (programmatic use only, not for indexing)

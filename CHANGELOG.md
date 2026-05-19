@@ -3,6 +3,29 @@
 All notable changes to MyPasswordChecker.com are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2026-05-19]
+
+### Changed
+- `/generate-phonetic`: removed the on-page Pricing block (Quantum / Standard
+  / Pay-per-use figures no longer matched the permanent tiers).
+- `/free-password-checker`: "Premium Access ($1)" button now reads
+  "Premium Tools" and links to `/premium` with no dollar amount. The two
+  older JS-rendered ads at the bottom were replaced with the same
+  ForgeMCP + FlowGuideAI iframe creatives as the homepage, and
+  `ad-tracking.js` is now loaded so origin attribution works there too.
+- `/about`: API tier pricing in the "Can I use this for my business?"
+  FAQ refreshed to the permanent rates and doubled Quantum-tier quotas;
+  "Premium Tools ($1)" feature box commented out (preserved for
+  restoration).
+- `/premium`: title and meta description rewritten to cover all three
+  tools (quantum, phonetic, breach); og / twitter tags refreshed;
+  JSON-LD `WebApplication` schema added; added to `sitemap.xml`; removed
+  from the `robots.txt` Disallow list (premium is free for everyone).
+- Header nav on every public page: Premium link added next to Free Tool.
+- Corner-link carousel: Premium inserted into the ring between Free Tool
+  and Developer API, so the ring is now Home → Free Tool → Premium →
+  Developer API → Docs → Pricing → About → Home.
+
 ## [2026-05-18]
 
 ### Changed

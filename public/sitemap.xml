@@ -90,7 +90,15 @@
     <priority>0.6</priority>
   </url>
 
+  <url>
+    <loc>https://mypasswordchecker.com/premium</loc>
+    <lastmod>2026-05-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Excluded by design:
-       premium / dashboard / domains  - paywalled or user-specific (auth/payment required)
+       dashboard / domains  - user-specific (auth required)
+       numbers              - operator-only analytics dashboard
        404 / attribution-badge / widget-demo  - error and utility pages, not indexable content -->
 </urlset>
