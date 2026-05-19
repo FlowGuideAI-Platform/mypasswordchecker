@@ -135,10 +135,6 @@ export default {
 				return await handleTrackClick(request, env, corsHeaders);
 			}
 
-			if (url.pathname === '/api/numbers-auth' && request.method === 'POST') {
-				return await handleNumbersAuth(request, env, corsHeaders);
-			}
-
 			if (url.pathname === '/api/ad-analytics' && request.method === 'POST') {
 				return await handleAdAnalytics(request, env, corsHeaders);
 			}
@@ -1258,65 +1254,32 @@ async function handleTrackClick(request, env, corsHeaders) {
 }
 
 /**
- * True only if apiKey exists in api_keys and is active.
+ * True only if apiKey is an active key owned by a /numbers operator.
+ * Gates the hidden /numbers analytics page.
  */
-async function isActiveApiKey(env, apiKey) {
+async function isNumbersKey(env, apiKey) {
 	if (!apiKey || typeof apiKey !== 'string') return false;
 	try {
 		const row = await env.DB.prepare(
-			`SELECT status FROM api_keys WHERE api_key = ?`
+			`SELECT status, user_email FROM api_keys WHERE api_key = ?`
 		).bind(apiKey).first();
-		return !!row && row.status === 'active';
+		return !!row && row.status === 'active'
+			&& NUMBERS_ALLOWED_EMAILS.includes(String(row.user_email || '').trim().toLowerCase());
 	} catch (e) {
 		return false;
 	}
 }
 
 /**
- * /numbers step 1 — verify API key + allowed email, then email a 6-digit code.
- * Failure responses are uniform so neither factor is revealed.
- */
-async function handleNumbersAuth(request, env, corsHeaders) {
-	try {
-		const body = await request.json();
-		const email = String(body.email || '').trim().toLowerCase();
-		const apiKey = body.apiKey || body.api_key;
-		if (!NUMBERS_ALLOWED_EMAILS.includes(email) || !(await isActiveApiKey(env, apiKey))) {
-			return jsonResponse({ error: 'Not authorized' }, 403, corsHeaders);
-		}
-		const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
-		const sent = await sendEmail(
-			env, email, 'Your /numbers access code',
-			`<p>Your MyPasswordChecker analytics access code is <strong style="font-size:20px">${code}</strong>.</p><p>It expires in 10 minutes.</p>`,
-			`Your MyPasswordChecker analytics access code is ${code}. It expires in 10 minutes.`
-		);
-		if (!sent) {
-			return jsonResponse({ error: 'Could not send the access-code email. Try again later.' }, 502, corsHeaders);
-		}
-		await env.SESSION_CACHE.put(`numbers_code:${email}`, code, { expirationTtl: 600 });
-		return jsonResponse({ ok: true, message: 'A 6-digit code has been emailed to you.' }, 200, corsHeaders);
-	} catch (error) {
-		console.error('Numbers auth error:', error);
-		return jsonResponse({ error: 'Auth request failed' }, 500, corsHeaders);
-	}
-}
-
-/**
- * /numbers step 2 — verify API key + email + emailed code, return aggregated
+ * /numbers — verify the operator's API key, then return aggregated
  * ad-click analytics (no PII).
  */
 async function handleAdAnalytics(request, env, corsHeaders) {
 	try {
 		const body = await request.json();
-		const email = String(body.email || '').trim().toLowerCase();
 		const apiKey = body.apiKey || body.api_key;
-		const code = String(body.code || '').trim();
-		if (!NUMBERS_ALLOWED_EMAILS.includes(email) || !(await isActiveApiKey(env, apiKey))) {
+		if (!(await isNumbersKey(env, apiKey))) {
 			return jsonResponse({ error: 'Not authorized' }, 403, corsHeaders);
-		}
-		const storedCode = await env.SESSION_CACHE.get(`numbers_code:${email}`);
-		if (!storedCode || !code || code !== storedCode) {
-			return jsonResponse({ error: 'Invalid or expired code' }, 403, corsHeaders);
 		}
 
 		const totalsRows = await env.DB.prepare(

@@ -28,6 +28,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - Corner-link page carousel — prev/next links in the top and bottom corners of
   the six main pages, cycling as a ring: Home → Free Tool → Developer API →
   Docs → Pricing → About → Home.
+- Privacy-respecting ad click tracking — clicks on the ForgeMCP / FlowGuideAI
+  banners are logged to a new `ad_clicks` D1 table with no PII (no IP, no
+  cookies, no identifiers). The visitor's traffic origin (Google, Claude,
+  direct, …) is captured once per session and appended to the outbound link
+  as `utm_term`, so it carries through to FlowGuideAI / ForgeMCP for
+  conversion attribution.
+- New rotating combo banner (ForgeMCP + FlowGuideAI) on the Premium page,
+  replacing the previous horizontal ad.
+- Hidden `/numbers` analytics dashboard — API-key gated, `noindex` and
+  disallowed in `robots.txt` — showing clicks by banner, traffic source, and
+  placement. Worker endpoints `/api/track-click` and `/api/ad-analytics`
+  added to the existing API worker.
 
 ### Removed
 - Promotional banners and their countdown / auto-revert scripts from
