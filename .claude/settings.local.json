@@ -12,7 +12,11 @@
       "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && npx wrangler pages project delete mypasswordchecker-main --yes 2>&1)",
       "Bash(cd \"/Users/jack/Projects - Xcode/mypasswordchecker\" && git add workers/mypasswordchecker-api.js wrangler-static.toml wrangler.toml && git commit -m \"$\\(cat <<'EOF'\nEnforce domain verification for all API tiers and fix wrangler.toml\n\n- Move domain verification check from Free tier only to all tiers \\(0-6\\) to prevent phishing abuse\n- Fix wrangler.toml entry point from non-existent api-d1.js to mypasswordchecker-api.js\n- Fix KV namespace IDs to match actual Cloudflare account namespaces\n- Remove temporary wrangler-static.toml deployment config\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "mcp__plugin_playwright_playwright__browser_navigate",
-      "mcp__plugin_playwright_playwright__browser_evaluate"
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(grep -nE 'paywall|isPremium|hasPaid|payment|Stripe|stripe|unlock|access|FREE|promo|March|\\\\\\\\$1' premium.html)",
+      "WebFetch(domain:www.flowguideai.com)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Add corner-link page carousel across the 6 main pages *)"
     ]
   }
 }
