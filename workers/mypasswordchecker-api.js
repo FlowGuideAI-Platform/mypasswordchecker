@@ -181,6 +181,11 @@ export default {
 		if (url.pathname === '/api/create-free-api-key' && request.method === 'POST') {
 			return await handleCreateFreeAPIKey(request, env, corsHeaders);
 		}
+
+		// P1 — frontend register flow (email + name only, no domain up front).
+		if (url.pathname === '/api/auth/register' && request.method === 'POST') {
+			return await handleAuthRegister(request, env, corsHeaders);
+		}
 			// ═══════════════════════════════════════════════
 			// ADMIN DASHBOARD (Requires ADMIN_TOKEN)
 			// ═══════════════════════════════════════════════
@@ -2476,6 +2481,98 @@ async function handleCreateFreeAPIKey(request, env, corsHeaders) {
 		},
 		upgrade_url: 'https://mypasswordchecker.com/pricing'
 	}, 200, corsHeaders);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// P1: /api/auth/register — thin frontend wrapper for free signup.
+// Same internal create-a-free-key flow as /api/create-free-api-key, but
+// accepts {email, name} (no domain) so the dashboard's register form
+// doesn't have to collect a domain up front. The user adds + verifies a
+// domain afterwards via /api/dashboard/{add,verify}-domain.
+// Returns: { success, api_key, tier:0, status:'pending', next_steps }
+// ═══════════════════════════════════════════════════════════════
+async function handleAuthRegister(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const email = String(body.email || '').trim().toLowerCase();
+		const name = body.name ? String(body.name).trim() : null;
+
+		if (!email) {
+			return jsonResponse({ error: 'Missing required field: email' }, 400, corsHeaders);
+		}
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(email)) {
+			return jsonResponse({ error: 'Invalid email address' }, 400, corsHeaders);
+		}
+
+		// One free key per email.
+		const existing = await env.DB.prepare(
+			`SELECT api_key FROM api_keys WHERE tier = 0 AND user_email = ?`
+		).bind(email).first();
+		if (existing) {
+			return jsonResponse({
+				error: 'Email already has a free API key',
+				message: 'Sign in with the existing key, or upgrade to a paid tier.',
+				upgrade_url: 'https://mypasswordchecker.com/pricing'
+			}, 409, corsHeaders);
+		}
+
+		const apiKey = `sk_free_${generateRandomId(32)}`;
+		const verificationCode = generateRandomId(6);
+		const now = Date.now();
+
+		await env.DB.prepare(`
+			INSERT INTO api_keys (
+				api_key, user_email, user_name, tier, created_at,
+				quota_limit, quota_used,
+				quantum_limit, quantum_used,
+				phonetic_limit, phonetic_used,
+				breach_limit, breach_used,
+				billing_cycle_start,
+				payment_processor, status
+			) VALUES (?, ?, ?, 0, ?, 50, 0, 0, 0, 0, 0, 0, 0, ?, 'free', 'active')
+		`).bind(apiKey, email, name, now, now).run();
+		// Free tier is active immediately so the dashboard can sign in right
+		// after register; P6 re-introduces an email_verified gate once the
+		// EMAIL binding is configured. email_verified stays 0 in the meantime.
+
+		await env.DB.prepare(`
+			INSERT INTO email_verifications (
+				verification_code, user_email, api_key, created_at, expires_at
+			) VALUES (?, ?, ?, ?, ?)
+		`).bind(
+			verificationCode, email, apiKey, now,
+			now + (24 * 60 * 60 * 1000)
+		).run();
+
+		// Sends the verification email. With the EMAIL binding absent today
+		// this silently no-ops (same as /api/create-free-api-key); P6 wires it.
+		await sendVerificationEmail(env, email, apiKey, verificationCode);
+
+		await logAudit(env, {
+			event: 'free_api_key_created_via_auth_register',
+			api_key: apiKey,
+			email: email,
+		});
+
+		return jsonResponse({
+			success: true,
+			api_key: apiKey,
+			tier: 0,
+			status: 'active',
+			next_steps: [
+				'Save your API key — you will only see it this once.',
+				'Verify your email by clicking the link we sent you (when email is enabled).',
+				'Add and verify a domain in the dashboard before paid features activate.'
+			]
+		}, 201, corsHeaders);
+	} catch (error) {
+		console.error('Auth register error:', error);
+		return jsonResponse({
+			error: 'Registration failed',
+			message: error.message
+		}, 500, corsHeaders);
+	}
 }
 
 // ═══════════════════════════════════════════════════════════════

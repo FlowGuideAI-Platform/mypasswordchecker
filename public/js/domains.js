@@ -1,7 +1,15 @@
 // Domain Verification Dashboard JavaScript
-// Handles domain verification UI and API interactions
+// Handles domain verification UI and API interactions.
+//
+// P1 — API-key-as-credential (spec §3): the key is stored in localStorage
+// by /dashboard.html on login, and we send it on every authenticated call
+// as a query param or X-API-Key header. No cookies, no sessions.
 
 let currentSession = null;
+
+function getDashboardApiKey() {
+    return localStorage.getItem('mypasswordchecker_api_key') || '';
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -9,20 +17,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadDomains();
 });
 
-// Check if user is authenticated
+// Check if the stored API key is still valid via the worker's
+// /api/verify-api-key endpoint. If no key or not valid, send the user
+// back to /dashboard.html to sign in.
 async function checkAuth() {
+    const key = getDashboardApiKey();
+    if (!key) { window.location.href = '/dashboard.html'; return; }
     try {
-        const response = await fetch('/api/dashboard', {
-            credentials: 'include'
-        });
-
-        if (!response.ok) {
-            // Not authenticated, redirect to dashboard
+        const response = await fetch('/api/verify-api-key?api_key=' + encodeURIComponent(key));
+        const data = await response.json();
+        if (!response.ok || !data.valid) {
+            localStorage.removeItem('mypasswordchecker_api_key');
             window.location.href = '/dashboard.html';
             return;
         }
-
-        const data = await response.json();
         currentSession = data;
     } catch (error) {
         console.error('Auth check failed:', error);
@@ -44,8 +52,9 @@ async function loadDomains() {
         errorEl.style.display = 'none';
         containerEl.style.display = 'none';
 
-        const response = await fetch('/api/domains/list', {
-            credentials: 'include'
+        const key = getDashboardApiKey();
+        const response = await fetch('/api/dashboard/get-domains?api_key=' + encodeURIComponent(key), {
+            headers: { 'X-API-Key': key }
         });
 
         if (!response.ok) {
@@ -299,13 +308,14 @@ async function addDomain() {
         addBtn.disabled = true;
         addBtn.textContent = 'Adding...';
 
-        const response = await fetch('/api/domains/add', {
+        const key = getDashboardApiKey();
+        const response = await fetch('/api/dashboard/add-domain', {
             method: 'POST',
-            credentials: 'include',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-Key': key
             },
-            body: JSON.stringify({ domain, method })
+            body: JSON.stringify({ api_key: key, domain, method })
         });
 
         const data = await response.json();
@@ -330,13 +340,14 @@ async function addDomain() {
 // Verify domain
 async function verifyDomain(domain) {
     try {
-        const response = await fetch('/api/domains/verify', {
+        const key = getDashboardApiKey();
+        const response = await fetch('/api/dashboard/verify-domain', {
             method: 'POST',
-            credentials: 'include',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-Key': key
             },
-            body: JSON.stringify({ domain })
+            body: JSON.stringify({ api_key: key, domain })
         });
 
         const data = await response.json();
@@ -365,9 +376,18 @@ async function removeDomain(domain) {
     }
 
     try {
-        const response = await fetch(`/api/domains/${encodeURIComponent(domain)}`, {
-            method: 'DELETE',
-            credentials: 'include'
+        // Remove-domain endpoint lands with the admin / overage work in P5
+        // (worker doesn't yet expose /api/dashboard/remove-domain). The path
+        // below is the conventional name; calling it surfaces a clean 404
+        // rather than silently appearing to work.
+        const key = getDashboardApiKey();
+        const response = await fetch('/api/dashboard/remove-domain', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': key
+            },
+            body: JSON.stringify({ api_key: key, domain })
         });
 
         const data = await response.json();

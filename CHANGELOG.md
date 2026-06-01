@@ -3,6 +3,63 @@
 All notable changes to MyPasswordChecker.com are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2026-06-01]
+
+### Fixed
+- **Root cause of the aac2.com API outage / customer-base collapse:** the
+  `api_keys` table was missing the `quantum_limit/used`, `phonetic_limit/
+  used`, `breach_limit/used` columns that the worker's paid-tier INSERT
+  references. Every paid-key creation has been silently failing with
+  `no such column` since whenever those INSERTs were added. Fixed with
+  `migrations/d1-add-pq-quotas.sql` (additive ALTER TABLE only).
+- Stripped the rest of the stale `$295` / `$75` / `$150` / `$2,950` etc.
+  pricing copy from `pricing.html`, `password-api.html`, `about.html`,
+  and `api-docs.html`; corrected Super Quantum quotas (6M → 10M checks,
+  600K → 1M quantum + phonetic) and dropped XL Quantum to $60, Super to
+  $99 per spec §4.
+
+### Added — Developer Dashboard rebuild P1 (foundation)
+Following the `CC BUILD PROMPT — Rebuild MyPasswordChecker Developer
+Dashboard` spec. P1 only; P2–P6 land in subsequent commits.
+- `public/js/pricing.js` — single source of truth for the API tier
+  catalog (spec §4). Exports `window.Pricing.TIERS`,
+  `Pricing.tierById/tierByLevel`, `Pricing.formatPrice`. Dashboard
+  reads from this; future surfaces should too so prices can't drift.
+- `POST /api/auth/register` — thin worker wrapper for the dashboard's
+  email-register form. Same internal flow as `/api/create-free-api-key`
+  but accepts `{email, name}` (no domain up front). Free tier is
+  created active immediately; P6 re-introduces email-verification
+  gating once the EMAIL binding is configured.
+- `public/dashboard.html` JS rewired to API-key-as-credential
+  (spec §3): API key stored in `localStorage`, sent as `X-API-Key`
+  header or `?api_key=…` query param. All `credentials: 'include'`
+  cookie-session reliance removed. Replaced `/api/auth/login` and
+  `/api/auth/me` with localStorage + `/api/verify-api-key`. Plan
+  names + monthly costs sourced from `Pricing.tierByLevel(data.tier)`
+  instead of stale hardcoded maps.
+- `public/js/domains.js` ported off cookie sessions to the same
+  API-key model; rewired `/api/domains/{add,verify,list}` to the
+  worker's actual paths `/api/dashboard/{add,verify,get}-domain`.
+- Upgrade buttons relabeled with current permanent prices ($2.50 /
+  $5 / $20 / $40 / $60 / $99); the dead `super_quantum_annual` and
+  `$1 Premium` buttons removed. Until P3 wires Stripe Checkout +
+  PayPal subscriptions, the upgrade button just lands the user on
+  `/pricing.html`.
+- Overage Protection panel hidden (P5 re-enables); admin panel
+  remains hidden (P5). The wrapper that fired `/api/admin/check` +
+  `/api/dashboard/overage-setting` on every dashboard load is gated
+  off so the console isn't spammed with 404s in the meantime.
+- All dashboard rendering switched to DOM methods (`textContent`,
+  `createElement`) rather than `innerHTML`, so any worker-supplied
+  string is safe regardless of upstream validation.
+
+P1 acceptance verified end-to-end against the live API:
+`/api/auth/register` → `{api_key, tier:0, status:'active'}` ✓ ·
+`/api/verify-api-key` → `{valid:true, tier:0}` ✓ ·
+`/api/dashboard/usage` → tier + quota_used/limit ✓ ·
+`/api/dashboard/get-domains` ✓ ·
+`/api/dashboard/add-domain` → verification token issued ✓.
+
 ## [2026-05-31]
 
 ### Fixed

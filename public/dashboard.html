@@ -133,36 +133,28 @@
                     </div>
                     <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
                         <button id="btn-standard" class="btn btn-primary" onclick="upgradePlan('standard')">
-                            ⬆️ Upgrade to Standard ($5/mo)
+                            ⬆️ Upgrade to Standard ($2.50/mo)
                         </button>
                         <button id="btn-basic-quantum" class="btn btn-primary" onclick="upgradePlan('basic_quantum')">
-                            ⬆️ Basic Quantum ($10/mo)
+                            ⬆️ Basic Quantum ($5/mo)
                         </button>
                         <button id="btn-quantum" class="btn btn-primary" onclick="upgradePlan('standard_quantum')">
-                            ⬆️ Standard Quantum ($40/mo)
+                            ⬆️ Standard Quantum ($20/mo)
                         </button>
-                        <button id="btn-super-quantum" class="btn btn-primary" onclick="showSuperQuantumOptions()" style="background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);">
-                            ⬆️ Super Quantum
+                        <button id="btn-large-quantum" class="btn btn-primary" onclick="upgradePlan('large_quantum')">
+                            ⬆️ Large Quantum ($40/mo)
                         </button>
-                        <button class="btn btn-secondary" onclick="upgradePlan('quantum_single')">
-                            $1 Premium (24hr)
+                        <button id="btn-xl-quantum" class="btn btn-primary" onclick="upgradePlan('xl_quantum')">
+                            ⬆️ XL Quantum ($60/mo)
                         </button>
-                    </div>
-                    <div id="super-quantum-options" style="display: none; margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(30,58,138,0.1) 0%, rgba(49,46,129,0.1) 100%); border-radius: 0.5rem; border: 2px solid #1e3a8a;">
-                        <p style="margin-bottom: 1rem; font-weight: 600;">Choose Super Quantum billing:</p>
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="upgradePlan('super_quantum_monthly')" style="background: #1e3a8a;">
-                                Monthly - $295/month
-                            </button>
-                            <button class="btn btn-primary" onclick="upgradePlan('super_quantum_annual')" style="background: #312e81;">
-                                Annual - $2,950/year (save $590)
-                            </button>
-                        </div>
+                        <button id="btn-super-quantum" class="btn btn-primary" onclick="upgradePlan('super_quantum')" style="background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);">
+                            ⬆️ Super Quantum ($99/mo)
+                        </button>
                     </div>
                 </div>
 
-                <!-- Overage Protection Setting -->
-                <div class="checker-card" style="margin-bottom: 2rem;">
+                <!-- Overage Protection Setting (hidden in P1; re-enabled in P5 spec phase 5) -->
+                <div class="checker-card" style="margin-bottom: 2rem; display: none;">
                     <h2 style="margin-bottom: 1rem;">🛡️ Overage Protection</h2>
                     <p style="color: var(--text-secondary); margin-bottom: 1rem;">
                         Control what happens when you exceed your monthly quota.
@@ -486,8 +478,27 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         }
     </style>
 
+    <!-- Centralized tier catalog (single source of truth, spec §4). -->
+    <script src="/js/pricing.js"></script>
     <script>
         let currentApiKey = '';
+
+        // P1 — API key IS the credential (spec §3). Stored in localStorage,
+        // sent as X-API-Key header or ?api_key= query on every authenticated call.
+        function getApiKey() {
+            return currentApiKey || localStorage.getItem('mypasswordchecker_api_key') || '';
+        }
+        function setApiKey(key) {
+            currentApiKey = key || '';
+            if (key) localStorage.setItem('mypasswordchecker_api_key', key);
+            else localStorage.removeItem('mypasswordchecker_api_key');
+        }
+        function logout() {
+            setApiKey('');
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('api-key-input-section').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'none';
+        }
 
         // Show/hide sections
         function showApiKeyInput() {
@@ -500,31 +511,26 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             document.getElementById('api-key-input-section').style.display = 'none';
         }
 
-        // Register new account
+        // Register new account — wires to the worker's /api/auth/register thin
+        // wrapper (which delegates to the same internal logic as
+        // /api/create-free-api-key). Free tier is created active immediately;
+        // P6 re-introduces email-verification gating once email is wired.
         async function registerAccount() {
-            const email = document.getElementById('email').value;
-            const name = document.getElementById('name').value;
-
-            if (!email) {
-                alert('Please enter your email address');
-                return;
-            }
-
+            const email = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+            if (!email) { alert('Please enter your email address'); return; }
             try {
                 const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, name })
                 });
-
                 const data = await response.json();
-
-                if (data.success) {
-                    currentApiKey = data.api_key;
-                    localStorage.setItem('mypasswordchecker_api_key', currentApiKey);
+                if (response.ok && data.success && data.api_key) {
+                    setApiKey(data.api_key);
                     showDashboard();
                 } else {
-                    alert('Registration failed: ' + (data.error || 'Unknown error'));
+                    alert('Registration failed: ' + (data.error || data.message || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Registration error:', error);
@@ -532,34 +538,24 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             }
         }
 
-        // Load dashboard with existing API key (Login)
+        // "Login" = paste your existing API key. We store it locally and
+        // validate via the worker's existing /api/verify-api-key (no cookies,
+        // no sessions). If the key is active the dashboard loads.
         async function loadDashboard() {
-            const apiKey = document.getElementById('existing-api-key').value;
-
-            if (!apiKey) {
-                alert('Please enter your API key');
-                return;
-            }
-
+            const apiKey = document.getElementById('existing-api-key').value.trim();
+            if (!apiKey) { alert('Please enter your API key'); return; }
             try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ api_key: apiKey })
-                });
-
+                const response = await fetch('/api/verify-api-key?api_key=' + encodeURIComponent(apiKey));
                 const data = await response.json();
-
-                if (response.ok && data.success) {
-                    // Login successful, reload page to show dashboard
-                    window.location.reload();
+                if (response.ok && data.valid) {
+                    setApiKey(apiKey);
+                    showDashboard();
                 } else {
-                    alert('Login failed: ' + (data.error || 'Invalid API key'));
+                    alert('Invalid API key: ' + (data.error || 'not found or inactive'));
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                alert('Login failed. Please try again.');
+                alert('Could not verify API key. Please try again.');
             }
         }
 
@@ -575,142 +571,103 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             loadUsageData();
         }
 
-        // Load usage data
+        // Helpers — DOM methods only, no innerHTML, so any worker-supplied
+        // text can be safely rendered.
+        function _clear(el) { while (el && el.firstChild) el.removeChild(el.firstChild); }
+        function _setText(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+        function _setWidth(id, pct) { const el = document.getElementById(id); if (el) el.style.width = pct + '%'; }
+        function _setUpgradePrompt(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            _clear(el);
+            const a = document.createElement('a');
+            a.href = '/pricing.html';
+            a.style.color = 'var(--primary-color)';
+            a.textContent = 'Upgrade to access';
+            el.appendChild(a);
+        }
+        function _showError(id, message) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            _clear(el);
+            const div = document.createElement('div');
+            div.className = 'alert alert-error';
+            div.textContent = message;
+            el.appendChild(div);
+        }
+
+        // Load usage from the worker (existing /api/dashboard/usage handler,
+        // keyed off ?api_key=). Plan name + monthly cost come from
+        // window.Pricing (loaded from /js/pricing.js) so they can't drift.
+        // Per-bucket counters for quantum / phonetic / breach surface in P3
+        // once subscription activation populates those columns.
         async function loadUsageData() {
-            document.getElementById('usage-loading').style.display = 'block';
-            document.getElementById('usage-data').style.display = 'none';
+            const key = getApiKey();
+            if (!key) return;
+
+            const loading = document.getElementById('usage-loading');
+            if (loading) loading.style.display = 'block';
+            const usageData = document.getElementById('usage-data');
+            if (usageData) usageData.style.display = 'none';
 
             try {
-                const response = await fetch('/api/dashboard/usage', {
-                    credentials: 'include'  // Use session cookie instead of API key
+                const response = await fetch('/api/dashboard/usage?api_key=' + encodeURIComponent(key));
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load usage data');
+
+                const tier = (window.Pricing && Pricing.tierByLevel(data.tier)) || Pricing.tierById('free');
+                _setText('current-plan', tier.name);
+                _setText('monthly-cost', Pricing.formatPrice(tier.monthly));
+
+                if (data.tier >= 2) {
+                    const dvs = document.getElementById('domain-verification-section');
+                    if (dvs) dvs.style.display = 'block';
+                    loadDomains();
+                }
+
+                // Mark "current plan" on the matching upgrade button so users
+                // can see what they're on. Lookup is by tier integer.
+                const planButtons = [
+                    { tier: 1, id: 'btn-standard' },
+                    { tier: 2, id: 'btn-basic-quantum' },
+                    { tier: 3, id: 'btn-quantum' },
+                    { tier: 6, id: 'btn-super-quantum' }
+                ];
+                planButtons.forEach(b => {
+                    const btn = document.getElementById(b.id);
+                    if (!btn) return;
+                    if (b.tier === data.tier) {
+                        btn.textContent = '✓ Current Plan';
+                        btn.disabled = true;
+                        btn.style.opacity = '0.6';
+                        btn.style.cursor = 'not-allowed';
+                        btn.onclick = null;
+                    }
                 });
 
-                const data = await response.json();
+                // Password checks (worker returns quota_used / quota_limit).
+                const used = Number(data.quota_used || 0);
+                const limit = Number(data.quota_limit || 0);
+                const remaining = Math.max(0, limit - used);
+                _setText('tier1-used', used.toLocaleString());
+                _setText('tier1-quota', limit.toLocaleString());
+                _setText('tier1-remaining', remaining.toLocaleString());
+                _setWidth('tier1-bar', Math.min(100, limit > 0 ? (used / limit) * 100 : 0));
 
-                if (response.ok) {
-                    // Update plan
-                    const planNames = {
-                        'free': 'Free',
-                        'standard': 'Standard',
-                        'basic_quantum': 'Basic Quantum',
-                        'quantum_monthly': 'Standard Quantum',
-                        'standard_quantum': 'Standard Quantum',
-                        'super_quantum_monthly': 'Super Quantum (Monthly)',
-                        'super_quantum_annual': 'Super Quantum (Annual)'
-                    };
-                    document.getElementById('current-plan').textContent = planNames[data.plan] || data.plan;
+                // Quantum / phonetic / breach buckets aren't yet exposed by the
+                // worker's usage handler — show an upgrade prompt until P3
+                // wires them via subscription activation.
+                _setUpgradePrompt('tier2-status');
+                _setUpgradePrompt('tier3-status');
+                _setUpgradePrompt('breach-status');
 
-                    const costs = {
-                        'free': '$0',
-                        'standard': '$12',
-                        'basic_quantum': '$29',
-                        'quantum_monthly': '$49',
-                        'standard_quantum': '$49',
-                        'super_quantum_monthly': '$295',
-                        'super_quantum_annual': '$245.83'  // $2950/year = $245.83/month
-                    };
-                    document.getElementById('monthly-cost').textContent = costs[data.plan] || '$0';
+                _setText('current-month', data.month || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
 
-                    // Update subscription buttons
-                    const btnStandard = document.getElementById('btn-standard');
-                    const btnQuantum = document.getElementById('btn-quantum');
-                    const btnSuperQuantum = document.getElementById('btn-super-quantum');
-
-                    if (data.plan === 'standard') {
-                        btnStandard.textContent = '✓ Current Plan';
-                        btnStandard.disabled = true;
-                        btnStandard.style.opacity = '0.6';
-                        btnStandard.style.cursor = 'not-allowed';
-                        btnStandard.onclick = null;
-                    } else if (data.plan === 'quantum_monthly') {
-                        btnQuantum.textContent = '✓ Current Plan';
-                        btnQuantum.disabled = true;
-                        btnQuantum.style.opacity = '0.6';
-                        btnQuantum.style.cursor = 'not-allowed';
-                        btnQuantum.onclick = null;
-
-                        // Also disable Standard button (can't downgrade)
-                        btnStandard.textContent = '⬇️ Downgrade to Standard ($19/mo)';
-                    } else if (data.plan === 'super_quantum_monthly' || data.plan === 'super_quantum_annual') {
-                        btnSuperQuantum.textContent = '✓ Current Plan';
-                        btnSuperQuantum.disabled = true;
-                        btnSuperQuantum.style.opacity = '0.6';
-                        btnSuperQuantum.style.cursor = 'not-allowed';
-                        btnSuperQuantum.onclick = null;
-
-                        // Show domain verification requirement message
-                        const domainBanner = document.createElement('div');
-                        domainBanner.style.cssText = 'background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%); color: white; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;';
-                        domainBanner.innerHTML = '<strong>🔐 Domain Verification Required</strong><br>Your Super Quantum plan requires domain verification. Please verify your domain to use the API. Contact <a href="mailto:enterprise@mypasswordchecker.com" style="color: white; text-decoration: underline;">enterprise@mypasswordchecker.com</a> for setup support.';
-                        document.querySelector('.checker-card').prepend(domainBanner);
-                    }
-
-                    // Show domain verification section for all Quantum tiers
-                    const isQuantumTier = data.plan === 'basic_quantum' || data.plan === 'quantum_monthly' || data.plan === 'standard_quantum' || data.plan === 'super_quantum_monthly' || data.plan === 'super_quantum_annual';
-
-                    if (isQuantumTier) {
-                        // Show the domain verification section
-                        document.getElementById('domain-verification-section').style.display = 'block';
-
-                        // Load existing domains
-                        loadDomains();
-                    }
-
-                    // Update Tier 1
-                    document.getElementById('tier1-used').textContent = data.tier1.usage;
-                    document.getElementById('tier1-quota').textContent = data.tier1.quota;
-                    document.getElementById('tier1-remaining').textContent = data.tier1.remaining;
-
-                    const tier1Percent = Math.min(100, (data.tier1.usage / data.tier1.quota) * 100);
-                    document.getElementById('tier1-bar').style.width = tier1Percent + '%';
-
-                    // Update Tier 2
-                    if (data.tier2.quota > 0) {
-                        document.getElementById('tier2-used').textContent = data.tier2.usage;
-                        document.getElementById('tier2-quota').textContent = data.tier2.quota;
-                        document.getElementById('tier2-status').textContent = data.tier2.remaining + ' requests remaining';
-
-                        const tier2Percent = Math.min(100, (data.tier2.usage / data.tier2.quota) * 100);
-                        document.getElementById('tier2-bar').style.width = tier2Percent + '%';
-                    } else {
-                        document.getElementById('tier2-status').innerHTML = '<a href="/pricing.html" style="color: var(--primary-color);">Upgrade to access Tier 2</a>';
-                    }
-
-                    // Update Tier 3
-                    if (data.tier3 && data.tier3.quota > 0) {
-                        document.getElementById('tier3-used').textContent = data.tier3.usage;
-                        document.getElementById('tier3-quota').textContent = data.tier3.quota;
-                        document.getElementById('tier3-status').textContent = data.tier3.remaining + ' requests remaining';
-
-                        const tier3Percent = Math.min(100, (data.tier3.usage / data.tier3.quota) * 100);
-                        document.getElementById('tier3-bar').style.width = tier3Percent + '%';
-                    } else {
-                        document.getElementById('tier3-status').innerHTML = '<a href="/pricing.html" style="color: var(--primary-color);">Upgrade to access Tier 3</a>';
-                    }
-
-                    // Update Breach Check
-                    if (data.breach && data.breach.quota > 0) {
-                        document.getElementById('breach-used').textContent = data.breach.usage;
-                        document.getElementById('breach-quota').textContent = data.breach.quota;
-                        document.getElementById('breach-status').textContent = data.breach.remaining + ' breach checks remaining';
-
-                        const breachPercent = Math.min(100, (data.breach.usage / data.breach.quota) * 100);
-                        document.getElementById('breach-bar').style.width = breachPercent + '%';
-                    } else {
-                        document.getElementById('breach-status').innerHTML = '<a href="/pricing.html" style="color: var(--primary-color);">Upgrade to access breach checking</a>';
-                    }
-
-                    // Update month
-                    document.getElementById('current-month').textContent = data.month;
-
-                    document.getElementById('usage-loading').style.display = 'none';
-                    document.getElementById('usage-data').style.display = 'block';
-                } else {
-                    throw new Error(data.error || 'Failed to load usage data');
-                }
+                if (loading) loading.style.display = 'none';
+                if (usageData) usageData.style.display = 'block';
             } catch (error) {
                 console.error('Usage loading error:', error);
-                document.getElementById('usage-loading').innerHTML = '<div class="alert alert-error">Failed to load usage data. Please check your API key.</div>';
+                _showError('usage-loading', 'Failed to load usage data. Please check your API key.');
             }
         }
 
@@ -752,13 +709,14 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
             try {
-                const response = await fetch('/api/domains/add', {
+                const response = await fetch('/api/dashboard/add-domain', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-Key': currentApiKey
+                        'X-API-Key': getApiKey()
                     },
                     body: JSON.stringify({
+                        api_key: getApiKey(),
                         domain: cleanDomain,
                         method: method
                     })
@@ -812,13 +770,14 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             }
 
             try {
-                const response = await fetch('/api/domains/verify', {
+                const response = await fetch('/api/dashboard/verify-domain', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-Key': currentApiKey
+                        'X-API-Key': getApiKey()
                     },
                     body: JSON.stringify({
+                        api_key: getApiKey(),
                         domain: domain
                     })
                 });
@@ -850,28 +809,53 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         }
 
         async function loadDomains() {
+            const key = getApiKey();
+            if (!key) return;
             try {
-                const response = await fetch('/api/domains/list', {
-                    headers: {
-                        'X-API-Key': currentApiKey
-                    }
+                const response = await fetch('/api/dashboard/get-domains?api_key=' + encodeURIComponent(key), {
+                    headers: { 'X-API-Key': key }
                 });
-
                 const data = await response.json();
+                if (!response.ok) return;
 
-                if (response.ok && data.domains) {
-                    const container = document.getElementById('verified-domains');
-                    if (data.domains.length === 0) {
-                        container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic;">No domains verified yet.</p>';
-                    } else {
-                        container.innerHTML = data.domains.map(d => `
-                            <div style="background: ${d.status === 'verified' ? '#d1fae5' : '#fee2e2'}; border: 1px solid ${d.status === 'verified' ? '#10b981' : '#ef4444'}; padding: 1rem; border-radius: 0.25rem; margin-bottom: 0.5rem;">
-                                <strong>${d.domain}</strong> - ${d.status === 'verified' ? '✅ Verified' : '⏳ Pending'}
-                                ${d.status === 'pending' ? `<button onclick="retryVerification('${d.domain}')" class="btn btn-secondary" style="margin-left: 1rem; padding: 0.25rem 0.75rem;">Retry Verification</button>` : ''}
-                            </div>
-                        `).join('');
-                    }
+                const container = document.getElementById('verified-domains');
+                if (!container) return;
+                _clear(container);
+
+                const list = Array.isArray(data.domains) ? data.domains : [];
+                if (list.length === 0) {
+                    const p = document.createElement('p');
+                    p.style.color = 'var(--text-secondary)';
+                    p.style.fontStyle = 'italic';
+                    p.textContent = 'No domains verified yet.';
+                    container.appendChild(p);
+                    return;
                 }
+
+                // Build rows with DOM methods so worker-returned domain strings
+                // can't inject HTML even if validation upstream is weakened.
+                list.forEach(d => {
+                    const isVerified = d.status === 'verified';
+                    const row = document.createElement('div');
+                    row.style.cssText =
+                        'background:' + (isVerified ? '#d1fae5' : '#fee2e2') +
+                        ';border:1px solid ' + (isVerified ? '#10b981' : '#ef4444') +
+                        ';padding:1rem;border-radius:0.25rem;margin-bottom:0.5rem;';
+                    const strong = document.createElement('strong');
+                    strong.textContent = d.domain || '';
+                    row.appendChild(strong);
+                    row.appendChild(document.createTextNode(' - ' + (isVerified ? '✅ Verified' : '⏳ Pending')));
+                    if (!isVerified) {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-secondary';
+                        btn.style.marginLeft = '1rem';
+                        btn.style.padding = '0.25rem 0.75rem';
+                        btn.textContent = 'Retry Verification';
+                        btn.addEventListener('click', () => retryVerification(d.domain));
+                        row.appendChild(btn);
+                    }
+                    container.appendChild(row);
+                });
             } catch (error) {
                 console.error('Load domains error:', error);
             }
@@ -883,98 +867,37 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             optionsDiv.style.display = optionsDiv.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Upgrade to plan (Stripe Checkout)
-        async function upgradePlan(plan) {
-            const planNames = {
-                'standard': 'Standard ($5/month)',
-                'basic_quantum': 'Basic Quantum ($10/month)',
-                'quantum_monthly': 'Standard Quantum ($40/month)',
-                'standard_quantum': 'Standard Quantum ($40/month)',
-                'super_quantum_monthly': 'Super Quantum ($295/month)',
-                'super_quantum_annual': 'Super Quantum ($2,950/year - save $590)',
-                'quantum_single': '$1 Premium (24-hour access)'
-            };
-
-            let confirmMessage = `Upgrade to ${planNames[plan]}?`;
-            if (plan === 'basic_quantum' || plan === 'quantum_monthly' || plan === 'standard_quantum') {
-                confirmMessage += '\n\nNote: Quantum tiers require domain verification for API access.';
-            } else if (plan === 'super_quantum_monthly' || plan === 'super_quantum_annual') {
-                confirmMessage += '\n\nNote: Domain verification is required. Contact enterprise@mypasswordchecker.com for setup support.';
-            }
-
-            if (!confirm(confirmMessage)) {
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/create-checkout-session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ plan })
-                });
-
-                const data = await response.json();
-
-                if (data.checkout_url) {
-                    // Redirect to Square Checkout
-                    window.location.href = data.checkout_url;
-                } else {
-                    alert('Error creating checkout: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Checkout error:', error);
-                alert('Failed to start checkout. Please try again.');
-            }
+        // Subscription upgrades land in P3 (Stripe Checkout for tiers >= $10,
+        // PayPal subscription for tiers < $10). Until then, send the user to
+        // the public pricing page so they still see the catalog.
+        function upgradePlan(_plan) {
+            window.location.href = '/pricing.html';
         }
 
-        // Check authentication on page load
+        // Check authentication on page load. If a key is stored, validate it
+        // via /api/verify-api-key and show the dashboard; otherwise show the
+        // register / paste-key UI. GitHub OAuth lands in P4 — its callback
+        // will eventually redirect here with the key in the URL hash.
         window.addEventListener('load', async () => {
-            // Check for OAuth messages
-            const urlParams = new URLSearchParams(window.location.search);
-
+            const stored = getApiKey();
+            if (!stored) {
+                document.getElementById('auth-section').style.display = 'block';
+                return;
+            }
             try {
-                const response = await fetch('/api/auth/me', {
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    currentApiKey = data.api_key || '(hidden for security)';
+                const response = await fetch('/api/verify-api-key?api_key=' + encodeURIComponent(stored));
+                const data = await response.json();
+                if (response.ok && data.valid) {
+                    setApiKey(stored);
                     showDashboard();
-
-                    // Show success messages
-                    if (urlParams.get('success') === 'true') {
-                        // Show onboarding banner for new subscribers
-                        document.getElementById('onboarding-banner').style.display = 'block';
-                        window.history.replaceState({}, '', '/dashboard.html');
-                    } else if (urlParams.get('login') === 'success') {
-                        alert('Successfully signed in with GitHub!');
-                        window.history.replaceState({}, '', '/dashboard.html');
-                    }
                 } else {
-                    // Not authenticated - show login form
+                    // Stored key is no longer valid — drop it and go back to auth.
+                    setApiKey('');
                     document.getElementById('auth-section').style.display = 'block';
-                    document.getElementById('api-key-input-section').style.display = 'none';
-                    document.getElementById('dashboard-content').style.display = 'none';
-
-                    // Show error messages
-                    const error = urlParams.get('error');
-                    if (error === 'oauth_failed') {
-                        alert('GitHub sign-in failed. Please try again or register with email.');
-                    } else if (error === 'invalid_state') {
-                        alert('Security validation failed. Please try signing in again.');
-                    } else if (error === 'no_email') {
-                        alert('Could not retrieve your email from GitHub. Please make sure your GitHub email is public or register with email.');
-                    }
-                    if (error) {
-                        window.history.replaceState({}, '', '/dashboard.html');
-                    }
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
                 document.getElementById('auth-section').style.display = 'block';
-                document.getElementById('dashboard-content').style.display = 'none';
             }
         });
 
@@ -1093,13 +1016,11 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             }
         }
 
-        // Load overage setting when loading usage data
-        const originalLoadUsageData = loadUsageData;
-        loadUsageData = async function() {
-            await originalLoadUsageData();
-            await loadOverageSetting();
-            await checkAdminStatus();
-        };
+        // The overage + admin wrappers around loadUsageData are disabled in P1
+        // alongside their UI. They fire against unbuilt endpoints
+        // (/api/dashboard/overage-setting, /api/admin/check) and just spam
+        // 404s in the console. P5 re-introduces both panels and re-wires
+        // this wrapper.
 
         // Check if current user is admin and load admin panel
         async function checkAdminStatus() {
