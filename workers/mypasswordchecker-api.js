@@ -5067,28 +5067,50 @@ function extractDomain(url) {
  * No external service needed!
  */
 async function sendEmail(env, to, subject, htmlBody, textBody) {
+	// P6 — Resend over HTTP. The Cloudflare Email Workers binding was never
+	// configured, so the previous EmailMessage / env.EMAIL.send() path
+	// silently failed for every verification flow. Switching to Resend's
+	// REST API turns those flows on with no Cloudflare-side setup.
+	if (!env.RESEND_API_KEY) {
+		console.error('Email send skipped: RESEND_API_KEY not configured.');
+		await logAudit(env, {
+			event: 'email_send_skipped_no_provider',
+			to: to,
+			subject: subject,
+		});
+		return false;
+	}
 	try {
-		const message = new EmailMessage(
-			env.EMAIL_FROM || "noreply@mypasswordchecker.com",
-			to,
-			subject
-		);
+		const payload = {
+			from: env.EMAIL_FROM || 'MyPasswordChecker <noreply@mypasswordchecker.com>',
+			to: [to],
+			subject: subject,
+			reply_to: env.EMAIL_REPLY_TO || 'support@mypasswordchecker.com',
+		};
+		if (htmlBody) payload.html = htmlBody;
+		if (textBody) payload.text = textBody;
+		if (!payload.html && !payload.text) payload.text = subject;
 
-		message.setHeader("Reply-To", env.EMAIL_REPLY_TO || "support@mypasswordchecker.com");
-
-		// Set both HTML and plain text versions
-		if (htmlBody) {
-			message.setHeader("Content-Type", "text/html; charset=utf-8");
-			await message.setBody(htmlBody);
-		} else {
-			message.setHeader("Content-Type", "text/plain; charset=utf-8");
-			await message.setBody(textBody);
+		const response = await fetch('https://api.resend.com/emails', {
+			method: 'POST',
+			headers: {
+				'Authorization': 'Bearer ' + env.RESEND_API_KEY,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(payload),
+		});
+		const data = await response.json().catch(() => ({}));
+		if (!response.ok) {
+			console.error('Resend send failed:', data);
+			await logAudit(env, {
+				event: 'email_send_failed',
+				to: to,
+				subject: subject,
+				error: (data && data.message) || ('HTTP ' + response.status),
+			});
+			return false;
 		}
-
-		// Send via Cloudflare's email binding
-		await env.EMAIL.send(message);
-
-		console.log(`Email sent to ${to}: ${subject}`);
+		console.log(`Email sent to ${to}: ${subject} (resend id ${data.id})`);
 		return true;
 
 	} catch (error) {
