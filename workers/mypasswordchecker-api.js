@@ -159,6 +159,19 @@ export default {
 				return await handleGetDomains(request, env, corsHeaders);
 			}
 
+			// P2 — IP allowlist verification (mirrors the domain flow).
+			if (url.pathname === '/api/dashboard/add-ip' && request.method === 'POST') {
+				return await handleAddIp(request, env, corsHeaders);
+			}
+
+			if (url.pathname === '/api/dashboard/verify-ip' && request.method === 'POST') {
+				return await handleVerifyIp(request, env, corsHeaders);
+			}
+
+			if (url.pathname === '/api/dashboard/get-ips' && request.method === 'GET') {
+				return await handleGetIps(request, env, corsHeaders);
+			}
+
 			if (url.pathname === '/api/dashboard/rotate-key' && request.method === 'POST') {
 				return await handleRotateKey(request, env, corsHeaders);
 			}
@@ -1064,10 +1077,22 @@ async function handleVerifySession(request, env, corsHeaders) {
  *
  * GET /api/verify-api-key?api_key=sk_live_xxx
  */
+// P2 — true when the request comes from an allowed IP, or when no
+// allowlist is configured (an empty / null allowed_ips means "any IP").
+function _enforceAllowedIps(allowedIpsJson, sourceIp) {
+	if (!allowedIpsJson) return { ok: true };
+	let list;
+	try { list = JSON.parse(allowedIpsJson); } catch (e) { return { ok: true }; }
+	if (!Array.isArray(list) || list.length === 0) return { ok: true };
+	if (sourceIp && list.indexOf(sourceIp) !== -1) return { ok: true };
+	return { ok: false, allowed: list, source: sourceIp || null };
+}
+
 async function handleVerifyAPIKey(request, env, corsHeaders) {
 	try {
 		const url = new URL(request.url);
 		const api_key = url.searchParams.get('api_key');
+		const sourceIp = request.headers.get('CF-Connecting-IP') || '';
 
 		if (!api_key) {
 			return jsonResponse({
@@ -1079,6 +1104,16 @@ async function handleVerifyAPIKey(request, env, corsHeaders) {
 		const cached = await env.API_KEYS.get(api_key);
 		if (cached) {
 			const data = JSON.parse(cached);
+
+			// P2 — IP allowlist enforcement (cached path).
+			const ipCheck = _enforceAllowedIps(data.allowed_ips, sourceIp);
+			if (!ipCheck.ok) {
+				return jsonResponse({
+					valid: false,
+					error: 'Request IP not in allowlist',
+					source_ip: sourceIp,
+				}, 403, corsHeaders);
+			}
 
 			// Check quota
 			if (data.used >= data.quota) {
@@ -1113,6 +1148,16 @@ async function handleVerifyAPIKey(request, env, corsHeaders) {
 			}, 404, corsHeaders);
 		}
 
+		// P2 — IP allowlist enforcement (database path).
+		const ipCheck = _enforceAllowedIps(result.allowed_ips, sourceIp);
+		if (!ipCheck.ok) {
+			return jsonResponse({
+				valid: false,
+				error: 'Request IP not in allowlist',
+				source_ip: sourceIp,
+			}, 403, corsHeaders);
+		}
+
 		// Check quota
 		if (result.quota_used >= result.quota_limit) {
 			return jsonResponse({
@@ -1123,13 +1168,15 @@ async function handleVerifyAPIKey(request, env, corsHeaders) {
 			}, 429, corsHeaders);
 		}
 
-		// Cache for next time
+		// Cache for next time — include allowed_ips so the cached path can
+		// enforce it without an extra D1 read.
 		await env.API_KEYS.put(api_key, JSON.stringify({
 			email: result.user_email,
 			tier: result.tier,
 			quota: result.quota_limit,
 			used: result.quota_used,
 			billing_cycle_end: result.billing_cycle_end,
+			allowed_ips: result.allowed_ips,
 		}), { expirationTtl: 86400 });  // 24 hours
 
 		return jsonResponse({
@@ -1880,6 +1927,223 @@ async function handleGetDomains(request, env, corsHeaders) {
 		console.error('Get domains error:', error);
 		return jsonResponse({
 			error: 'Failed to fetch domains',
+			message: error.message
+		}, 500, corsHeaders);
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// P2 — IP allowlist verification
+// Mirrors the domain pattern: add (issue token) → verify (the
+// request HAS to come from the claimed IP) → list. Stored in
+// ip_verifications and, on verify, appended to api_keys.allowed_ips
+// (JSON). Enforced on /api/verify-api-key when allowed_ips is set.
+// ═══════════════════════════════════════════════════════════════
+
+const _IPV4_RE = /^(25[0-5]|2[0-4]\d|[01]?\d?\d)(\.(25[0-5]|2[0-4]\d|[01]?\d?\d)){3}$/;
+const _IPV6_RE = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|::([0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}|::|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4})$/;
+
+function isValidIp(ip) {
+	if (typeof ip !== 'string') return false;
+	const v = ip.trim();
+	return _IPV4_RE.test(v) || _IPV6_RE.test(v);
+}
+
+/**
+ * Resolve the api_key for the current request (header OR query OR body).
+ */
+function resolveApiKey(request, url, bodyApiKey) {
+	return request.headers.get('X-API-Key')
+		|| (url && url.searchParams.get('api_key'))
+		|| bodyApiKey
+		|| null;
+}
+
+/**
+ * POST /api/dashboard/add-ip
+ * Body: { api_key, ip }
+ * Returns: { ip, verification_token, instructions, verify_url }
+ *
+ * Issues a one-shot token for the claimed IP. Token is bound to that
+ * specific (api_key, ip) — proof of ownership is delivered later by
+ * `verify-ip` from the IP being claimed (we check CF-Connecting-IP).
+ */
+async function handleAddIp(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const url = new URL(request.url);
+		const apiKey = resolveApiKey(request, url, body.api_key);
+		const ip = String(body.ip || '').trim();
+
+		if (!apiKey) {
+			return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		}
+		if (!isValidIp(ip)) {
+			return jsonResponse({ error: 'Invalid IP address (IPv4 or IPv6 only)' }, 400, corsHeaders);
+		}
+
+		const keyRow = await env.DB.prepare(
+			`SELECT api_key FROM api_keys WHERE api_key = ? AND status = 'active'`
+		).bind(apiKey).first();
+		if (!keyRow) {
+			return jsonResponse({ error: 'API key not found or inactive' }, 401, corsHeaders);
+		}
+
+		const existing = await env.DB.prepare(
+			`SELECT status FROM ip_verifications WHERE api_key = ? AND ip = ?`
+		).bind(apiKey, ip).first();
+		if (existing && existing.status === 'verified') {
+			return jsonResponse({
+				error: 'IP already verified',
+				ip: ip
+			}, 409, corsHeaders);
+		}
+
+		const token = `mypwdckr_${generateRandomId(32)}`;
+		const now = Date.now();
+
+		// If there's a stale pending row for this (key, ip), replace its token.
+		if (existing) {
+			await env.DB.prepare(
+				`UPDATE ip_verifications SET verification_token = ?, created_at = ? WHERE api_key = ? AND ip = ?`
+			).bind(token, now, apiKey, ip).run();
+		} else {
+			await env.DB.prepare(
+				`INSERT INTO ip_verifications (api_key, ip, verification_token, status, created_at)
+				 VALUES (?, ?, ?, 'pending', ?)`
+			).bind(apiKey, ip, token, now).run();
+		}
+
+		await logAudit(env, {
+			event: 'ip_verification_requested',
+			api_key: apiKey,
+			ip: ip,
+		});
+
+		return jsonResponse({
+			success: true,
+			ip: ip,
+			verification_token: token,
+			instructions:
+				'From the server at ' + ip + ', issue this request. ' +
+				'It must originate from the claimed IP — that is how we verify ownership.',
+			curl_example:
+				"curl -X POST https://mypasswordchecker.com/api/dashboard/verify-ip " +
+				"-H 'Content-Type: application/json' " +
+				"-d '" + JSON.stringify({ ip: ip, token: token }) + "'",
+			verify_url: '/api/dashboard/verify-ip'
+		}, 200, corsHeaders);
+	} catch (error) {
+		console.error('Add IP error:', error);
+		return jsonResponse({
+			error: 'Failed to add IP',
+			message: error.message
+		}, 500, corsHeaders);
+	}
+}
+
+/**
+ * POST /api/dashboard/verify-ip
+ * Body: { ip, token }
+ * Header: CF-Connecting-IP (set by Cloudflare for every request)
+ *
+ * The only sound proof of IP ownership is the request originating from
+ * that IP. We compare CF-Connecting-IP to the claimed ip + verify the
+ * token, then mark verified and append to api_keys.allowed_ips.
+ */
+async function handleVerifyIp(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const claimedIp = String(body.ip || '').trim();
+		const token = String(body.token || '').trim();
+		const sourceIp = request.headers.get('CF-Connecting-IP') || '';
+
+		if (!claimedIp || !token) {
+			return jsonResponse({ error: 'Missing ip or token' }, 400, corsHeaders);
+		}
+		if (sourceIp !== claimedIp) {
+			return jsonResponse({
+				error: 'IP ownership not proven',
+				message: 'This request must originate from ' + claimedIp + '. Detected source: ' + sourceIp + '.'
+			}, 403, corsHeaders);
+		}
+
+		const row = await env.DB.prepare(
+			`SELECT id, api_key FROM ip_verifications
+			 WHERE ip = ? AND verification_token = ? AND status = 'pending'`
+		).bind(claimedIp, token).first();
+		if (!row) {
+			return jsonResponse({
+				error: 'Invalid or expired token'
+			}, 403, corsHeaders);
+		}
+
+		const now = Date.now();
+		await env.DB.prepare(
+			`UPDATE ip_verifications SET status = 'verified', verified_at = ? WHERE id = ?`
+		).bind(now, row.id).run();
+
+		// Append to api_keys.allowed_ips (JSON array, dedup-on-add).
+		const keyRow = await env.DB.prepare(
+			`SELECT allowed_ips FROM api_keys WHERE api_key = ?`
+		).bind(row.api_key).first();
+		const list = keyRow && keyRow.allowed_ips ? JSON.parse(keyRow.allowed_ips) : [];
+		if (list.indexOf(claimedIp) === -1) list.push(claimedIp);
+		await env.DB.prepare(
+			`UPDATE api_keys SET allowed_ips = ? WHERE api_key = ?`
+		).bind(JSON.stringify(list), row.api_key).run();
+
+		// Drop the cache so the next verify-api-key picks the new allowlist.
+		await env.API_KEYS.delete(row.api_key);
+
+		await logAudit(env, {
+			event: 'ip_verified',
+			api_key: row.api_key,
+			ip: claimedIp,
+		});
+
+		return jsonResponse({
+			success: true,
+			verified: true,
+			ip: claimedIp
+		}, 200, corsHeaders);
+	} catch (error) {
+		console.error('Verify IP error:', error);
+		return jsonResponse({
+			error: 'Failed to verify IP',
+			message: error.message
+		}, 500, corsHeaders);
+	}
+}
+
+/**
+ * GET /api/dashboard/get-ips?api_key=…
+ * Returns: { ips: [{ ip, status, verified_at }] }
+ */
+async function handleGetIps(request, env, corsHeaders) {
+	try {
+		const url = new URL(request.url);
+		const apiKey = resolveApiKey(request, url, null);
+		if (!apiKey) {
+			return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		}
+		const keyRow = await env.DB.prepare(
+			`SELECT api_key FROM api_keys WHERE api_key = ? AND status = 'active'`
+		).bind(apiKey).first();
+		if (!keyRow) {
+			return jsonResponse({ error: 'API key not found or inactive' }, 401, corsHeaders);
+		}
+		const rows = await env.DB.prepare(
+			`SELECT ip, status, verified_at, created_at
+			 FROM ip_verifications WHERE api_key = ? ORDER BY created_at DESC`
+		).bind(apiKey).all();
+		return jsonResponse({
+			ips: rows.results || []
+		}, 200, corsHeaders);
+	} catch (error) {
+		console.error('Get IPs error:', error);
+		return jsonResponse({
+			error: 'Failed to fetch IPs',
 			message: error.message
 		}, 500, corsHeaders);
 	}

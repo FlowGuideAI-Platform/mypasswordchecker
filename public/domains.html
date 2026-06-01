@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Manage verified domains for MyPasswordChecker.com API - fraud prevention">
-    <title>Domain Verification - MyPasswordChecker.com</title>
+    <title>Domain &amp; IP Verification - MyPasswordChecker.com</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
     <style>
@@ -166,8 +166,8 @@
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <div>
-                    <h1 style="margin-bottom: 0.5rem;">🔒 Domain Verification</h1>
-                    <p style="color: var(--text-secondary);">Verify domain ownership to prevent API key theft and increase rate limits</p>
+                    <h1 style="margin-bottom: 0.5rem;">🔒 Domain &amp; IP Verification</h1>
+                    <p style="color: var(--text-secondary);">Verify domain ownership and restrict API requests to specific server IPs.</p>
                 </div>
                 <button class="btn btn-primary" onclick="showAddDomainModal()">+ Add Domain</button>
             </div>
@@ -215,6 +215,42 @@
 
                 <!-- Domains List -->
                 <div id="domains-list"></div>
+
+                <!-- ────────────────────────────────────────────────────
+                     IP Allowlist (P2)
+                     Same flow as domain verification but ownership is
+                     proven by issuing the verify request *from* the
+                     claimed IP (the worker checks CF-Connecting-IP).
+                     ──────────────────────────────────────────────────── -->
+                <section style="margin-top: 3rem;">
+                    <h2>🌐 Verified IPs (<span id="ip-count">0</span>)</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Add server IPs that may use this API key. When the list is non-empty, requests from any other IP are rejected.
+                        Verification is done by running a one-shot curl <strong>from the server at the claimed IP</strong>.
+                    </p>
+
+                    <div id="ips-list" style="margin-bottom: 1.5rem;"></div>
+
+                    <div class="checker-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">Add an IP</h3>
+                        <div class="input-group" style="margin-bottom: 0.75rem;">
+                            <label for="ip-input">IPv4 or IPv6</label>
+                            <input type="text" id="ip-input" class="password-input" placeholder="203.0.113.42 or 2001:db8::1" style="width: 100%; max-width: 480px;">
+                        </div>
+                        <div id="add-ip-error" class="alert alert-error" style="display: none; margin-bottom: 0.75rem;"></div>
+                        <button class="btn btn-primary" id="add-ip-btn" onclick="requestIpToken()">Generate verification token</button>
+
+                        <div id="ip-verify-instructions" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: white; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                            <p style="margin-bottom: 0.5rem;"><strong>From the server at <code id="ip-target"></code>, run:</strong></p>
+                            <pre style="background: #0d1117; color: #c9d1d9; padding: 1rem; border-radius: 0.25rem; overflow-x: auto; font-size: 0.875rem;"><code id="ip-curl"></code></pre>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.75rem;">
+                                The curl must originate from <code id="ip-target-2"></code> — that is the ownership proof.
+                                After running it, click refresh below.
+                            </p>
+                            <button class="btn btn-secondary" style="margin-top: 0.5rem;" onclick="loadIps()">Refresh status</button>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </main>

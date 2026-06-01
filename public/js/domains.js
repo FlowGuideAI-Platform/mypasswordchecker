@@ -15,6 +15,7 @@ function getDashboardApiKey() {
 document.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
     await loadDomains();
+    await loadIps();
 });
 
 // Check if the stored API key is still valid via the worker's
@@ -450,3 +451,111 @@ window.onclick = function(event) {
         closeAddDomainModal();
     }
 };
+
+// ─────────────────────────────────────────────────────────────
+// P2 — IP allowlist
+// All rendering via DOM methods, so worker-returned IP strings
+// can't inject HTML even if validation upstream changes.
+// ─────────────────────────────────────────────────────────────
+
+function _ipsClear(el) { while (el && el.firstChild) el.removeChild(el.firstChild); }
+
+async function loadIps() {
+    const key = getDashboardApiKey();
+    if (!key) return;
+
+    const listEl = document.getElementById('ips-list');
+    const countEl = document.getElementById('ip-count');
+    if (!listEl) return;
+
+    try {
+        const response = await fetch('/api/dashboard/get-ips?api_key=' + encodeURIComponent(key), {
+            headers: { 'X-API-Key': key }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        const ips = Array.isArray(data.ips) ? data.ips : [];
+
+        if (countEl) countEl.textContent = String(ips.filter(i => i.status === 'verified').length);
+        _ipsClear(listEl);
+
+        if (ips.length === 0) {
+            const p = document.createElement('p');
+            p.style.color = 'var(--text-secondary)';
+            p.style.fontStyle = 'italic';
+            p.textContent = 'No IPs in the allowlist yet — requests can come from any IP.';
+            listEl.appendChild(p);
+            return;
+        }
+
+        ips.forEach(entry => {
+            const isVerified = entry.status === 'verified';
+            const row = document.createElement('div');
+            row.style.cssText =
+                'background:' + (isVerified ? '#d1fae5' : '#fee2e2') +
+                ';border:1px solid ' + (isVerified ? '#10b981' : '#ef4444') +
+                ';padding:0.85rem 1rem;border-radius:0.25rem;margin-bottom:0.5rem;' +
+                'display:flex;justify-content:space-between;align-items:center;gap:1rem;';
+            const left = document.createElement('div');
+            const code = document.createElement('code');
+            code.style.fontWeight = '600';
+            code.textContent = entry.ip || '';
+            left.appendChild(code);
+            const status = document.createElement('span');
+            status.style.marginLeft = '0.75rem';
+            status.textContent = isVerified ? '✅ Verified' : '⏳ Pending';
+            left.appendChild(status);
+            row.appendChild(left);
+            listEl.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Load IPs error:', error);
+    }
+}
+
+async function requestIpToken() {
+    const key = getDashboardApiKey();
+    const input = document.getElementById('ip-input');
+    const errorEl = document.getElementById('add-ip-error');
+    const btn = document.getElementById('add-ip-btn');
+    const instructions = document.getElementById('ip-verify-instructions');
+    const target = document.getElementById('ip-target');
+    const target2 = document.getElementById('ip-target-2');
+    const curlEl = document.getElementById('ip-curl');
+
+    if (errorEl) errorEl.style.display = 'none';
+    const ip = (input && input.value || '').trim();
+    if (!ip) {
+        if (errorEl) { errorEl.textContent = 'Enter an IP first.'; errorEl.style.display = 'block'; }
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Issuing token…'; }
+
+    try {
+        const response = await fetch('/api/dashboard/add-ip', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': key },
+            body: JSON.stringify({ api_key: key, ip })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to add IP');
+
+        // Render the verify-from-IP instructions with textContent only.
+        if (target) target.textContent = data.ip;
+        if (target2) target2.textContent = data.ip;
+        if (curlEl) {
+            curlEl.textContent =
+                'curl -X POST https://mypasswordchecker.com/api/dashboard/verify-ip \\\n' +
+                "  -H 'Content-Type: application/json' \\\n" +
+                "  -d '" + JSON.stringify({ ip: data.ip, token: data.verification_token }) + "'";
+        }
+        if (instructions) instructions.style.display = 'block';
+        await loadIps();
+    } catch (error) {
+        console.error('Add IP error:', error);
+        if (errorEl) { errorEl.textContent = error.message; errorEl.style.display = 'block'; }
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Generate verification token'; }
+    }
+}
