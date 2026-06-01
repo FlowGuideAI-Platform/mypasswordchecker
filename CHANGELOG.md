@@ -60,6 +60,80 @@ P1 acceptance verified end-to-end against the live API:
 `/api/dashboard/get-domains` ✓ ·
 `/api/dashboard/add-domain` → verification token issued ✓.
 
+### Added — Developer Dashboard rebuild P2 (IP allowlist)
+- `migrations/d1-ip-verification.sql` — new `ip_verifications` table
+  (pending/verified workflow); existing `api_keys.allowed_ips` holds
+  the JSON allowlist consulted on `/api/verify-api-key`.
+- Worker: `/api/dashboard/{add,verify,get}-ips` (mirrors the domain
+  pattern). `verify-ip` requires the request to come *from* the
+  claimed IP — `CF-Connecting-IP` proves ownership.
+- `handleVerifyAPIKey` (both KV-cache and D1 paths) now rejects
+  requests with `CF-Connecting-IP` outside `allowed_ips` (403).
+  Cached payload carries `allowed_ips` so enforcement doesn't cost
+  an extra D1 read.
+- `/domains.html` renamed "Domain & IP Verification"; new IP section
+  with curl example for the verify step.
+
+### Added — Developer Dashboard rebuild P3 (recurring subscriptions)
+- Stripe Checkout (mode:subscription) for tiers $20+:
+  `/api/create-checkout-session`, `/api/create-portal-session`.
+  Existing `/api/stripe/webhook` extended with `checkout.session.
+  completed`, `customer.subscription.{created,updated,deleted}`,
+  and `invoice.payment_failed`. Tier comes from
+  `price.metadata.tier` — no hardcoded price IDs in code.
+- PayPal recurring subscriptions for tiers under $10 (Standard,
+  Basic Quantum) — better net at micropayment pricing:
+  `/api/paypal/create-subscription`, `/api/paypal/webhook` (PayPal's
+  /v1/notifications/verify-webhook-signature), and
+  `/api/paypal/cancel-subscription`.
+- Dashboard `upgradePlan` dispatches by `tier.processor` from
+  `pricing.js` (single source). `manageSubscription` opens the
+  Stripe Customer Portal or runs PayPal cancel based on the key's
+  `payment_processor`. Handles `?upgrade=success|cancel` return
+  params from hosted checkouts.
+- `tierQuotas(tier)` shared by both webhook rails so quotas can't
+  drift between Stripe and PayPal activations.
+- Setup scripts: `scripts/stripe-setup.md`, `scripts/paypal-setup.md`.
+
+### Added — Developer Dashboard rebuild P4 (GitHub OAuth)
+- Worker: `GET /api/auth/github` (CSRF state in `SESSION_CACHE`,
+  redirect to GitHub authorize) + `GET /api/auth/github/callback`
+  (validate state, exchange code, fetch primary verified email, look
+  up or create a free-tier api_keys row, redirect to
+  `/dashboard.html#token=<api_key>`).
+- Dashboard load handler reads the `#token=…` hash, stores it in
+  localStorage, strips the hash. Surfaces `?error=oauth_failed |
+  invalid_state | no_email` return params.
+- Setup script: `scripts/github-oauth-setup.md` (OAuth app
+  registration + GITHUB_CLIENT_ID/SECRET).
+
+### Added — Developer Dashboard rebuild P5 (admin + overage)
+- `migrations/d1-overage.sql` — `api_keys.overage_blocked INTEGER
+  DEFAULT 1` (safe default — 429 past quota unless owner opts in).
+- Admin endpoints (Authorization: Bearer ADMIN_TOKEN):
+  `/api/admin/check`, `/api/admin/domain-alerts`,
+  `/api/admin/unverified-users`, `/api/admin/domain-alerts/<id>/
+  update`, `/api/admin/resend-verification`.
+- Overage endpoints (owner): `GET/POST /api/dashboard/
+  overage-setting`. `allow_overage` (API contract) is inverse of
+  `overage_blocked` (database). KV cache busted on POST.
+- `handleVerifyAPIKey` (both paths) honors `overage_blocked`: past
+  quota with `overage_blocked=0` returns `valid:true,
+  over_quota:true` instead of 429.
+- Dashboard: re-enabled the Overage Protection card; the
+  `loadUsageData` wrapper that calls overage + admin checks is back.
+  All admin fetches send `Authorization: Bearer <ADMIN_TOKEN>` from
+  `sessionStorage`; a small "Enter admin token" link below the API
+  key triggers a prompt to store it.
+
+### Added — Developer Dashboard rebuild P6 (email via Resend)
+- `sendEmail()` rewritten to POST `https://api.resend.com/emails`.
+  Same `(env, to, subject, html, text)` signature so call sites
+  don't change. When `RESEND_API_KEY` isn't set, the helper logs
+  `email_send_skipped_no_provider` and returns false — register
+  still issues the api_key, nothing throws.
+- Setup script: `scripts/email-resend-setup.md`.
+
 ## [2026-05-31]
 
 ### Fixed
