@@ -971,11 +971,34 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             window.history.replaceState({}, '', '/dashboard.html');
         })();
 
-        // Check authentication on page load. If a key is stored, validate it
-        // via /api/verify-api-key and show the dashboard; otherwise show the
-        // register / paste-key UI. GitHub OAuth lands in P4 — its callback
-        // will eventually redirect here with the key in the URL hash.
+        // Check authentication on page load. Sources, in priority order:
+        //   1. URL hash fragment #token=… (GitHub OAuth callback redirect, P4)
+        //   2. localStorage (previous email/API-key sign-in)
+        // If a key is found, validate it via /api/verify-api-key and show the
+        // dashboard; otherwise show the register / paste-key UI.
         window.addEventListener('load', async () => {
+            // P4 — pick up the key dropped by /api/auth/github/callback.
+            if (window.location.hash && window.location.hash.indexOf('#token=') === 0) {
+                const tokenFromHash = decodeURIComponent(window.location.hash.substring('#token='.length));
+                if (tokenFromHash) {
+                    setApiKey(tokenFromHash);
+                    window.history.replaceState({}, '', '/dashboard.html');
+                }
+            }
+            // Surface OAuth-failure return params so the user knows what went wrong.
+            const params = new URLSearchParams(window.location.search);
+            const oauthError = params.get('error');
+            if (oauthError === 'oauth_failed') {
+                alert('GitHub sign-in failed. Please try again or register with email.');
+                window.history.replaceState({}, '', '/dashboard.html');
+            } else if (oauthError === 'invalid_state') {
+                alert('Security validation failed — please try signing in again.');
+                window.history.replaceState({}, '', '/dashboard.html');
+            } else if (oauthError === 'no_email') {
+                alert('Could not retrieve a verified email from GitHub. Make sure your primary GitHub email is verified, or register with email.');
+                window.history.replaceState({}, '', '/dashboard.html');
+            }
+
             const stored = getApiKey();
             if (!stored) {
                 document.getElementById('auth-section').style.display = 'block';

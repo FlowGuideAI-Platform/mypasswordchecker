@@ -218,6 +218,14 @@ export default {
 		if (url.pathname === '/api/auth/register' && request.method === 'POST') {
 			return await handleAuthRegister(request, env, corsHeaders);
 		}
+
+		// P4 — GitHub OAuth sign-in.
+		if (url.pathname === '/api/auth/github' && request.method === 'GET') {
+			return await handleGitHubAuthStart(request, env, corsHeaders);
+		}
+		if (url.pathname === '/api/auth/github/callback' && request.method === 'GET') {
+			return await handleGitHubAuthCallback(request, env, corsHeaders);
+		}
 			// ═══════════════════════════════════════════════
 			// ADMIN DASHBOARD (Requires ADMIN_TOKEN)
 			// ═══════════════════════════════════════════════
@@ -3415,6 +3423,137 @@ function verifyAdminToken(request, env) {
 	}
 
 	return { valid: true };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// P4 — GitHub OAuth
+// State CSRF token in SESSION_CACHE (10 min TTL). On callback we
+// exchange the code, find the user's PRIMARY VERIFIED email, then
+// look up or create a free-tier api_keys row keyed on that email
+// (GitHub email is the account identity). Final redirect is
+// /dashboard.html#token=<api_key>; the dashboard reads the hash,
+// stores in localStorage, strips it.
+// ═══════════════════════════════════════════════════════════════
+
+async function handleGitHubAuthStart(request, env, corsHeaders) {
+	try {
+		if (!env.GITHUB_CLIENT_ID) {
+			return jsonResponse({ error: 'GitHub OAuth not configured. Set GITHUB_CLIENT_ID in wrangler.toml.' }, 500, corsHeaders);
+		}
+		const state = generateRandomId(32);
+		await env.SESSION_CACHE.put('github_state:' + state, '1', { expirationTtl: 600 });
+		const params = new URLSearchParams({
+			client_id: env.GITHUB_CLIENT_ID,
+			redirect_uri: 'https://mypasswordchecker.com/api/auth/github/callback',
+			scope: 'user:email',
+			state: state,
+			allow_signup: 'true',
+		});
+		return Response.redirect('https://github.com/login/oauth/authorize?' + params.toString(), 302);
+	} catch (error) {
+		console.error('GitHub OAuth start error:', error);
+		return Response.redirect('https://mypasswordchecker.com/dashboard.html?error=oauth_failed', 302);
+	}
+}
+
+async function handleGitHubAuthCallback(request, env, corsHeaders) {
+	try {
+		const url = new URL(request.url);
+		const code = url.searchParams.get('code');
+		const state = url.searchParams.get('state');
+		if (!code || !state) {
+			return Response.redirect('https://mypasswordchecker.com/dashboard.html?error=oauth_failed', 302);
+		}
+		const known = await env.SESSION_CACHE.get('github_state:' + state);
+		if (!known) {
+			return Response.redirect('https://mypasswordchecker.com/dashboard.html?error=invalid_state', 302);
+		}
+		await env.SESSION_CACHE.delete('github_state:' + state);
+
+		// Exchange code for an access token.
+		const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+			method: 'POST',
+			headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				client_id: env.GITHUB_CLIENT_ID,
+				client_secret: env.GITHUB_CLIENT_SECRET,
+				code: code,
+				redirect_uri: 'https://mypasswordchecker.com/api/auth/github/callback',
+			})
+		});
+		const tokenData = await tokenRes.json();
+		const accessToken = tokenData.access_token;
+		if (!accessToken) {
+			console.error('GitHub token exchange failed:', tokenData);
+			return Response.redirect('https://mypasswordchecker.com/dashboard.html?error=oauth_failed', 302);
+		}
+
+		// Find the primary verified email.
+		const emailRes = await fetch('https://api.github.com/user/emails', {
+			headers: {
+				'Authorization': 'Bearer ' + accessToken,
+				'User-Agent': 'MyPasswordChecker',
+				'Accept': 'application/vnd.github+json',
+			}
+		});
+		const emails = await emailRes.json();
+		if (!Array.isArray(emails)) {
+			console.error('GitHub /user/emails unexpected:', emails);
+			return Response.redirect('https://mypasswordchecker.com/dashboard.html?error=oauth_failed', 302);
+		}
+		const primary = emails.find(e => e.primary && e.verified);
+		if (!primary || !primary.email) {
+			return Response.redirect('https://mypasswordchecker.com/dashboard.html?error=no_email', 302);
+		}
+		const email = String(primary.email).toLowerCase();
+
+		// Pull the display name if it's available — purely cosmetic.
+		let userName = null;
+		try {
+			const userRes = await fetch('https://api.github.com/user', {
+				headers: { 'Authorization': 'Bearer ' + accessToken, 'User-Agent': 'MyPasswordChecker' }
+			});
+			const userData = await userRes.json();
+			userName = userData.name || userData.login || null;
+		} catch (e) {}
+
+		// Existing account → reuse; new → create a free-tier row.
+		const row = await env.DB.prepare(
+			`SELECT api_key FROM api_keys WHERE user_email = ? ORDER BY tier DESC LIMIT 1`
+		).bind(email).first();
+
+		let apiKey;
+		if (row) {
+			apiKey = row.api_key;
+		} else {
+			apiKey = `sk_free_${generateRandomId(32)}`;
+			const now = Date.now();
+			await env.DB.prepare(`
+				INSERT INTO api_keys (
+					api_key, user_email, user_name, tier, created_at,
+					quota_limit, quota_used,
+					quantum_limit, quantum_used,
+					phonetic_limit, phonetic_used,
+					breach_limit, breach_used,
+					billing_cycle_start,
+					payment_processor, status, email_verified
+				) VALUES (?, ?, ?, 0, ?, 50, 0, 0, 0, 0, 0, 0, 0, ?, 'free', 'active', 1)
+			`).bind(apiKey, email, userName, now, now).run();
+			await logAudit(env, {
+				event: 'github_signin_new_key',
+				api_key: apiKey,
+				email: email,
+			});
+		}
+
+		return Response.redirect(
+			'https://mypasswordchecker.com/dashboard.html#token=' + encodeURIComponent(apiKey),
+			302
+		);
+	} catch (error) {
+		console.error('GitHub OAuth callback error:', error);
+		return Response.redirect('https://mypasswordchecker.com/dashboard.html?error=oauth_failed', 302);
+	}
 }
 
 /**
