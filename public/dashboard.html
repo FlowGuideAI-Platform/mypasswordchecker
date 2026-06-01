@@ -151,6 +151,14 @@
                             ⬆️ Super Quantum ($99/mo)
                         </button>
                     </div>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        <button id="btn-manage-subscription" class="btn btn-secondary" onclick="manageSubscription()">
+                            ⚙️ Manage subscription
+                        </button>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Opens Stripe's hosted Customer Portal (for $10+ tiers) or cancels your PayPal subscription (under-$10 tiers).
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Overage Protection Setting (hidden in P1; re-enabled in P5 spec phase 5) -->
@@ -867,12 +875,101 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             optionsDiv.style.display = optionsDiv.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Subscription upgrades land in P3 (Stripe Checkout for tiers >= $10,
-        // PayPal subscription for tiers < $10). Until then, send the user to
-        // the public pricing page so they still see the catalog.
-        function upgradePlan(_plan) {
-            window.location.href = '/pricing.html';
+        // P3 — Subscription upgrade dispatch (spec §2). Tier under $10 goes
+        // to PayPal Subscriptions, tier $10+ goes to Stripe Checkout. Source
+        // of truth is the `processor` field on each tier in pricing.js so the
+        // mapping isn't duplicated anywhere.
+        async function upgradePlan(planId) {
+            const key = getApiKey();
+            if (!key) { alert('Sign in with your API key first.'); return; }
+            const tier = window.Pricing && Pricing.tierById(planId);
+            if (!tier || !tier.processor) {
+                window.location.href = '/pricing.html';
+                return;
+            }
+            const endpoint = tier.processor === 'stripe'
+                ? '/api/create-checkout-session'
+                : '/api/paypal/create-subscription';
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-API-Key': key },
+                    body: JSON.stringify({ api_key: key, tier: tier.tier })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert('Could not start checkout: ' + (data.error || res.statusText));
+                    return;
+                }
+                const redirect = data.url || data.approve_url;
+                if (redirect) {
+                    window.location.href = redirect;
+                } else {
+                    alert('No checkout URL returned. ' + (data.message || ''));
+                }
+            } catch (error) {
+                console.error('Upgrade error:', error);
+                alert('Could not start checkout. Please try again.');
+            }
         }
+
+        // Manage subscription — opens the appropriate hosted UI for the
+        // active payment processor. Stripe gets a Customer Portal session;
+        // PayPal opens a confirm dialog and posts to our cancel endpoint
+        // (PayPal has no equivalent hosted portal).
+        async function manageSubscription() {
+            const key = getApiKey();
+            if (!key) return;
+            try {
+                const usage = await fetch('/api/dashboard/usage?api_key=' + encodeURIComponent(key)).then(r => r.json());
+                const processor = usage && usage.payment_processor;
+                if (processor === 'stripe') {
+                    const res = await fetch('/api/create-portal-session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-API-Key': key },
+                        body: JSON.stringify({ api_key: key })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.url) {
+                        window.location.href = data.url;
+                    } else {
+                        alert('Could not open Stripe portal: ' + (data.error || res.statusText));
+                    }
+                } else if (processor === 'paypal') {
+                    if (!confirm('Cancel your PayPal subscription? This takes effect at the end of the current billing period.')) return;
+                    const res = await fetch('/api/paypal/cancel-subscription', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-API-Key': key },
+                        body: JSON.stringify({ api_key: key })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        alert('Cancellation requested. PayPal will confirm shortly and the dashboard will reflect it.');
+                    } else {
+                        alert('Could not cancel: ' + (data.error || res.statusText));
+                    }
+                } else {
+                    alert('No active subscription to manage.');
+                }
+            } catch (error) {
+                console.error('Manage subscription error:', error);
+                alert('Failed to open subscription management. Please try again.');
+            }
+        }
+
+        // Handle the redirect-back from Stripe / PayPal.
+        (function handleUpgradeReturn() {
+            const params = new URLSearchParams(window.location.search);
+            const upgrade = params.get('upgrade');
+            if (!upgrade) return;
+            if (upgrade === 'success') {
+                const banner = document.getElementById('onboarding-banner');
+                if (banner) banner.style.display = 'block';
+            } else if (upgrade === 'cancel') {
+                // User backed out of the hosted checkout; nothing to do.
+            }
+            window.history.replaceState({}, '', '/dashboard.html');
+        })();
 
         // Check authentication on page load. If a key is stored, validate it
         // via /api/verify-api-key and show the dashboard; otherwise show the

@@ -96,6 +96,17 @@ export default {
 				return await handlePayPalVerify(request, env, corsHeaders);
 			}
 
+			// P3b — PayPal subscription rail (under-$10 tiers: Standard, Basic Quantum).
+			if (url.pathname === '/api/paypal/create-subscription' && request.method === 'POST') {
+				return await handlePayPalCreateSubscription(request, env, corsHeaders);
+			}
+			if (url.pathname === '/api/paypal/webhook' && request.method === 'POST') {
+				return await handlePayPalWebhook(request, env, corsHeaders);
+			}
+			if (url.pathname === '/api/paypal/cancel-subscription' && request.method === 'POST') {
+				return await handlePayPalCancelSubscription(request, env, corsHeaders);
+			}
+
 			// Stripe specific endpoints
 			if (url.pathname === '/api/stripe/create-intent' && request.method === 'POST') {
 				return await handleCreateStripeIntent(request, env, corsHeaders);
@@ -103,6 +114,14 @@ export default {
 
 			if (url.pathname === '/api/stripe/webhook' && request.method === 'POST') {
 				return await handleStripeWebhook(request, env, corsHeaders);
+			}
+
+			// P3a — Stripe Checkout subscription rail ($10+ tiers: Std Quantum, Large, XL, Super).
+			if (url.pathname === '/api/create-checkout-session' && request.method === 'POST') {
+				return await handleCreateCheckoutSession(request, env, corsHeaders);
+			}
+			if (url.pathname === '/api/create-portal-session' && request.method === 'POST') {
+				return await handleCreatePortalSession(request, env, corsHeaders);
 			}
 
 			// ═══════════════════════════════════════════════
@@ -931,6 +950,109 @@ async function handleStripeWebhook(request, env, corsHeaders) {
 			});
 		}
 
+		// ─────────────────────────────────────────────────────────────
+		// P3a — Stripe Checkout subscription lifecycle (tiers $10+).
+		// Single source of truth for tier mapping is price.metadata.tier
+		// on the Stripe Price; this handler never hardcodes price IDs.
+		// ─────────────────────────────────────────────────────────────
+
+		// Checkout finished — link customer + subscription to the api_key.
+		if (event.type === 'checkout.session.completed') {
+			const session = event.data.object;
+			const apiKey = session.client_reference_id;
+			if (apiKey && session.customer && session.subscription) {
+				await env.DB.prepare(`
+					UPDATE api_keys
+					SET stripe_customer_id = ?,
+					    stripe_subscription_id = ?,
+					    payment_processor = 'stripe'
+					WHERE api_key = ?
+				`).bind(session.customer, session.subscription, apiKey).run();
+				await env.API_KEYS.delete(apiKey);
+				await logAudit(env, {
+					event: 'stripe_checkout_completed',
+					api_key: apiKey,
+					customer_id: session.customer,
+					subscription_id: session.subscription,
+				});
+			}
+		}
+
+		// Subscription created or updated — set tier + reset the matching
+		// quota counters from the catalog, mark active.
+		if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
+			const sub = event.data.object;
+			const item = sub.items && sub.items.data && sub.items.data[0];
+			const tier = Number(item && item.price && item.price.metadata && item.price.metadata.tier || 0);
+			if (tier > 0 && sub.customer) {
+				const q = tierQuotas(tier);
+				const now = Date.now();
+				const cycleEnd = (Number(sub.current_period_end) || (Date.now()/1000 + 30*86400)) * 1000;
+				await env.DB.prepare(`
+					UPDATE api_keys
+					SET tier = ?, status = 'active',
+					    quota_limit = ?, quota_used = 0,
+					    quantum_limit = ?, quantum_used = 0,
+					    phonetic_limit = ?, phonetic_used = 0,
+					    breach_limit = ?, breach_used = 0,
+					    billing_cycle_start = ?, billing_cycle_end = ?,
+					    stripe_subscription_id = ?,
+					    payment_processor = 'stripe'
+					WHERE stripe_customer_id = ?
+				`).bind(
+					tier,
+					q.quota, q.quantum, q.phonetic, q.breach,
+					now, cycleEnd, sub.id, sub.customer
+				).run();
+				// Bust the KV cache so the next /api/verify-api-key reads fresh
+				// limits + status. We need the api_key to do that.
+				const row = await env.DB.prepare(
+					`SELECT api_key FROM api_keys WHERE stripe_customer_id = ?`
+				).bind(sub.customer).first();
+				if (row) await env.API_KEYS.delete(row.api_key);
+				await logAudit(env, {
+					event: 'stripe_subscription_active',
+					subscription_id: sub.id,
+					tier: tier,
+				});
+			}
+		}
+
+		// Subscription cancelled at period end (or immediately).
+		if (event.type === 'customer.subscription.deleted') {
+			const sub = event.data.object;
+			await env.DB.prepare(
+				`UPDATE api_keys SET status = 'canceled' WHERE stripe_subscription_id = ?`
+			).bind(sub.id).run();
+			const row = await env.DB.prepare(
+				`SELECT api_key FROM api_keys WHERE stripe_subscription_id = ?`
+			).bind(sub.id).first();
+			if (row) await env.API_KEYS.delete(row.api_key);
+			await logAudit(env, {
+				event: 'stripe_subscription_canceled',
+				subscription_id: sub.id,
+			});
+		}
+
+		// Recurring charge failed — suspend until the customer fixes the
+		// payment method (Stripe will retry automatically).
+		if (event.type === 'invoice.payment_failed') {
+			const invoice = event.data.object;
+			if (invoice.subscription) {
+				await env.DB.prepare(
+					`UPDATE api_keys SET status = 'suspended', suspended_reason = ? WHERE stripe_subscription_id = ?`
+				).bind('Payment failed — update card in Stripe portal', invoice.subscription).run();
+				const row = await env.DB.prepare(
+					`SELECT api_key FROM api_keys WHERE stripe_subscription_id = ?`
+				).bind(invoice.subscription).first();
+				if (row) await env.API_KEYS.delete(row.api_key);
+				await logAudit(env, {
+					event: 'stripe_subscription_suspended',
+					subscription_id: invoice.subscription,
+				});
+			}
+		}
+
 		return jsonResponse({ received: true }, 200, corsHeaders);
 
 	} catch (error) {
@@ -939,6 +1061,433 @@ async function handleStripeWebhook(request, env, corsHeaders) {
 			error: 'Webhook processing failed',
 			message: error.message
 		}, 500, corsHeaders);
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// P3 — Subscription tier catalog (matches public/js/pricing.js).
+// One place; webhooks + checkout handlers read from here.
+// ═══════════════════════════════════════════════════════════════
+
+function tierQuotas(tier) {
+	switch (Number(tier)) {
+		case 1: return { quota: 12000,     quantum: 100,     phonetic: 100,     breach: 0      };
+		case 2: return { quota: 50000,     quantum: 1000,    phonetic: 1000,    breach: 0      };
+		case 3: return { quota: 300000,    quantum: 10000,   phonetic: 10000,   breach: 2000   };
+		case 4: return { quota: 800000,    quantum: 50000,   phonetic: 50000,   breach: 10000  };
+		case 5: return { quota: 2000000,   quantum: 200000,  phonetic: 200000,  breach: 40000  };
+		case 6: return { quota: 10000000,  quantum: 1000000, phonetic: 1000000, breach: 400000 };
+		default: return { quota: 50, quantum: 0, phonetic: 0, breach: 0 };
+	}
+}
+
+function stripeTierToPriceId(env, tier) {
+	const key = 'STRIPE_PRICE_TIER_' + String(tier);
+	return env[key] || null;
+}
+
+function paypalTierToPlanId(env, tier) {
+	const key = 'PAYPAL_PLAN_TIER_' + String(tier);
+	return env[key] || null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// P3a — Stripe Checkout subscription creation
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/create-checkout-session
+ * Body: { api_key, tier }
+ * Returns: { url }
+ *
+ * Creates a Stripe Checkout Session in subscription mode for the
+ * requested tier. The Price ID per tier is configured as a wrangler
+ * var (STRIPE_PRICE_TIER_<n>) so the worker never embeds price IDs.
+ */
+async function handleCreateCheckoutSession(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const apiKey = body.api_key || body.apiKey;
+		const tier = Number(body.tier);
+
+		if (!apiKey) {
+			return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		}
+		if (![3, 4, 5, 6].includes(tier)) {
+			return jsonResponse({
+				error: 'Stripe handles only $10+ tiers (Standard Quantum and up). For Standard $2.50 or Basic Quantum $5 use /api/paypal/create-subscription.'
+			}, 400, corsHeaders);
+		}
+		const priceId = stripeTierToPriceId(env, tier);
+		if (!priceId) {
+			return jsonResponse({
+				error: 'No Stripe Price configured for this tier',
+				details: 'Set STRIPE_PRICE_TIER_' + tier + ' in wrangler.toml after creating the Price.'
+			}, 500, corsHeaders);
+		}
+
+		const keyRow = await env.DB.prepare(
+			`SELECT user_email, stripe_customer_id FROM api_keys WHERE api_key = ? AND status = 'active'`
+		).bind(apiKey).first();
+		if (!keyRow) {
+			return jsonResponse({ error: 'API key not found or inactive' }, 401, corsHeaders);
+		}
+
+		const params = new URLSearchParams();
+		params.set('mode', 'subscription');
+		params.set('line_items[0][price]', priceId);
+		params.set('line_items[0][quantity]', '1');
+		params.set('client_reference_id', apiKey);
+		params.set('success_url', 'https://mypasswordchecker.com/dashboard.html?upgrade=success');
+		params.set('cancel_url', 'https://mypasswordchecker.com/dashboard.html?upgrade=cancel');
+		if (keyRow.stripe_customer_id) {
+			params.set('customer', keyRow.stripe_customer_id);
+		} else if (keyRow.user_email) {
+			params.set('customer_email', keyRow.user_email);
+		}
+		params.set('allow_promotion_codes', 'true');
+
+		const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: params,
+		});
+		const data = await stripeRes.json();
+		if (!stripeRes.ok || !data.url) {
+			console.error('Stripe checkout session failed:', data);
+			return jsonResponse({
+				error: 'Failed to create checkout session',
+				details: data.error || data
+			}, 502, corsHeaders);
+		}
+
+		await logAudit(env, {
+			event: 'stripe_checkout_session_created',
+			api_key: apiKey,
+			tier: tier,
+			session_id: data.id,
+		});
+
+		return jsonResponse({ url: data.url, session_id: data.id }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Checkout session error:', error);
+		return jsonResponse({ error: 'Failed to create checkout session', message: error.message }, 500, corsHeaders);
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// P3a — Stripe Customer Portal (hosted "Manage subscription")
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/create-portal-session
+ * Body: { api_key }
+ * Returns: { url }
+ */
+async function handleCreatePortalSession(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const apiKey = body.api_key || body.apiKey;
+		if (!apiKey) {
+			return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		}
+		const row = await env.DB.prepare(
+			`SELECT stripe_customer_id FROM api_keys WHERE api_key = ? AND status IN ('active', 'suspended')`
+		).bind(apiKey).first();
+		if (!row || !row.stripe_customer_id) {
+			return jsonResponse({ error: 'No Stripe customer attached to this key' }, 404, corsHeaders);
+		}
+		const params = new URLSearchParams();
+		params.set('customer', row.stripe_customer_id);
+		params.set('return_url', 'https://mypasswordchecker.com/dashboard.html');
+		const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: params,
+		});
+		const data = await res.json();
+		if (!res.ok || !data.url) {
+			console.error('Stripe portal session failed:', data);
+			return jsonResponse({ error: 'Failed to create portal session', details: data.error || data }, 502, corsHeaders);
+		}
+		return jsonResponse({ url: data.url }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Portal session error:', error);
+		return jsonResponse({ error: 'Failed to create portal session', message: error.message }, 500, corsHeaders);
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// P3b — PayPal recurring subscriptions (under-$10 tiers)
+// ═══════════════════════════════════════════════════════════════
+
+function paypalBase(env) {
+	return env.PAYPAL_ENVIRONMENT === 'sandbox'
+		? 'https://api-m.sandbox.paypal.com'
+		: 'https://api-m.paypal.com';
+}
+
+/**
+ * POST /api/paypal/create-subscription
+ * Body: { api_key, tier }
+ * Returns: { approve_url, subscription_id }
+ *
+ * Creates a PayPal Subscription against the Billing Plan configured
+ * for the tier (PAYPAL_PLAN_TIER_<n>). Frontend redirects the user
+ * to approve_url; PayPal calls BILLING.SUBSCRIPTION.ACTIVATED on the
+ * webhook once approved.
+ */
+async function handlePayPalCreateSubscription(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const apiKey = body.api_key || body.apiKey;
+		const tier = Number(body.tier);
+
+		if (!apiKey) {
+			return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		}
+		if (![1, 2].includes(tier)) {
+			return jsonResponse({
+				error: 'PayPal handles only Standard ($2.50) and Basic Quantum ($5). $10+ tiers use /api/create-checkout-session.'
+			}, 400, corsHeaders);
+		}
+		const planId = paypalTierToPlanId(env, tier);
+		if (!planId) {
+			return jsonResponse({
+				error: 'No PayPal Plan configured for this tier',
+				details: 'Set PAYPAL_PLAN_TIER_' + tier + ' in wrangler.toml after creating the Plan.'
+			}, 500, corsHeaders);
+		}
+
+		const keyRow = await env.DB.prepare(
+			`SELECT user_email FROM api_keys WHERE api_key = ? AND status = 'active'`
+		).bind(apiKey).first();
+		if (!keyRow) {
+			return jsonResponse({ error: 'API key not found or inactive' }, 401, corsHeaders);
+		}
+
+		const accessToken = await getPayPalAccessToken(env);
+		const ppRes = await fetch(paypalBase(env) + '/v1/billing/subscriptions', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+				'PayPal-Request-Id': generateRandomId(32),
+			},
+			body: JSON.stringify({
+				plan_id: planId,
+				custom_id: apiKey,
+				subscriber: keyRow.user_email ? { email_address: keyRow.user_email } : undefined,
+				application_context: {
+					brand_name: 'MyPasswordChecker',
+					user_action: 'SUBSCRIBE_NOW',
+					return_url: 'https://mypasswordchecker.com/dashboard.html?upgrade=success',
+					cancel_url: 'https://mypasswordchecker.com/dashboard.html?upgrade=cancel',
+				}
+			})
+		});
+		const data = await ppRes.json();
+		if (!ppRes.ok || !data.id) {
+			console.error('PayPal subscription create failed:', data);
+			return jsonResponse({ error: 'Failed to create subscription', details: data }, 502, corsHeaders);
+		}
+		const approve = (data.links || []).find(l => l.rel === 'approve');
+		if (!approve) {
+			return jsonResponse({ error: 'PayPal did not return an approve link', details: data }, 502, corsHeaders);
+		}
+
+		await logAudit(env, {
+			event: 'paypal_subscription_created',
+			api_key: apiKey,
+			tier: tier,
+			subscription_id: data.id,
+		});
+
+		return jsonResponse({ approve_url: approve.href, subscription_id: data.id }, 200, corsHeaders);
+	} catch (error) {
+		console.error('PayPal subscription error:', error);
+		return jsonResponse({ error: 'Failed to create subscription', message: error.message }, 500, corsHeaders);
+	}
+}
+
+/**
+ * POST /api/paypal/webhook
+ * Verifies via PayPal's /v1/notifications/verify-webhook-signature.
+ * Handles subscription lifecycle events.
+ */
+async function handlePayPalWebhook(request, env, corsHeaders) {
+	try {
+		const rawBody = await request.text();
+		const headers = {
+			auth_algo: request.headers.get('paypal-auth-algo'),
+			cert_url: request.headers.get('paypal-cert-url'),
+			transmission_id: request.headers.get('paypal-transmission-id'),
+			transmission_sig: request.headers.get('paypal-transmission-sig'),
+			transmission_time: request.headers.get('paypal-transmission-time'),
+		};
+		if (!headers.transmission_id || !env.PAYPAL_WEBHOOK_ID) {
+			return jsonResponse({ error: 'Missing PayPal signature headers or webhook id' }, 400, corsHeaders);
+		}
+
+		const accessToken = await getPayPalAccessToken(env);
+		const verifyRes = await fetch(paypalBase(env) + '/v1/notifications/verify-webhook-signature', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				auth_algo: headers.auth_algo,
+				cert_url: headers.cert_url,
+				transmission_id: headers.transmission_id,
+				transmission_sig: headers.transmission_sig,
+				transmission_time: headers.transmission_time,
+				webhook_id: env.PAYPAL_WEBHOOK_ID,
+				webhook_event: JSON.parse(rawBody),
+			})
+		});
+		const verifyData = await verifyRes.json();
+		if (verifyData.verification_status !== 'SUCCESS') {
+			console.error('PayPal webhook signature invalid:', verifyData);
+			return jsonResponse({ error: 'Invalid signature' }, 401, corsHeaders);
+		}
+
+		const event = JSON.parse(rawBody);
+		const resource = event.resource || {};
+		const apiKey = resource.custom_id;
+		const subscriptionId = resource.id;
+
+		console.log('PayPal webhook:', event.event_type);
+
+		if (event.event_type === 'BILLING.SUBSCRIPTION.ACTIVATED' && apiKey) {
+			// PayPal doesn't put the plan/tier on the webhook payload — we
+			// fetch it from the subscription resource to be safe. (Plans
+			// are recorded in env.PAYPAL_PLAN_TIER_<n>; we reverse-lookup.)
+			let tier = 0;
+			const planId = resource.plan_id;
+			[1, 2].forEach(t => {
+				if (paypalTierToPlanId(env, t) === planId) tier = t;
+			});
+			if (tier > 0) {
+				const q = tierQuotas(tier);
+				const now = Date.now();
+				const cycleEnd = now + 30 * 24 * 60 * 60 * 1000;
+				await env.DB.prepare(`
+					UPDATE api_keys
+					SET tier = ?, status = 'active',
+					    quota_limit = ?, quota_used = 0,
+					    quantum_limit = ?, quantum_used = 0,
+					    phonetic_limit = ?, phonetic_used = 0,
+					    breach_limit = ?, breach_used = 0,
+					    billing_cycle_start = ?, billing_cycle_end = ?,
+					    stripe_subscription_id = ?,
+					    payment_processor = 'paypal'
+					WHERE api_key = ?
+				`).bind(
+					tier, q.quota, q.quantum, q.phonetic, q.breach,
+					now, cycleEnd, subscriptionId, apiKey
+				).run();
+				await env.API_KEYS.delete(apiKey);
+				await logAudit(env, {
+					event: 'paypal_subscription_active',
+					api_key: apiKey,
+					tier: tier,
+					subscription_id: subscriptionId,
+				});
+			}
+		}
+
+		if (event.event_type === 'BILLING.SUBSCRIPTION.CANCELLED' || event.event_type === 'BILLING.SUBSCRIPTION.EXPIRED') {
+			await env.DB.prepare(
+				`UPDATE api_keys SET status = 'canceled' WHERE stripe_subscription_id = ?`
+			).bind(subscriptionId).run();
+			const row = await env.DB.prepare(
+				`SELECT api_key FROM api_keys WHERE stripe_subscription_id = ?`
+			).bind(subscriptionId).first();
+			if (row) await env.API_KEYS.delete(row.api_key);
+			await logAudit(env, {
+				event: 'paypal_subscription_canceled',
+				subscription_id: subscriptionId,
+			});
+		}
+
+		if (event.event_type === 'BILLING.SUBSCRIPTION.SUSPENDED' || event.event_type === 'PAYMENT.SALE.DENIED') {
+			const subId = event.event_type === 'PAYMENT.SALE.DENIED'
+				? resource.billing_agreement_id || subscriptionId
+				: subscriptionId;
+			await env.DB.prepare(
+				`UPDATE api_keys SET status = 'suspended', suspended_reason = ? WHERE stripe_subscription_id = ?`
+			).bind('PayPal payment failed', subId).run();
+			const row = await env.DB.prepare(
+				`SELECT api_key FROM api_keys WHERE stripe_subscription_id = ?`
+			).bind(subId).first();
+			if (row) await env.API_KEYS.delete(row.api_key);
+			await logAudit(env, {
+				event: 'paypal_subscription_suspended',
+				subscription_id: subId,
+			});
+		}
+
+		return jsonResponse({ received: true }, 200, corsHeaders);
+	} catch (error) {
+		console.error('PayPal webhook error:', error);
+		return jsonResponse({ error: 'Webhook processing failed', message: error.message }, 500, corsHeaders);
+	}
+}
+
+/**
+ * POST /api/paypal/cancel-subscription
+ * Body: { api_key, reason? }
+ * Cancels the user's PayPal subscription (BILLING.SUBSCRIPTION.CANCELLED
+ * webhook fires on success to do the D1 update).
+ */
+async function handlePayPalCancelSubscription(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const apiKey = body.api_key || body.apiKey;
+		const reason = String(body.reason || 'User cancelled from dashboard').slice(0, 128);
+		if (!apiKey) {
+			return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		}
+		const row = await env.DB.prepare(
+			`SELECT stripe_subscription_id, payment_processor FROM api_keys WHERE api_key = ?`
+		).bind(apiKey).first();
+		if (!row || !row.stripe_subscription_id || row.payment_processor !== 'paypal') {
+			return jsonResponse({ error: 'No PayPal subscription attached to this key' }, 404, corsHeaders);
+		}
+		const accessToken = await getPayPalAccessToken(env);
+		const ppRes = await fetch(
+			paypalBase(env) + '/v1/billing/subscriptions/' + encodeURIComponent(row.stripe_subscription_id) + '/cancel',
+			{
+				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ reason })
+			}
+		);
+		if (!ppRes.ok && ppRes.status !== 204) {
+			let detail = null;
+			try { detail = await ppRes.json(); } catch (e) {}
+			console.error('PayPal cancel failed:', detail);
+			return jsonResponse({ error: 'Failed to cancel subscription', details: detail }, 502, corsHeaders);
+		}
+		await logAudit(env, {
+			event: 'paypal_subscription_cancel_requested',
+			api_key: apiKey,
+			subscription_id: row.stripe_subscription_id,
+		});
+		return jsonResponse({ success: true, message: 'Cancellation requested — the BILLING.SUBSCRIPTION.CANCELLED webhook will finalize the state.' }, 200, corsHeaders);
+	} catch (error) {
+		console.error('PayPal cancel error:', error);
+		return jsonResponse({ error: 'Failed to cancel subscription', message: error.message }, 500, corsHeaders);
 	}
 }
 
