@@ -246,6 +246,29 @@ export default {
 				return await handleAdminSuspendKey(request, env, corsHeaders);
 			}
 
+			// P5 — Admin panel + overage toggle.
+			if (url.pathname === '/api/admin/check' && request.method === 'GET') {
+				return await handleAdminCheck(request, env, corsHeaders);
+			}
+			if (url.pathname === '/api/admin/domain-alerts' && request.method === 'GET') {
+				return await handleAdminDomainAlerts(request, env, corsHeaders);
+			}
+			if (url.pathname === '/api/admin/unverified-users' && request.method === 'GET') {
+				return await handleAdminUnverifiedUsers(request, env, corsHeaders);
+			}
+			if (url.pathname.startsWith('/api/admin/domain-alerts/') && url.pathname.endsWith('/update') && request.method === 'POST') {
+				return await handleAdminUpdateAlertStatus(request, env, corsHeaders, url.pathname);
+			}
+			if (url.pathname === '/api/admin/resend-verification' && request.method === 'POST') {
+				return await handleAdminResendVerification(request, env, corsHeaders);
+			}
+			if (url.pathname === '/api/dashboard/overage-setting' && request.method === 'GET') {
+				return await handleGetOverageSetting(request, env, corsHeaders);
+			}
+			if (url.pathname === '/api/dashboard/overage-setting' && request.method === 'POST') {
+				return await handlePostOverageSetting(request, env, corsHeaders);
+			}
+
 		if (url.pathname === '/api/admin/free-tier-stats' && request.method === 'GET') {
 			return await handleAdminFreeTierStats(request, env, corsHeaders);
 		}
@@ -1672,14 +1695,28 @@ async function handleVerifyAPIKey(request, env, corsHeaders) {
 				}, 403, corsHeaders);
 			}
 
-			// Check quota
+			// Check quota — honor the per-key overage setting (P5).
+			// overage_blocked defaults to 1 (reject past quota); when 0, the
+			// account has opted into overage billing and we return valid + a
+			// flag instead of 429.
 			if (data.used >= data.quota) {
+				if (data.overage_blocked !== 0) {
+					return jsonResponse({
+						valid: false,
+						error: 'Quota exceeded',
+						quota_limit: data.quota,
+						quota_used: data.used,
+					}, 429, corsHeaders);
+				}
 				return jsonResponse({
-					valid: false,
-					error: 'Quota exceeded',
+					valid: true,
+					over_quota: true,
+					tier: data.tier,
 					quota_limit: data.quota,
 					quota_used: data.used,
-				}, 429, corsHeaders);
+					quota_remaining: 0,
+					source: 'cache',
+				}, 200, corsHeaders);
 			}
 
 			return jsonResponse({
@@ -1715,18 +1752,40 @@ async function handleVerifyAPIKey(request, env, corsHeaders) {
 			}, 403, corsHeaders);
 		}
 
-		// Check quota
+		// Check quota — honor overage_blocked (P5).
+		const overageBlocked = result.overage_blocked === 0 ? 0 : 1;
 		if (result.quota_used >= result.quota_limit) {
+			if (overageBlocked) {
+				return jsonResponse({
+					valid: false,
+					error: 'Quota exceeded',
+					quota_limit: result.quota_limit,
+					quota_used: result.quota_used,
+				}, 429, corsHeaders);
+			}
+			// Allowed-overage path — still cache for the next call.
+			await env.API_KEYS.put(api_key, JSON.stringify({
+				email: result.user_email,
+				tier: result.tier,
+				quota: result.quota_limit,
+				used: result.quota_used,
+				billing_cycle_end: result.billing_cycle_end,
+				allowed_ips: result.allowed_ips,
+				overage_blocked: overageBlocked,
+			}), { expirationTtl: 86400 });
 			return jsonResponse({
-				valid: false,
-				error: 'Quota exceeded',
+				valid: true,
+				over_quota: true,
+				tier: result.tier,
 				quota_limit: result.quota_limit,
 				quota_used: result.quota_used,
-			}, 429, corsHeaders);
+				quota_remaining: 0,
+				source: 'database',
+			}, 200, corsHeaders);
 		}
 
-		// Cache for next time — include allowed_ips so the cached path can
-		// enforce it without an extra D1 read.
+		// Cache for next time — include allowed_ips and overage_blocked so the
+		// cached path can enforce both without an extra D1 read.
 		await env.API_KEYS.put(api_key, JSON.stringify({
 			email: result.user_email,
 			tier: result.tier,
@@ -1734,6 +1793,7 @@ async function handleVerifyAPIKey(request, env, corsHeaders) {
 			used: result.quota_used,
 			billing_cycle_end: result.billing_cycle_end,
 			allowed_ips: result.allowed_ips,
+			overage_blocked: overageBlocked,
 		}), { expirationTtl: 86400 });  // 24 hours
 
 		return jsonResponse({
@@ -4137,6 +4197,203 @@ async function handleAdminFreeTierStats(request, env, corsHeaders) {
 		}, 500, corsHeaders);
 	}
 }
+
+// ═══════════════════════════════════════════════════════════════
+// P5 — Admin panel endpoints (all Bearer ADMIN_TOKEN gated) and
+// per-key overage toggle.
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * GET /api/admin/check
+ * Dashboard uses this to decide whether to reveal the admin panel.
+ * Anything other than 200 means "you're not admin, hide it".
+ */
+async function handleAdminCheck(request, env, corsHeaders) {
+	const auth = verifyAdminToken(request, env);
+	if (!auth.valid) {
+		return jsonResponse({ admin: false }, 401, corsHeaders);
+	}
+	return jsonResponse({ admin: true, is_admin: true }, 200, corsHeaders);
+}
+
+/**
+ * GET /api/admin/domain-alerts
+ * Aggregated abuse-events rows where the request domain disagreed with the
+ * email-domain. Surfaces likely API-key theft / unauthorized sharing.
+ */
+async function handleAdminDomainAlerts(request, env, corsHeaders) {
+	const auth = verifyAdminToken(request, env);
+	if (!auth.valid) return jsonResponse({ error: auth.error }, 401, corsHeaders);
+	try {
+		const rows = await env.DB.prepare(`
+			SELECT id, api_key, email, email_domain, request_domain,
+			       request_country, occurrence_count, last_seen_at, status
+			FROM abuse_events
+			WHERE event_type = 'domain_mismatch'
+			ORDER BY last_seen_at DESC
+			LIMIT 200
+		`).all();
+		return jsonResponse({ alerts: rows.results || [] }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Admin domain alerts error:', error);
+		return jsonResponse({ error: 'Failed to load alerts', message: error.message }, 500, corsHeaders);
+	}
+}
+
+/**
+ * GET /api/admin/unverified-users
+ * Users who registered but haven't verified their email yet.
+ */
+async function handleAdminUnverifiedUsers(request, env, corsHeaders) {
+	const auth = verifyAdminToken(request, env);
+	if (!auth.valid) return jsonResponse({ error: auth.error }, 401, corsHeaders);
+	try {
+		const rows = await env.DB.prepare(`
+			SELECT api_key AS customer_id, user_email AS email, user_name AS name,
+			       tier AS plan, created_at,
+			       (SELECT MAX(created_at) FROM email_verifications WHERE api_key = api_keys.api_key) AS email_verification_sent_at
+			FROM api_keys
+			WHERE email_verified = 0 AND status != 'canceled'
+			ORDER BY created_at DESC
+			LIMIT 500
+		`).all();
+		const users = (rows.results || []).map(r => ({
+			customer_id: r.customer_id,
+			email: r.email,
+			name: r.name,
+			plan: r.plan === 0 ? 'free' : 'tier_' + r.plan,
+			created_at: r.created_at,
+			email_verification_sent_at: r.email_verification_sent_at,
+		}));
+		return jsonResponse({ users: users }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Admin unverified users error:', error);
+		return jsonResponse({ error: 'Failed to load unverified users', message: error.message }, 500, corsHeaders);
+	}
+}
+
+/**
+ * POST /api/admin/domain-alerts/<id>/update
+ * Body: { status: 'reviewed' | 'ignored' | 'pending' }
+ */
+async function handleAdminUpdateAlertStatus(request, env, corsHeaders, pathname) {
+	const auth = verifyAdminToken(request, env);
+	if (!auth.valid) return jsonResponse({ error: auth.error }, 401, corsHeaders);
+	try {
+		const parts = pathname.split('/');
+		const id = Number(parts[parts.length - 2]);
+		const body = await request.json();
+		const status = String(body.status || '').toLowerCase();
+		if (!Number.isInteger(id) || !['pending', 'reviewed', 'ignored'].includes(status)) {
+			return jsonResponse({ error: 'Invalid id or status' }, 400, corsHeaders);
+		}
+		await env.DB.prepare(
+			`UPDATE abuse_events SET status = ? WHERE id = ?`
+		).bind(status, id).run();
+		return jsonResponse({ success: true, id: id, status: status }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Admin update alert error:', error);
+		return jsonResponse({ error: 'Failed to update alert', message: error.message }, 500, corsHeaders);
+	}
+}
+
+/**
+ * POST /api/admin/resend-verification
+ * Body: { customer_id }  (customer_id is the api_key for free-tier rows)
+ */
+async function handleAdminResendVerification(request, env, corsHeaders) {
+	const auth = verifyAdminToken(request, env);
+	if (!auth.valid) return jsonResponse({ error: auth.error }, 401, corsHeaders);
+	try {
+		const body = await request.json();
+		const apiKey = body.customer_id || body.api_key;
+		if (!apiKey) return jsonResponse({ error: 'Missing customer_id' }, 400, corsHeaders);
+		const row = await env.DB.prepare(
+			`SELECT user_email FROM api_keys WHERE api_key = ?`
+		).bind(apiKey).first();
+		if (!row || !row.user_email) {
+			return jsonResponse({ error: 'User not found' }, 404, corsHeaders);
+		}
+		const code = generateRandomId(6);
+		const now = Date.now();
+		await env.DB.prepare(`
+			INSERT INTO email_verifications (verification_code, user_email, api_key, created_at, expires_at)
+			VALUES (?, ?, ?, ?, ?)
+		`).bind(code, row.user_email, apiKey, now, now + (24 * 60 * 60 * 1000)).run();
+		// Best-effort send — silently no-ops while EMAIL binding is unconfigured
+		// (P6 wires Resend). Audit either way so the action is recorded.
+		await sendVerificationEmail(env, row.user_email, apiKey, code);
+		await logAudit(env, {
+			event: 'admin_resend_verification',
+			api_key: apiKey,
+			email: row.user_email,
+		});
+		return jsonResponse({ success: true, email: row.user_email }, 200, corsHeaders);
+	} catch (error) {
+		console.error('Admin resend verification error:', error);
+		return jsonResponse({ error: 'Failed to resend verification', message: error.message }, 500, corsHeaders);
+	}
+}
+
+// ─────────────────────────────────────────────────────────────
+// Overage toggle (per-key)
+// allow_overage in the API maps to the inverse of overage_blocked
+// in the database, so the existing dashboard UI's data shape
+// (`allow_overage`: 0 = blocked, 1 = allowed) keeps working.
+// ─────────────────────────────────────────────────────────────
+
+async function handleGetOverageSetting(request, env, corsHeaders) {
+	try {
+		const url = new URL(request.url);
+		const apiKey = resolveApiKey(request, url, null);
+		if (!apiKey) return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		const row = await env.DB.prepare(
+			`SELECT overage_blocked FROM api_keys WHERE api_key = ? AND status IN ('active', 'suspended')`
+		).bind(apiKey).first();
+		if (!row) return jsonResponse({ error: 'API key not found or inactive' }, 401, corsHeaders);
+		const overageBlocked = row.overage_blocked === 0 ? 0 : 1;
+		return jsonResponse({
+			// allow_overage is the dashboard's existing UI shape, inverse
+			// of the database column: 1 = allow overage charges, 0 = block.
+			allow_overage: overageBlocked === 1 ? 0 : 1,
+			overage_blocked: overageBlocked,
+		}, 200, corsHeaders);
+	} catch (error) {
+		console.error('Get overage setting error:', error);
+		return jsonResponse({ error: 'Failed to read overage setting', message: error.message }, 500, corsHeaders);
+	}
+}
+
+async function handlePostOverageSetting(request, env, corsHeaders) {
+	try {
+		const body = await request.json();
+		const url = new URL(request.url);
+		const apiKey = resolveApiKey(request, url, body.api_key);
+		if (!apiKey) return jsonResponse({ error: 'Missing api_key' }, 400, corsHeaders);
+		// Existing dashboard JS sends `allow_overage` (true = allow). The
+		// DB column is the safer default of `overage_blocked` (1 = block).
+		const allowOverage = body.allow_overage === true || body.allow_overage === 1;
+		const overageBlocked = allowOverage ? 0 : 1;
+		const row = await env.DB.prepare(
+			`UPDATE api_keys SET overage_blocked = ? WHERE api_key = ?`
+		).bind(overageBlocked, apiKey).run();
+		await env.API_KEYS.delete(apiKey);
+		await logAudit(env, {
+			event: 'overage_setting_updated',
+			api_key: apiKey,
+			overage_blocked: overageBlocked,
+		});
+		return jsonResponse({
+			success: true,
+			allow_overage: allowOverage ? 1 : 0,
+			overage_blocked: overageBlocked,
+		}, 200, corsHeaders);
+	} catch (error) {
+		console.error('Post overage setting error:', error);
+		return jsonResponse({ error: 'Failed to update overage setting', message: error.message }, 500, corsHeaders);
+	}
+}
+
 async function validateAPIRequest(apiKey, request, env) {
 	const startTime = Date.now();
 	const url = new URL(request.url);

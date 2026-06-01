@@ -116,6 +116,7 @@
                     <button class="btn btn-secondary" onclick="copyApiKey()" style="margin-top: 1rem;">
                         📋 Copy to Clipboard
                     </button>
+                    <a href="#" onclick="adminSignIn(); return false;" style="margin-left: 1rem; font-size: 0.875rem; color: var(--text-secondary);">🛡️ Enter admin token</a>
                 </div>
 
                 <!-- Current Plan -->
@@ -161,8 +162,8 @@
                     </div>
                 </div>
 
-                <!-- Overage Protection Setting (hidden in P1; re-enabled in P5 spec phase 5) -->
-                <div class="checker-card" style="margin-bottom: 2rem; display: none;">
+                <!-- Overage Protection Setting (P5) -->
+                <div class="checker-card" style="margin-bottom: 2rem;">
                     <h2 style="margin-bottom: 1rem;">🛡️ Overage Protection</h2>
                     <p style="color: var(--text-secondary); margin-bottom: 1rem;">
                         Control what happens when you exceed your monthly quota.
@@ -1024,8 +1025,9 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         // Load overage setting on dashboard load
         async function loadOverageSetting() {
             try {
-                const response = await fetch('/api/dashboard/overage-setting', {
-                    credentials: 'include'
+                const key = getApiKey();
+                const response = await fetch('/api/dashboard/overage-setting?api_key=' + encodeURIComponent(key), {
+                    headers: { 'X-API-Key': key }
                 });
 
                 if (response.ok) {
@@ -1086,13 +1088,14 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             }
 
             try {
+                const key = getApiKey();
                 const response = await fetch('/api/dashboard/overage-setting', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-API-Key': key
                     },
-                    credentials: 'include',
-                    body: JSON.stringify({ allow_overage: allowOverage })
+                    body: JSON.stringify({ api_key: key, allow_overage: allowOverage })
                 });
 
                 if (response.ok) {
@@ -1136,17 +1139,41 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             }
         }
 
-        // The overage + admin wrappers around loadUsageData are disabled in P1
-        // alongside their UI. They fire against unbuilt endpoints
-        // (/api/dashboard/overage-setting, /api/admin/check) and just spam
-        // 404s in the console. P5 re-introduces both panels and re-wires
-        // this wrapper.
+        // P5 — pull overage setting + check admin status alongside usage.
+        const originalLoadUsageData = loadUsageData;
+        loadUsageData = async function () {
+            await originalLoadUsageData();
+            await loadOverageSetting();
+            await checkAdminStatus();
+        };
+
+        // Admin token (separate from the API key) is held in sessionStorage
+        // so it doesn't survive a browser restart. The "Enter admin token"
+        // link below the API key prompts for it.
+        function getAdminToken() {
+            return sessionStorage.getItem('mypasswordchecker_admin_token') || '';
+        }
+        function setAdminToken(t) {
+            if (t) sessionStorage.setItem('mypasswordchecker_admin_token', t);
+            else sessionStorage.removeItem('mypasswordchecker_admin_token');
+        }
+        function adminHeaders() {
+            const t = getAdminToken();
+            return t ? { 'Authorization': 'Bearer ' + t } : {};
+        }
+        async function adminSignIn() {
+            const t = window.prompt('Enter the operator ADMIN_TOKEN to reveal the admin panel:');
+            if (!t) return;
+            setAdminToken(t.trim());
+            await checkAdminStatus();
+        }
 
         // Check if current user is admin and load admin panel
         async function checkAdminStatus() {
             try {
+                if (!getAdminToken()) return; // No token, don't even probe.
                 const response = await fetch('/api/admin/check', {
-                    credentials: 'include'
+                    headers: adminHeaders()
                 });
 
                 if (response.ok) {
@@ -1168,7 +1195,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         async function loadAdminAlerts() {
             try {
                 const response = await fetch('/api/admin/domain-alerts', {
-                    credentials: 'include'
+                    headers: adminHeaders()
                 });
 
                 if (response.ok) {
@@ -1233,7 +1260,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         async function loadUnverifiedUsers() {
             try {
                 const response = await fetch('/api/admin/unverified-users', {
-                    credentials: 'include'
+                    headers: adminHeaders()
                 });
 
                 if (response.ok) {
@@ -1295,8 +1322,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             try {
                 const response = await fetch(`/api/admin/domain-alerts/${alertId}/update`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: Object.assign({ 'Content-Type': 'application/json' }, adminHeaders()),
                     body: JSON.stringify({ status: newStatus })
                 });
 
@@ -1322,8 +1348,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             try {
                 const response = await fetch(`/api/admin/resend-verification`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: Object.assign({ 'Content-Type': 'application/json' }, adminHeaders()),
                     body: JSON.stringify({ customer_id: customerId })
                 });
 
