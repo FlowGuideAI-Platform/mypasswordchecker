@@ -296,7 +296,7 @@
                     <ul>
                         <li><a href="/">Password Checker</a></li>
                         <li><a href="/generate-phonetic.html">Phonetic Generator</a></li>
-                        <li><a href="/premium.html">Quantum Estimate</a></li>
+                        <li><a href="/premium.html">Premium Tools</a></li>
                         <li><a href="/api-docs.html">API Documentation</a></li>
                     </ul>
                 </div>
@@ -385,30 +385,15 @@
             document.getElementById('generate-btn').disabled = true;
 
             try {
-                // Call API to authorize generation (uses Tier 2 quota)
-                const apiResponse = await fetch('/api/v1/generate-phonetic-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ phrase })
-                });
-
-                const apiData = await apiResponse.json();
-
-                if (!apiData.success) {
-                    throw new Error(apiData.error || 'Failed to authorize generation');
-                }
-
-                // Generate client-side
+                // Premium tools are free for everyone — generate client-side, no API gate.
                 const variations = PhoneticGenerator.generateMultiple(phrase, 5, {
                     minLength: 20,
                     minEntropy: 80,
                     aggressiveness
                 });
 
-                // Display results
-                displayResults(variations, apiData);
+                // No quota/usage panel — pass empty apiData so displayResults skips it.
+                displayResults(variations, {});
 
             } catch (error) {
                 console.error('Generation error:', error);

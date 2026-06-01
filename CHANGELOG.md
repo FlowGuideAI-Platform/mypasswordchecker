@@ -3,6 +3,28 @@
 All notable changes to MyPasswordChecker.com are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2026-05-31]
+
+### Fixed
+- **Phonetic password generator on `/generate-phonetic`** was returning
+  "Endpoint not found" — the page was calling `/api/v1/generate-phonetic-
+  password`, an endpoint that doesn't exist. Removed the dead API
+  authorization step; the tool now generates client-side via
+  `PhoneticGenerator.generateMultiple`, matching how `/premium` already
+  does it. (Premium is free for everyone, no quota gate to check.)
+- **`/free-password-checker` was loading `/js/password-checker.js`
+  which 404'd**, leaving the strength meter, crack-time display, and
+  feedback panel completely inert. Created the missing file with
+  DOM-based rendering (`textContent` / `createElement` rather than
+  `innerHTML`) so it's safe against any zxcvbn feedback strings.
+
+### Changed
+- Stripped the remaining `$1` / `($1 one-time)` / `Premium access ($1)`
+  language from `/free-password-checker` body copy and footer.
+- Footer "Tools" menu across all main pages: "Quantum Estimate" relabeled
+  to "Premium Tools" to match the page's actual content (three tools, not
+  just quantum).
+
 ## [2026-05-19]
 
 ### Changed
