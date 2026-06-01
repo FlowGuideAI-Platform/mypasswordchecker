@@ -193,10 +193,13 @@
                     <p style="font-size: 1rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 1rem;">
                         We're committed to making password security accessible, transparent, and privacy-focused. Our tools are designed with the principle that your sensitive data should never leave your control unless absolutely necessary.
                     </p>
+                    <p style="font-size: 1rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 1rem;">
+                        The entire site is built on <strong>Cloudflare</strong> — static pages run on Workers Static Assets, the API runs on Cloudflare Workers, and we use D1, KV, and R2 for storage. No origin servers, no third-party hosting; every request is served from Cloudflare's edge.
+                    </p>
                     <div style="margin-top: 1.5rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.5rem; border-left: 4px solid var(--primary-color);">
                         <h4 style="margin-bottom: 1rem; color: var(--primary-color);">Open Source & Transparency</h4>
                         <p style="line-height: 1.7; margin-bottom: 0.5rem;">
-                            We believe in transparency. Our core password strength checker is <a href="https://github.com/8bh7grrxwp-afk/MyPasswordChecker" target="_blank" rel="noopener" style="color: var(--primary-color);">open source on GitHub</a>, allowing security researchers and developers to verify our claims and contribute improvements.
+                            We believe in transparency. Our core password strength checker is published as a <a href="https://github.com/FlowGuideAI-Platform/mypasswordchecker" target="_blank" rel="noopener" style="color: var(--primary-color);">public read-only mirror on GitHub</a>, allowing security researchers and developers to inspect our code and verify our claims. The repository is read-only — we don't accept external pull requests, but you're welcome to fork it for your own use.
                         </p>
                         <p style="line-height: 1.7; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0;">
                             For responsible disclosure of security vulnerabilities, please contact: <a href="mailto:security@mypasswordchecker.com" style="color: var(--primary-color);">security@mypasswordchecker.com</a>
