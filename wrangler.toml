@@ -48,6 +48,7 @@ TIER2_OVERAGE_PRICE = "9"
 # to commit. Matching secret keys live in `wrangler secret put`.
 STRIPE_PUBLISHABLE_KEY = "pk_live_51SEPDLLK2gT9yR9uSWyueOGp1mRCapxhACdP9ajY7wrAmIJwEGwPRHrGIerTOIJDzOd6xWBABZgfuzqIxXQyHaNy002Pc9T7q3"
 PAYPAL_CLIENT_ID       = "AakYgdAB7Qh88WH5DKYNXwxqyOrF35GhoZvAxu2n4HeP4NaSD7fgAn7XtV6A1eTEyvjIF1-41eTgKInC"
+GITHUB_CLIENT_ID       = "Ov23li19eZwYYpnbJtgl"
 
 # Recurring-subscription tier → price/plan IDs. Populated by the one-shot
 # /api/admin/run-payment-setup endpoint and read by checkout/portal flows.
