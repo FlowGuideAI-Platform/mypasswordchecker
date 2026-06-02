@@ -4336,6 +4336,239 @@ async function handleAdminResendVerification(request, env, corsHeaders) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// P3 — One-shot recurring-subscription catalog setup.
+// The helpers + handler below ran once to populate Stripe Prices,
+// PayPal Plans, the Stripe webhook, and to upsert the PayPal webhook
+// at /api/paypal/webhook. They are no longer routable (the router case
+// was removed), but kept here as documentation and so a future
+// re-bootstrap can call them via a fresh router stub if needed.
+//
+// To re-enable: add this back to the admin block of the router —
+//   if (url.pathname === '/api/admin/run-payment-setup' && request.method === 'POST') {
+//     return await handleRunPaymentSetup(request, env, corsHeaders);
+//   }
+// ─────────────────────────────────────────────────────────────
+
+async function _stripeApi(env, path, body, method) {
+	const init = { method: method || 'POST', headers: { 'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}` } };
+	if (body) {
+		init.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		init.body = body instanceof URLSearchParams ? body : new URLSearchParams(body);
+	}
+	const res = await fetch('https://api.stripe.com' + path, init);
+	const text = await res.text();
+	let data = {};
+	try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
+	if (!res.ok) throw new Error('Stripe ' + (method || 'POST') + ' ' + path + ' → ' + res.status + ' ' + (data.error?.message || text));
+	return data;
+}
+
+async function _runStripeSetup(env) {
+	const tiers = [
+		{ tier: 3, name: 'MyPasswordChecker — Standard Quantum', amount: 2000 },
+		{ tier: 4, name: 'MyPasswordChecker — Large Quantum',    amount: 4000 },
+		{ tier: 5, name: 'MyPasswordChecker — XL Quantum',       amount: 6000 },
+		{ tier: 6, name: 'MyPasswordChecker — Super Quantum',    amount: 9900 },
+	];
+
+	// List all active products once; filter in-memory. Avoids the
+	// /v1/products/search index, which isn't guaranteed enabled on
+	// every account.
+	const productsList = await _stripeApi(env, '/v1/products?limit=100&active=true', null, 'GET');
+	const allProducts = productsList.data || [];
+	const prices = {};
+
+	for (const t of tiers) {
+		let product = allProducts.find(p => p.name === t.name);
+		if (!product) {
+			const pp = new URLSearchParams();
+			pp.set('name', t.name);
+			pp.set('metadata[tier]', String(t.tier));
+			product = await _stripeApi(env, '/v1/products', pp);
+		}
+		// Find an active recurring monthly Price on this product with metadata.tier matching.
+		const priceList = await _stripeApi(env, '/v1/prices?product=' + product.id + '&active=true&limit=100', null, 'GET');
+		let price = (priceList.data || []).find(p =>
+			p.unit_amount === t.amount &&
+			p.currency === 'usd' &&
+			p.recurring && p.recurring.interval === 'month' &&
+			p.metadata && String(p.metadata.tier) === String(t.tier)
+		);
+		if (!price) {
+			const pp = new URLSearchParams();
+			pp.set('product', product.id);
+			pp.set('unit_amount', String(t.amount));
+			pp.set('currency', 'usd');
+			pp.set('recurring[interval]', 'month');
+			pp.set('metadata[tier]', String(t.tier));
+			price = await _stripeApi(env, '/v1/prices', pp);
+		}
+		prices[t.tier] = price.id;
+	}
+
+	// Webhook. Stripe only returns the signing secret on initial create,
+	// so if a webhook at our URL already exists we delete + recreate it
+	// to capture a fresh secret. Acceptable — the operator is setting
+	// this up for the first time and there's no live traffic mid-window.
+	const targetUrl = 'https://mypasswordchecker.com/api/stripe/webhook';
+	const events = [
+		'checkout.session.completed',
+		'customer.subscription.created',
+		'customer.subscription.updated',
+		'customer.subscription.deleted',
+		'invoice.payment_failed',
+	];
+	const whList = await _stripeApi(env, '/v1/webhook_endpoints?limit=100', null, 'GET');
+	const existingWh = (whList.data || []).find(w => w.url === targetUrl);
+	if (existingWh) {
+		await _stripeApi(env, '/v1/webhook_endpoints/' + existingWh.id, null, 'DELETE');
+	}
+	const whParams = new URLSearchParams();
+	whParams.set('url', targetUrl);
+	for (const ev of events) whParams.append('enabled_events[]', ev);
+	whParams.set('description', 'mypasswordchecker recurring subscriptions');
+	const wh = await _stripeApi(env, '/v1/webhook_endpoints', whParams);
+
+	return { prices, webhook: { id: wh.id, secret: wh.secret, recreated: !!existingWh } };
+}
+
+async function _paypalAccessToken(env) {
+	const creds = btoa(env.PAYPAL_CLIENT_ID + ':' + env.PAYPAL_CLIENT_SECRET);
+	const res = await fetch(paypalBase(env) + '/v1/oauth2/token', {
+		method: 'POST',
+		headers: {
+			'Authorization': 'Basic ' + creds,
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		body: 'grant_type=client_credentials',
+	});
+	const data = await res.json();
+	if (!res.ok || !data.access_token) throw new Error('PayPal auth: ' + (data.error_description || data.error || res.status));
+	return data.access_token;
+}
+
+async function _paypalApi(token, env, path, body, method) {
+	const init = { method: method || 'POST', headers: { 'Authorization': 'Bearer ' + token } };
+	if (body) {
+		init.headers['Content-Type'] = method === 'PATCH' ? 'application/json' : 'application/json';
+		init.body = JSON.stringify(body);
+	}
+	const res = await fetch(paypalBase(env) + path, init);
+	const text = await res.text();
+	let data = {};
+	try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
+	if (!res.ok) throw new Error('PayPal ' + (method || 'POST') + ' ' + path + ' → ' + res.status + ' ' + text);
+	return data;
+}
+
+async function _runPaypalSetup(env) {
+	const token = await _paypalAccessToken(env);
+	const productName = 'MyPasswordChecker API';
+
+	// Reuse existing product by name, else create.
+	const prodList = await _paypalApi(token, env, '/v1/catalogs/products?page_size=20', null, 'GET');
+	let product = (prodList.products || []).find(p => p.name === productName);
+	if (!product) {
+		product = await _paypalApi(token, env, '/v1/catalogs/products', {
+			name: productName,
+			description: 'Recurring API access subscription',
+			type: 'SERVICE',
+			category: 'SOFTWARE',
+		});
+	}
+	const productId = product.id;
+
+	const tiers = [
+		{ tier: 1, name: 'MyPasswordChecker — Standard',      value: '2.50' },
+		{ tier: 2, name: 'MyPasswordChecker — Basic Quantum', value: '5.00' },
+	];
+	const plansList = await _paypalApi(token, env, '/v1/billing/plans?product_id=' + productId + '&page_size=20', null, 'GET');
+	const existingPlans = plansList.plans || [];
+	const plans = {};
+	for (const t of tiers) {
+		let plan = existingPlans.find(p => p.name === t.name);
+		if (!plan) {
+			plan = await _paypalApi(token, env, '/v1/billing/plans', {
+				product_id: productId,
+				name: t.name,
+				billing_cycles: [{
+					frequency: { interval_unit: 'MONTH', interval_count: 1 },
+					tenure_type: 'REGULAR',
+					sequence: 1,
+					total_cycles: 0,
+					pricing_scheme: { fixed_price: { value: t.value, currency_code: 'USD' } },
+				}],
+				payment_preferences: {
+					auto_bill_outstanding: true,
+					setup_fee_failure_action: 'CONTINUE',
+					payment_failure_threshold: 1,
+				},
+			});
+		}
+		plans[t.tier] = plan.id;
+	}
+
+	// Webhook — extend existing webhook's event_types so the
+	// recurring subscription rail starts receiving deliveries without
+	// changing PAYPAL_WEBHOOK_ID.
+	const requiredEvents = [
+		'BILLING.SUBSCRIPTION.ACTIVATED',
+		'BILLING.SUBSCRIPTION.UPDATED',
+		'BILLING.SUBSCRIPTION.CANCELLED',
+		'BILLING.SUBSCRIPTION.EXPIRED',
+		'BILLING.SUBSCRIPTION.SUSPENDED',
+		'PAYMENT.SALE.DENIED',
+	];
+	const targetUrl = 'https://mypasswordchecker.com/api/paypal/webhook';
+	const whList = await _paypalApi(token, env, '/v1/notifications/webhooks', null, 'GET');
+	let webhook = { id: env.PAYPAL_WEBHOOK_ID || null, url: targetUrl, events_updated: false, created: false };
+	const existing = (whList.webhooks || []).find(w => w.url === targetUrl);
+	if (existing) {
+		webhook.id = existing.id;
+		const haveEvents = new Set((existing.event_types || []).map(e => e.name));
+		const missing = requiredEvents.filter(e => !haveEvents.has(e));
+		if (missing.length) {
+			const finalEvents = Array.from(new Set([...haveEvents, ...requiredEvents])).map(name => ({ name }));
+			await _paypalApi(token, env, '/v1/notifications/webhooks/' + existing.id, [
+				{ op: 'replace', path: '/event_types', value: finalEvents },
+			], 'PATCH');
+			webhook.events_updated = true;
+		}
+	} else {
+		const newWh = await _paypalApi(token, env, '/v1/notifications/webhooks', {
+			url: targetUrl,
+			event_types: requiredEvents.map(name => ({ name })),
+		});
+		webhook = { id: newWh.id, url: targetUrl, events_updated: true, created: true };
+	}
+
+	return { product_id: productId, plans, webhook };
+}
+
+async function handleRunPaymentSetup(request, env, corsHeaders) {
+	const auth = verifyAdminToken(request, env);
+	if (!auth.valid) return jsonResponse({ error: auth.error }, 401, corsHeaders);
+	const result = { stripe: null, paypal: null, errors: {} };
+	try {
+		result.stripe = await _runStripeSetup(env);
+	} catch (err) {
+		result.errors.stripe = err.message;
+	}
+	try {
+		result.paypal = await _runPaypalSetup(env);
+	} catch (err) {
+		result.errors.paypal = err.message;
+	}
+	await logAudit(env, {
+		event: 'payment_setup_run',
+		stripe_ok: !!result.stripe && !result.errors.stripe,
+		paypal_ok: !!result.paypal && !result.errors.paypal,
+	});
+	const status = (result.errors.stripe || result.errors.paypal) ? 207 : 200;
+	return jsonResponse(result, status, corsHeaders);
+}
+
+// ─────────────────────────────────────────────────────────────
 // Overage toggle (per-key)
 // allow_overage in the API maps to the inverse of overage_blocked
 // in the database, so the existing dashboard UI's data shape

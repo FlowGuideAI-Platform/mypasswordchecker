@@ -43,12 +43,28 @@ TIER2_MONTHLY_PRICE = "15000"
 TIER2_MONTHLY_QUOTA = "1500"
 TIER2_OVERAGE_PRICE = "9"
 
-# Secrets (set separately via Cloudflare dashboard or wrangler secret put)
-# STRIPE_SECRET_KEY = "sk_live_..."
-# STRIPE_SANDBOX_SECRET_KEY = "sk_test_..."
-# STRIPE_PUBLISHABLE_KEY = "pk_live_..."
-# STRIPE_SANDBOX_PUBLISHABLE_KEY = "pk_test_..."
-# STRIPE_WEBHOOK_SECRET = "whsec_..."
+# Client-visible payment-provider keys. Publishable / Client-ID values are
+# meant to be embedded in browser JS (Stripe.js, PayPal SDK); they're safe
+# to commit. Matching secret keys live in `wrangler secret put`.
+STRIPE_PUBLISHABLE_KEY = "pk_live_51SEPDLLK2gT9yR9uSWyueOGp1mRCapxhACdP9ajY7wrAmIJwEGwPRHrGIerTOIJDzOd6xWBABZgfuzqIxXQyHaNy002Pc9T7q3"
+PAYPAL_CLIENT_ID       = "AakYgdAB7Qh88WH5DKYNXwxqyOrF35GhoZvAxu2n4HeP4NaSD7fgAn7XtV6A1eTEyvjIF1-41eTgKInC"
+
+# Recurring-subscription tier → price/plan IDs. Populated by the one-shot
+# /api/admin/run-payment-setup endpoint and read by checkout/portal flows.
+STRIPE_PRICE_TIER_3 = "price_1Tdg37LK2gT9yR9unOrE5r81"  # Standard Quantum  $20/mo
+STRIPE_PRICE_TIER_4 = "price_1Tdg37LK2gT9yR9u1J0XuAAh"  # Large Quantum     $40/mo
+STRIPE_PRICE_TIER_5 = "price_1Tdg38LK2gT9yR9uHfjE1Coq"  # XL Quantum        $60/mo
+STRIPE_PRICE_TIER_6 = "price_1Tdg38LK2gT9yR9upHIKppHz"  # Super Quantum     $99/mo
+PAYPAL_PLAN_TIER_1  = "P-8UM81377503858412NIPCDBY"      # Standard          $2.50/mo
+PAYPAL_PLAN_TIER_2  = "P-01E69853KR4155216NIPCDCA"      # Basic Quantum     $5/mo
+# PayPal Product (parent of the plans above)
+PAYPAL_PRODUCT_ID = "PROD-00V47082NH495210J"
+
+# Secrets (set separately via `wrangler secret put`)
+# STRIPE_SECRET_KEY     — sk_live_...
+# STRIPE_WEBHOOK_SECRET — whsec_... (captured from the Stripe webhook-create response)
+# PAYPAL_CLIENT_SECRET  — set
+# PAYPAL_WEBHOOK_ID     — set (extended to BILLING.SUBSCRIPTION.* events)
 
 # Routes - Main domain (API only)
 [[routes]]
