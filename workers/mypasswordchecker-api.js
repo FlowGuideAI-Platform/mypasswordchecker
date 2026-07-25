@@ -1892,7 +1892,7 @@ async function handleTrackUsage(request, env, corsHeaders) {
 
 // Operators allowed into the hidden /numbers analytics page.
 const NUMBERS_ALLOWED_EMAILS = ['jack@flowguideai.com', 'jack@forgemcp.ai'];
-const AD_BANNER_IDS = ['flowguideai', 'forgemcp'];
+const AD_BANNER_IDS = ['flowguideai', 'forgemcp', 'suggestibility'];
 
 /**
  * Record an ad banner click. Privacy-respecting — no IP, no identifiers.

@@ -57,6 +57,16 @@ creative up to slot width. A third creative, `/ads/rotating-combo-ad.html`, is u
   - The test row is filterable: `placement = 'phase0-audit'`, `traffic_source =
     'phase0-audit'` — exclude it from real funnel counts.
 
+## Rail prep (2026-07-25, post-baseline)
+
+Tracked production copies of the redesign rail creatives exist at
+`/ads/forgemcp-300x250`, `/ads/flowguideai-300x250`, `/ads/suggestibility-300x250`
+(handoff creatives + the same beacon block + `utm_source=mypasswordchecker&utm_medium=house&utm_campaign=rail`).
+`AD_BANNER_IDS` now includes `suggestibility` — **requires an API-worker deploy**
+(`wrangler.toml`) before suggestibility clicks record; until then they 400 (harmless,
+nothing serves that creative yet). The Phase 3 rail should iframe these three; the two
+legacy creatives stay untouched until the old slots are removed.
+
 ## Phase 3 regression checklist (must match this baseline)
 
 - [ ] Both creatives load (200) from their unchanged `/ads/...` URLs in the new right rail.
