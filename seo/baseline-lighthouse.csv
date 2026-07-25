@@ -1,0 +1,4 @@
+Page,Run,Performance,SEO,Accessibility,BestPractices
+/,baseline,80,100,91,100
+/free-password-checker,baseline,80,100,94,100
+/generate-phonetic,baseline,99,100,88,100
