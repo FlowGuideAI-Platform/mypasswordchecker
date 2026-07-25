@@ -1,20 +1,11 @@
-# MyPasswordChecker.com - Robots.txt
-# Allow all search engines to index our public pages
-
 User-agent: *
 Allow: /
 
-# Disallow user-specific / paywalled pages (require authentication or payment).
-# Paths are extension-less prefixes, so they also cover the .html form.
+# Prefix matching — each path below also covers its .html form.
 Disallow: /dashboard
 Disallow: /domains
 Disallow: /numbers
-
-# Disallow API endpoints (programmatic use only, not for indexing)
 Disallow: /api/
-
-# Disallow data files (programmatic use only, not for indexing)
 Disallow: /data/
 
-# Sitemap location
 Sitemap: https://mypasswordchecker.com/sitemap.xml

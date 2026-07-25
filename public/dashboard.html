@@ -15,10 +15,9 @@
                 <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
                 <nav class="nav">
                     <a href="/">Password Checker</a>
-                    <a href="/free-password-checker.html">Free Tool</a>
-                    <a href="/password-api.html">Developer API</a>
-                    <a href="/docs.html">Docs</a>
-                    <a href="/pricing.html">Pricing</a>
+                    <a href="/password-api">Developer API</a>
+                    <a href="/docs">Docs</a>
+                    <a href="/pricing">Pricing</a>
                 </nav>
             </div>
         </div>
@@ -96,7 +95,7 @@
                 <div id="onboarding-banner" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;">
                     <h3 style="margin: 0 0 0.5rem 0; color: white;">🎉 Welcome! Your subscription is active</h3>
                     <p style="margin: 0 0 1rem 0; opacity: 0.95;">To start using the API, you need to verify your domain. This prevents unauthorized use of your API key.</p>
-                    <a href="/domains.html" class="btn" style="background: white; color: #667eea; border: none; display: inline-block; text-decoration: none;">
+                    <a href="/domains" class="btn" style="background: white; color: #667eea; border: none; display: inline-block; text-decoration: none;">
                         🔐 Verify Your Domain Now
                     </a>
                     <button onclick="document.getElementById('onboarding-banner').style.display='none'" style="margin-left: 1rem; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
@@ -377,8 +376,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
   -d '{"password":"test123"}'</div>
 
                     <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                        📚 <a href="/docs.html" style="color: var(--primary-color); font-weight: 600;">Developer Documentation</a> |
-                        <a href="/api-docs.html" style="color: var(--primary-color);">API Reference</a>
+                        📚 <a href="/docs" style="color: var(--primary-color); font-weight: 600;">Developer Documentation</a>
                     </p>
                 </div>
             </div>
@@ -396,29 +394,29 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                     <h4>Tools</h4>
                     <ul>
                         <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium.html">Quantum Estimate</a></li>
-                        <li><a href="/api-docs.html">API Documentation</a></li>
+                        <li><a href="/premium">Quantum Estimate</a></li>
+                        <li><a href="/docs">API Documentation</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="/privacy.html">Privacy Policy</a></li>
-                        <li><a href="/terms.html">Terms of Service</a></li>
-                        <li><a href="/disclaimer.html">Quantum Estimate Disclaimer</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Developer</h4>
                     <ul>
-                        <li><a href="/dashboard.html">Dashboard</a></li>
-                        <li><a href="/pricing.html">API Pricing</a></li>
-                        <li><a href="/api-docs.html">Documentation</a></li>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/pricing">API Pricing</a></li>
+                        <li><a href="/docs">Documentation</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy.html" style="color: inherit;">Privacy</a> | <a href="/terms.html" style="color: inherit;">Terms</a></p>
+                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
                 <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
                 <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
                 <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
@@ -590,7 +588,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             if (!el) return;
             _clear(el);
             const a = document.createElement('a');
-            a.href = '/pricing.html';
+            a.href = '/pricing';
             a.style.color = 'var(--primary-color)';
             a.textContent = 'Upgrade to access';
             el.appendChild(a);
@@ -885,7 +883,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             if (!key) { alert('Sign in with your API key first.'); return; }
             const tier = window.Pricing && Pricing.tierById(planId);
             if (!tier || !tier.processor) {
-                window.location.href = '/pricing.html';
+                window.location.href = '/pricing';
                 return;
             }
             const endpoint = tier.processor === 'stripe'
@@ -969,7 +967,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             } else if (upgrade === 'cancel') {
                 // User backed out of the hosted checkout; nothing to do.
             }
-            window.history.replaceState({}, '', '/dashboard.html');
+            window.history.replaceState({}, '', window.location.pathname);
         })();
 
         // Check authentication on page load. Sources, in priority order:
@@ -983,7 +981,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                 const tokenFromHash = decodeURIComponent(window.location.hash.substring('#token='.length));
                 if (tokenFromHash) {
                     setApiKey(tokenFromHash);
-                    window.history.replaceState({}, '', '/dashboard.html');
+                    window.history.replaceState({}, '', window.location.pathname);
                 }
             }
             // Surface OAuth-failure return params so the user knows what went wrong.
@@ -991,13 +989,13 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             const oauthError = params.get('error');
             if (oauthError === 'oauth_failed') {
                 alert('GitHub sign-in failed. Please try again or register with email.');
-                window.history.replaceState({}, '', '/dashboard.html');
+                window.history.replaceState({}, '', window.location.pathname);
             } else if (oauthError === 'invalid_state') {
                 alert('Security validation failed — please try signing in again.');
-                window.history.replaceState({}, '', '/dashboard.html');
+                window.history.replaceState({}, '', window.location.pathname);
             } else if (oauthError === 'no_email') {
                 alert('Could not retrieve a verified email from GitHub. Make sure your primary GitHub email is verified, or register with email.');
-                window.history.replaceState({}, '', '/dashboard.html');
+                window.history.replaceState({}, '', window.location.pathname);
             }
 
             const stored = getApiKey();

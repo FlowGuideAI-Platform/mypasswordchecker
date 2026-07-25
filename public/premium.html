@@ -58,11 +58,10 @@
                 <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
                 <nav class="nav">
                     <a href="/">Password Checker</a>
-                    <a href="/free-password-checker.html">Free Tool</a>
-                    <a href="/premium.html">Premium</a>
-                    <a href="/password-api.html">Developer API</a>
-                    <a href="/about.html">About</a>
-                    <a href="/pricing.html">Pricing</a>
+                    <a href="/premium">Premium</a>
+                    <a href="/password-api">Developer API</a>
+                    <a href="/about">About</a>
+                    <a href="/pricing">Pricing</a>
                 </nav>
             </div>
         </div>
@@ -70,7 +69,7 @@
 
     <!-- Page carousel (top) -->
     <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/free-password-checker">← Free Tool</a>
+        <a class="page-nav-link" href="/">← Home</a>
         <a class="page-nav-link" href="/password-api">Developer API →</a>
     </nav>
 
@@ -104,7 +103,7 @@
                             <li>Standard Plan: 12,000 classical checks/month for $19/mo</li>
                             <li>Get API key for automated integration</li>
                         </ul>
-                        <a href="/dashboard.html" class="btn btn-secondary">
+                        <a href="/dashboard" class="btn btn-secondary">
                             Go to Developer Dashboard
                         </a>
                     </div>
@@ -401,7 +400,7 @@
 
     <!-- Page carousel (bottom) -->
     <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/free-password-checker">← Free Tool</a>
+        <a class="page-nav-link" href="/">← Home</a>
         <a class="page-nav-link" href="/password-api">Developer API →</a>
     </nav>
 
@@ -416,29 +415,29 @@
                     <h4>Tools</h4>
                     <ul>
                         <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium.html">Premium Tools</a></li>
-                        <li><a href="/api-docs.html">API Documentation</a></li>
+                        <li><a href="/premium">Premium Tools</a></li>
+                        <li><a href="/docs">API Documentation</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="/privacy.html">Privacy Policy</a></li>
-                        <li><a href="/terms.html">Terms of Service</a></li>
-                        <li><a href="/disclaimer.html">Quantum Estimate Disclaimer</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Developer</h4>
                     <ul>
-                        <li><a href="/dashboard.html">Dashboard</a></li>
-                        <li><a href="/pricing.html">API Pricing</a></li>
-                        <li><a href="/api-docs.html">Documentation</a></li>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/pricing">API Pricing</a></li>
+                        <li><a href="/docs">Documentation</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy.html" style="color: inherit;">Privacy</a> | <a href="/terms.html" style="color: inherit;">Terms</a></p>
+                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
                 <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
                 <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
                 <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
@@ -631,7 +630,7 @@
                             localStorage.setItem('premium_expires', verifyData.expires_at);
 
                             // Reload page to show premium content
-                            window.location.href = '/premium.html?paypal_success=true';
+                            window.location.href = '/premium?paypal_success=true';
                         } else {
                             throw new Error(verifyData.error || 'Payment verification failed');
                         }

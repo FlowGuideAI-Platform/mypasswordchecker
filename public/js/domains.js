@@ -2,7 +2,7 @@
 // Handles domain verification UI and API interactions.
 //
 // P1 — API-key-as-credential (spec §3): the key is stored in localStorage
-// by /dashboard.html on login, and we send it on every authenticated call
+// by /dashboard on login, and we send it on every authenticated call
 // as a query param or X-API-Key header. No cookies, no sessions.
 
 let currentSession = null;
@@ -20,22 +20,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Check if the stored API key is still valid via the worker's
 // /api/verify-api-key endpoint. If no key or not valid, send the user
-// back to /dashboard.html to sign in.
+// back to /dashboard to sign in.
 async function checkAuth() {
     const key = getDashboardApiKey();
-    if (!key) { window.location.href = '/dashboard.html'; return; }
+    if (!key) { window.location.href = '/dashboard'; return; }
     try {
         const response = await fetch('/api/verify-api-key?api_key=' + encodeURIComponent(key));
         const data = await response.json();
         if (!response.ok || !data.valid) {
             localStorage.removeItem('mypasswordchecker_api_key');
-            window.location.href = '/dashboard.html';
+            window.location.href = '/dashboard';
             return;
         }
         currentSession = data;
     } catch (error) {
         console.error('Auth check failed:', error);
-        window.location.href = '/dashboard.html';
+        window.location.href = '/dashboard';
     }
 }
 

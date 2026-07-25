@@ -175,11 +175,10 @@
                 <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
                 <nav class="nav">
                     <a href="/">Password Checker</a>
-                    <a href="/free-password-checker.html">Free Tool</a>
-                    <a href="/premium.html">Premium</a>
-                    <a href="/password-api.html">Developer API</a>
-                    <a href="/docs.html">Docs</a>
-                    <a href="/pricing.html">Pricing</a>
+                    <a href="/premium">Premium</a>
+                    <a href="/password-api">Developer API</a>
+                    <a href="/docs">Docs</a>
+                    <a href="/pricing">Pricing</a>
                 </nav>
             </div>
         </div>
@@ -222,8 +221,8 @@
                     <h3 style="margin-top: 2rem;">Resources</h3>
                     <ul>
                         <li><a href="#support">Support</a></li>
-                        <li><a href="/dashboard.html">Dashboard</a></li>
-                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/pricing">Pricing</a></li>
                     </ul>
                 </aside>
 
@@ -265,7 +264,7 @@
                     <!-- Authentication -->
                     <section id="authentication">
                         <h2>🔑 Authentication</h2>
-                        <p>All API requests require authentication using your API key. You can obtain an API key from the <a href="/dashboard.html" style="color: var(--primary-color);">Developer Dashboard</a>.</p>
+                        <p>All API requests require authentication using your API key. You can obtain an API key from the <a href="/dashboard" style="color: var(--primary-color);">Developer Dashboard</a>.</p>
 
                         <h3>API Key Format</h3>
                         <p>API keys follow the format: <code>mpc_{32_hex_characters}</code></p>
@@ -290,7 +289,7 @@
                         <p>Make your first API request in seconds:</p>
 
                         <h3>1. Get Your API Key</h3>
-                        <p>Sign up at the <a href="/dashboard.html" style="color: var(--primary-color);">Developer Dashboard</a> to receive your free API key with 50 requests per month. Domain verification required for activation.</p>
+                        <p>Sign up at the <a href="/dashboard" style="color: var(--primary-color);">Developer Dashboard</a> to receive your free API key with 50 requests per month. Domain verification required for activation.</p>
 
                         <h3>2. Make Your First Request</h3>
                         <div class="code-block">curl -X POST https://mypasswordchecker.com/api/v1/check-password \
@@ -342,7 +341,7 @@
                             </tbody>
                         </table>
 
-                        <p style="margin-top: 1.5rem;">See our <a href="/pricing.html" style="color: var(--primary-color);">Pricing page</a> for detailed quota information per plan.</p>
+                        <p style="margin-top: 1.5rem;">See our <a href="/pricing" style="color: var(--primary-color);">Pricing page</a> for detailed quota information per plan.</p>
                     </section>
 
                     <!-- Password Check Endpoint -->
@@ -419,7 +418,7 @@
                         <p style="margin-top: 1rem;">Calculate theoretical quantum computing resistance using Grover's algorithm.</p>
 
                         <div class="alert alert-info" style="margin: 1.5rem 0;">
-                            <strong>ℹ️ Note:</strong> This endpoint requires a Basic Quantum plan or higher. See the <a href="/pricing.html" style="color: var(--primary-color);">Pricing page</a> for tier details.
+                            <strong>ℹ️ Note:</strong> This endpoint requires a Basic Quantum plan or higher. See the <a href="/pricing" style="color: var(--primary-color);">Pricing page</a> for tier details.
                         </div>
 
                         <h3>Request Parameters</h3>
@@ -700,8 +699,8 @@ const response = await fetch('https://mypasswordchecker.com/api/v1/breach-check'
                         <ul style="line-height: 1.8;">
                             <li><strong>Cache responses:</strong> Password strength doesn't change; cache results for identical passwords</li>
                             <li><strong>Set timeouts:</strong> Configure reasonable request timeouts (recommended: 5 seconds)</li>
-                            <li><strong>Monitor usage:</strong> Track your API usage in the <a href="/dashboard.html" style="color: var(--primary-color);">Dashboard</a></li>
-                            <li><strong>Verify domains:</strong> Add your domains in <a href="/domains.html" style="color: var(--primary-color);">Domain Verification</a> for fraud protection</li>
+                            <li><strong>Monitor usage:</strong> Track your API usage in the <a href="/dashboard" style="color: var(--primary-color);">Dashboard</a></li>
+                            <li><strong>Verify domains:</strong> Add your domains in <a href="/domains" style="color: var(--primary-color);">Domain Verification</a> for fraud protection</li>
                         </ul>
                     </section>
 
@@ -809,27 +808,21 @@ print(f"Crack time: {data['crack_time']['display']}")</div>
 
                         <div class="feature-grid">
                             <div class="feature-card">
-                                <h4>📚 Documentation</h4>
-                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Review our <a href="/api-docs.html" style="color: var(--primary-color);">API Reference</a> for detailed endpoint specifications
-                                </p>
-                            </div>
-                            <div class="feature-card">
                                 <h4>📊 Dashboard</h4>
                                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Monitor usage and manage your account in the <a href="/dashboard.html" style="color: var(--primary-color);">Developer Dashboard</a>
+                                    Monitor usage and manage your account in the <a href="/dashboard" style="color: var(--primary-color);">Developer Dashboard</a>
                                 </p>
                             </div>
                             <div class="feature-card">
                                 <h4>💰 Pricing</h4>
                                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    View plans and features on our <a href="/pricing.html" style="color: var(--primary-color);">Pricing page</a>
+                                    View plans and features on our <a href="/pricing" style="color: var(--primary-color);">Pricing page</a>
                                 </p>
                             </div>
                             <div class="feature-card">
                                 <h4>🔒 Security</h4>
                                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Read our <a href="/privacy.html" style="color: var(--primary-color);">Privacy Policy</a> and <a href="/terms.html" style="color: var(--primary-color);">Terms of Service</a>
+                                    Read our <a href="/privacy" style="color: var(--primary-color);">Privacy Policy</a> and <a href="/terms" style="color: var(--primary-color);">Terms of Service</a>
                                 </p>
                             </div>
                         </div>
@@ -860,29 +853,29 @@ print(f"Crack time: {data['crack_time']['display']}")</div>
                     <h4>Tools</h4>
                     <ul>
                         <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium.html">Premium Tools</a></li>
-                        <li><a href="/api-docs.html">API Documentation</a></li>
+                        <li><a href="/premium">Premium Tools</a></li>
+                        <li><a href="/docs">API Documentation</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="/privacy.html">Privacy Policy</a></li>
-                        <li><a href="/terms.html">Terms of Service</a></li>
-                        <li><a href="/disclaimer.html">Quantum Estimate Disclaimer</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Developer</h4>
                     <ul>
-                        <li><a href="/dashboard.html">Dashboard</a></li>
-                        <li><a href="/pricing.html">API Pricing</a></li>
-                        <li><a href="/docs.html">Developer Docs</a></li>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/pricing">API Pricing</a></li>
+                        <li><a href="/docs">Developer Docs</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy.html" style="color: inherit;">Privacy</a> | <a href="/terms.html" style="color: inherit;">Terms</a></p>
+                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
                 <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
                 <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
                 <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
