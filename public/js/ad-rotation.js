@@ -25,7 +25,9 @@
  *     <div class="ad-creative" data-ad="1">…flowguideai…</div>
  *     <div class="ad-creative" data-ad="2">…suggestibility…</div>
  *   </div>
- *   <div class="ad-slot" data-slot="b"> …the same three… </div>
+ *   <div class="ad-slot" data-slot="b"></div>  ← may be left empty; an empty
+ *   slot B is populated by cloning slot A's creatives at init (site addition),
+ *   so the roster and its order have exactly one source.
  *
  *   .ad-slot     { position: relative; width: 300px; height: 250px; }
  *   .ad-creative { position: absolute; inset: 0; display: none; }
@@ -48,6 +50,16 @@
     var slotA = root.querySelector('.ad-slot[data-slot="a"]');
     var slotB = root.querySelector('.ad-slot[data-slot="b"]');
     if (!slotA || !slotB) return null;
+
+    // Site addition (not in the handoff original): the roster has one source.
+    // If slot B is empty, clone slot A's creatives — order matters because
+    // paint() indexes by DOM position, and a mismatched order would show the
+    // same ad in both slots.
+    if (!slotB.querySelector('.ad-creative')) {
+      slotA.querySelectorAll('.ad-creative').forEach(function (n) {
+        slotB.appendChild(n.cloneNode(true));
+      });
+    }
 
     var a = 0;
     var b = 1;

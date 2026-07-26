@@ -9,6 +9,10 @@
     <lastmod>2026-07-25</lastmod>
   </url>
   <url>
+    <loc>https://mypasswordchecker.com/password-cracker-test</loc>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
     <loc>https://mypasswordchecker.com/premium</loc>
     <lastmod>2026-07-25</lastmod>
   </url>
@@ -45,6 +49,5 @@
     <lastmod>2026-07-25</lastmod>
   </url>
   <!-- Excluded by design: /dashboard /domains (auth), /numbers (operator-only),
-       404 / attribution-badge / widget-demo (utility). /password-cracker-test
-       is added in redesign Phase 4 — regenerate then. -->
+       404 / attribution-badge / widget-demo (utility). -->
 </urlset>

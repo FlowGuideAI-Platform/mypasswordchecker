@@ -34,6 +34,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/css/modernist.css">
+    <link rel="modulepreload" href="/js/crack-model.js">
+    <link rel="modulepreload" href="/js/checker-widget.js">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
 
     <script type="application/ld+json">
@@ -116,8 +118,6 @@
          this page's grids and ordering. The two bright-accent FIELDS on this
          page are the meter fill and the quantum result cell (colour budget —
          a third accent field is a defect). */
-      .shell { max-width: 1280px; margin: 0 auto; }
-
       .hero { display: grid; grid-template-columns: 7fr 5fr; border-bottom: 2px solid var(--color-divider); }
       .hero-left { border-right: 2px solid var(--color-divider); }
       .hero-copy { padding: var(--space-8) var(--space-8) 0; }
@@ -130,24 +130,8 @@
       .hero-panel, .hero-weak { background: var(--color-surface); }
       .hero-panel { padding: var(--space-8) var(--space-8) 0; }
       .hero-weak { padding: 0 var(--space-8) var(--space-8); }
-      .pw-row { display: flex; gap: var(--space-2); }
-      .pw-row .input { flex: 1; font-family: ui-monospace, Menlo, monospace; }
-      .pw-row .btn { min-width: 64px; justify-content: flex-start; }
-      .meter { height: 10px; background: var(--color-neutral-300); margin: var(--space-6) 0 var(--space-2); }
-      .meter-fill { height: 10px; background: var(--color-accent); width: 0; }
-      .strength-row {
-        display: flex; justify-content: space-between; font-size: 12px;
-        letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
-      }
-      .weak-list { list-style: none; margin: 0; padding: 0; }
-      .weak-list li { display: flex; gap: var(--space-2); font-size: 13px; padding: var(--space-1) 0; }
-      .weak-list .dash { color: var(--color-accent); }
 
       .results { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 2px solid var(--color-divider); }
-      .cell { padding: var(--space-8); }
-      .cell-gpu, .cell-entropy { border-right: 2px solid var(--color-divider); }
-      .cell-quantum { background: var(--color-accent); color: var(--color-bg); }
-      .cell-quantum .caption { opacity: 0.85; }
 
       .trust, .tools, .faq { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
       .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-8); }
@@ -170,16 +154,6 @@
       .api-buttons { display: flex; gap: var(--space-3); }
       .api-buttons .btn { justify-content: flex-start; }
 
-      .ad-rail { padding: var(--space-8) var(--space-4); }
-      .ad-rail h6 { margin-bottom: var(--space-4); }
-      .ad-slot { position: relative; width: 300px; height: 250px; }
-      .ad-slot + .ad-slot { margin-top: var(--space-4); }
-      .ad-creative { position: absolute; inset: 0; display: none; }
-      .ad-creative iframe { width: 300px; height: 250px; border: 0; display: block; }
-      /* Static first paint matches initAdRail's initial (0,1) pair; the script
-         normalizes immediately and rotation takes over. */
-      .ad-slot[data-slot="a"] .ad-creative:nth-child(1) { display: block; }
-      .ad-slot[data-slot="b"] .ad-creative:nth-child(2) { display: block; }
 
       .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
       .faq-grid p { font-size: 14px; margin: 0; }
@@ -207,19 +181,16 @@
         .domains-strip { order: 14; }
 
         /* rules horizontal-only */
-        .cell-gpu, .cell-entropy, .api-strip { border-right: 0; }
-        .hero-panel, .cell-gpu, .cell-entropy, .cell-quantum,
-        .hero-lead, .ad-rail, .api-strip { border-bottom: 2px solid var(--color-divider); }
+        .api-strip { border-right: 0; }
+        .hero-panel, .cell-quantum, .hero-lead, .ad-rail,
+        .api-strip { border-bottom: 2px solid var(--color-divider); }
 
         .hero-copy { padding: var(--space-4) var(--space-4) 0; }
         .hero h1 { font-size: 40px; }
         .eyebrow { margin-bottom: var(--space-3); }
         .hero-panel, .hero-weak, .hero-lead { padding: var(--space-4); }
-        .pw-row .btn, .pw-row .input { min-height: 44px; }
 
-        .cell { padding: var(--space-4); }
-
-        .trust, .tools, .faq, .api-strip, .ad-rail { padding: var(--space-4); }
+        .trust, .tools, .faq, .api-strip { padding: var(--space-4); }
         .trust-grid { grid-template-columns: 1fr; gap: var(--space-4); }
         .tools-grid { grid-template-columns: 1fr; }
         .faq-grid { grid-template-columns: 1fr; gap: var(--space-4); }
@@ -256,6 +227,7 @@
                     <div><strong>zxcvbn pattern matching</strong><span class="text-muted">Dropbox's library, run client-side</span></div>
                     <div><strong>Grover's algorithm model</strong><span class="text-muted">Halves effective key strength</span></div>
                 </div>
+                <p class="text-muted" style="font-size: 13px; margin: var(--space-4) 0 0;">Want the attack-by-attack breakdown? <a href="/password-cracker-test">Run the full password cracker test</a>.</p>
             </div>
         </div>
         <div class="hero-right">
@@ -398,82 +370,22 @@
     <script src="/js/ad-tracking.js"></script>
     <!-- Ad rail: runs before the zxcvbn parse so revenue content never waits on it -->
     <script src="/js/ad-rotation.js"></script>
-    <script>
-      (function () {
-        var slotA = document.querySelector('.ad-slot[data-slot="a"]');
-        var slotB = document.querySelector('.ad-slot[data-slot="b"]');
-        slotA.querySelectorAll('.ad-creative').forEach(function (n) {
-          slotB.appendChild(n.cloneNode(true));
-        });
-        initAdRail();
-      })();
-    </script>
+    <script>initAdRail();</script>
     <!-- Real zxcvbn, self-hosted; must load before the checker module -->
     <script src="/js/vendor/zxcvbn-4.4.2.js"></script>
 
     <script type="module">
-      import { analyze, CAPTIONS, DEMO_PASSWORD, SECONDS_PER_YEAR, SECONDS_PER_DAY } from '/js/crack-model.js';
+      import { analyze, DEMO_PASSWORD, SECONDS_PER_YEAR, SECONDS_PER_DAY } from '/js/crack-model.js';
+      import { initChecker } from '/js/checker-widget.js';
 
-      const $ = (id) => document.getElementById(id);
-      const input = $('pw');
-      const toggle = $('pw-toggle');
-      const meterFill = $('meter-fill');
-      const strengthLabelEl = $('strength-label');
-      const numGpu = $('num-gpu'), unitGpu = $('unit-gpu');
-      const numBits = $('num-bits');
-      const numQ = $('num-q'), unitQ = $('unit-q');
-      const weakList = $('weak-list');
-
-      // Captions and the API demo figures are generated from the model's constants
-      // so a printed rate can never contradict a computed value (the static HTML
-      // text is a no-JS fallback carrying the same strings).
-      $('caption-gpu').textContent = CAPTIONS.gpu;
-      $('caption-entropy').textContent = CAPTIONS.entropy;
-      $('caption-q').textContent = CAPTIONS.quantum;
-      $('target-label').textContent = CAPTIONS.target;
+      // API-strip demo figures — generated from the model so they can never
+      // contradict the live tool (static text is the no-JS fallback).
       const demo = analyze(DEMO_PASSWORD);
-      $('api-bits').textContent = demo.bits;
-      $('api-gpu').textContent = (demo.classicalSeconds / SECONDS_PER_YEAR).toPrecision(2).replace('e+', 'e');
-      $('api-grover').textContent = Math.round(demo.quantumSeconds / SECONDS_PER_DAY);
+      document.getElementById('api-bits').textContent = demo.bits;
+      document.getElementById('api-gpu').textContent = (demo.classicalSeconds / SECONDS_PER_YEAR).toPrecision(2).replace('e+', 'e');
+      document.getElementById('api-grover').textContent = Math.round(demo.quantumSeconds / SECONDS_PER_DAY);
 
-      // Synchronous recalculation on every keystroke — no debounce, no spinner,
-      // no async, and never a network request (the trust row promises this).
-      let lastNotesKey;
-      function render() {
-        const r = analyze(input.value);
-        meterFill.style.width = r.pct;
-        strengthLabelEl.textContent = r.label;
-        numGpu.textContent = r.cBig;
-        unitGpu.textContent = r.cUnit;
-        numBits.textContent = r.bits;
-        numQ.textContent = r.qBig;
-        unitQ.textContent = r.qUnit;
-        const notesKey = r.notes.join('\n');
-        if (notesKey === lastNotesKey) return;
-        lastNotesKey = notesKey;
-        weakList.replaceChildren(...r.notes.map((t) => {
-          const li = document.createElement('li');
-          const dash = document.createElement('span');
-          dash.className = 'dash';
-          dash.textContent = '—';
-          const text = document.createElement('span');
-          text.textContent = t;
-          li.append(dash, text);
-          return li;
-        }));
-      }
-
-      input.addEventListener('input', render);
-      toggle.addEventListener('click', () => {
-        const hidden = input.type === 'password';
-        input.type = hidden ? 'text' : 'password';
-        toggle.textContent = hidden ? 'Hide' : 'Show';
-      });
-
-      // The design-pinned demo has one source: the model's export. The HTML
-      // value attribute is only the no-JS fallback.
-      input.value = DEMO_PASSWORD;
-      render();
+      initChecker();
     </script>
 </body>
 </html>

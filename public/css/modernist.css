@@ -293,6 +293,40 @@ textarea.input { min-height: 90px; resize: vertical; }
 .site-footer strong { font-family: var(--font-heading); display: block; margin-bottom: var(--space-2); }
 .footer-col { display: flex; flex-direction: column; gap: var(--space-1); }
 
+.shell { max-width: 1280px; margin: 0 auto; }
+
+/* Checker panel internals (shared DOM contract with /js/checker-widget.js) */
+.pw-row { display: flex; gap: var(--space-2); }
+.pw-row .input { flex: 1; font-family: ui-monospace, Menlo, monospace; }
+.pw-row .btn { min-width: 64px; justify-content: flex-start; }
+.meter { height: 10px; background: var(--color-neutral-300); margin: var(--space-6) 0 var(--space-2); }
+.meter-fill { height: 10px; background: var(--color-accent); width: 0; }
+.strength-row {
+  display: flex; justify-content: space-between; font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
+}
+.weak-list { list-style: none; margin: 0; padding: 0; }
+.weak-list li { display: flex; gap: var(--space-2); font-size: 13px; padding: var(--space-1) 0; }
+.weak-list .dash { color: var(--color-accent); }
+
+/* Result cells — the quantum cell is one of the page's two bright-accent
+   fields (colour budget); editing it here edits every rebuilt page. */
+.cell { padding: var(--space-8); }
+.cell-gpu, .cell-entropy { border-right: 2px solid var(--color-divider); }
+.cell-quantum { background: var(--color-accent); color: var(--color-bg); }
+.cell-quantum .caption { opacity: 0.85; }
+
+/* House-ad rail (rotation contract in /js/ad-rotation.js) */
+.ad-rail { padding: var(--space-8) var(--space-4); }
+.ad-rail h6 { margin-bottom: var(--space-4); }
+.ad-slot { position: relative; width: 300px; height: 250px; }
+.ad-slot + .ad-slot { margin-top: var(--space-4); }
+.ad-creative { position: absolute; inset: 0; display: none; }
+.ad-creative iframe { width: 300px; height: 250px; border: 0; display: block; }
+/* Static first paint matches initAdRail's initial (0,1) pair. */
+.ad-slot[data-slot="a"] .ad-creative:nth-child(1) { display: block; }
+.ad-slot[data-slot="b"] .ad-creative:nth-child(2) { display: block; }
+
 .domains-strip { padding: 0 var(--space-8) var(--space-8); }
 .domains-strip .hr { margin-top: 0; }
 .domains-row { font-size: 12px; display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: baseline; }
@@ -305,6 +339,10 @@ textarea.input { min-height: 90px; resize: vertical; }
   .topnav { flex-direction: column; gap: var(--space-3); align-items: flex-start; padding: var(--space-4); }
   .topnav-links { flex-wrap: wrap; gap: var(--space-3) var(--space-4); }
   .numeral { font-size: 56px; }
+  .cell { padding: var(--space-4); }
+  .cell-gpu, .cell-entropy { border-right: 0; border-bottom: 2px solid var(--color-divider); }
+  .pw-row .btn, .pw-row .input { min-height: 44px; }
+  .ad-rail { padding: var(--space-4); }
   .site-footer { grid-template-columns: 1fr 1fr; padding: var(--space-4); }
   .domains-strip { padding: 0 var(--space-4) var(--space-4); }
 }

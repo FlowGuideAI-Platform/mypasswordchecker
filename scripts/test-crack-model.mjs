@@ -40,10 +40,33 @@ check('empty.label', empty.label, 'Nothing to measure');
 const weak = m.analyze('password123');
 check('weak.commonNote', weak.notes.some(n => n.includes('most common')), true);
 
-// The homepage's no-JS fallback must carry the same demo strings
-const html = readFileSync(join(root, 'public/index.html'), 'utf8');
-for (const s of ['>8.1<', '>MILLION YEARS<', '>85<', '>12<', '>WEEKS<', 'value="Cobalt-Rope-7"']) {
-  check(`index.html fallback contains ${s}`, html.includes(s), true);
+// Every page carrying the demo as a no-JS fallback must hold the same strings
+const pages = {
+  'index.html': readFileSync(join(root, 'public/index.html'), 'utf8'),
+  'password-cracker-test.html': readFileSync(join(root, 'public/password-cracker-test.html'), 'utf8'),
+};
+for (const [name, html] of Object.entries(pages)) {
+  for (const s of ['>8.1<', '>MILLION YEARS<', '>85<', '>12<', '>WEEKS<', 'value="Cobalt-Rope-7"']) {
+    check(`${name} fallback contains ${s}`, html.includes(s), true);
+  }
+}
+
+// The static crack-time table must be the generator's verbatim output
+const { rows } = await import(join(root, 'scripts/generate-crack-table.mjs'));
+for (const row of rows()) {
+  check(`table row present: ${row.slice(8, 48)}…`, pages['password-cracker-test.html'].includes(row), true);
+}
+
+// FAQPage JSON-LD must mirror visible copy (rich-result requirement)
+for (const [name, html] of Object.entries(pages)) {
+  for (const block of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    const data = JSON.parse(block[1]);
+    if (data['@type'] !== 'FAQPage') continue;
+    for (const q of data.mainEntity) {
+      const vis = q.acceptedAnswer.text.replace(/&/g, '&amp;');
+      check(`${name} FAQ visible: "${q.name.slice(0, 40)}…"`, html.includes(vis) || html.includes(q.acceptedAnswer.text), true);
+    }
+  }
 }
 
 if (failures) { console.error(`\n${failures} failure(s)`); process.exit(1); }
