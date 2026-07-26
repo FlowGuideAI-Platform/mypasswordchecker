@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&amp;display=swap">
+<link rel="stylesheet" href="theme-modernist.css">
+<style>
+  body { margin: 0; background: #f3f2f2; }
+  /* Body-size links take the deep ramp step — the base accent is only tuned to 3:1 (chrome and large text), not paragraph copy. */
+  .t-modernist a { color: var(--color-accent-700); }
+  .t-modernist a:hover { text-decoration: underline; }
+  .slot { background: repeating-linear-gradient(135deg, rgba(0,0,0,.06) 0 6px, rgba(0,0,0,0) 6px 12px); display: flex; align-items: center; justify-content: center; text-align: center; }
+  .slot span { font-family: ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1.5; color: #6b665f; padding: 12px; }
+</style>
+</helmet>
+
+<div class="t-modernist" style="max-width:1280px; margin:0 auto">
+
+    <nav style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-4) var(--space-8); border-bottom:2px solid var(--color-divider)">
+      <span style="font-family:var(--font-heading); font-weight:800; font-size:19px; letter-spacing:-0.02em">MyPasswordChecker<span style="color:var(--color-accent-700)">.com</span></span>
+      <div style="display:flex; gap:var(--space-6); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600">
+        <a href="#" style="color:var(--color-text); text-decoration:none">Checker</a>
+        <a href="#" style="color:var(--color-text); text-decoration:none">Phonetic Generator</a>
+        <a href="#" style="color:var(--color-text); text-decoration:none">Breach Check</a>
+        <a href="#" style="color:var(--color-text); text-decoration:none">Developer API</a>
+        <a href="#" style="color:var(--color-text); text-decoration:none">Pricing</a>
+      </div>
+    </nav>
+
+    <div style="display:grid; grid-template-columns:7fr 5fr; border-bottom:2px solid var(--color-divider)">
+      <div style="padding:var(--space-8); border-right:2px solid var(--color-divider)">
+        <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; color:var(--color-accent-700); margin-bottom:var(--space-6)">Runs in your browser — nothing is sent</div>
+        <h1 style="font-size:60px; margin:0 0 var(--space-4); max-width:15ch">How strong is your password?</h1>
+        <p style="font-size:17px; max-width:48ch; margin:0">A free strength test with entropy, GPU crack time, and a quantum resistance estimate — the only checker that models Grover's algorithm. Nothing you type leaves this page.</p>
+        <div class="hr"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); font-size:13px">
+          <div><strong style="display:block; font-family:var(--font-heading)">zxcvbn pattern matching</strong><span class="text-muted">Dropbox's library, run client-side</span></div>
+          <div><strong style="display:block; font-family:var(--font-heading)">Grover's algorithm model</strong><span class="text-muted">Halves effective key strength</span></div>
+        </div>
+      </div>
+
+      <div style="padding:var(--space-8); background:var(--color-surface)">
+        <label style="display:block; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; margin-bottom:var(--space-2)">Your password</label>
+        <div style="display:flex; gap:var(--space-2)">
+          <input class="input" type="{{ type1 }}" value="{{ p1 }}" onChange="{{ set1 }}" placeholder="Type or paste it" style="flex:1; font-family:ui-monospace, Menlo, monospace" />
+          <button class="btn btn-secondary" onClick="{{ toggle1 }}" style="min-width:64px; justify-content:flex-start">{{ eye1 }}</button>
+        </div>
+        <div style="height:10px; background:var(--color-neutral-300); margin:var(--space-6) 0 var(--space-2)">
+          <div style="height:10px; background:var(--color-accent); width:{{ f1.pct }}"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600">
+          <span>{{ f1.label }}</span><span class="text-muted">Target: 100 bits</span>
+        </div>
+        <div class="hr"></div>
+        <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; margin-bottom:var(--space-3)">What weakens it</div>
+        <sc-for list="{{ f1.notes }}" as="n" hint-placeholder-count="2">
+          <div style="display:flex; gap:var(--space-2); font-size:13px; padding:var(--space-1) 0"><span style="color:var(--color-accent)">—</span><span>{{ n.t }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; border-bottom:2px solid var(--color-divider)">
+      <div style="padding:var(--space-8); border-right:2px solid var(--color-divider)">
+        <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; margin-bottom:var(--space-4)">Crack time — modern GPU</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:76px; line-height:0.9; letter-spacing:-0.04em">{{ f1.cBig }}</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:20px; letter-spacing:0.06em; margin-top:var(--space-2)">{{ f1.cUnit }}</div>
+        <p class="text-muted" style="font-size:12px; margin-top:var(--space-4)">At 10¹¹ guesses per second — a single rented GPU rig, offline against a leaked hash.</p>
+      </div>
+      <div style="padding:var(--space-8); border-right:2px solid var(--color-divider)">
+        <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; margin-bottom:var(--space-4)">Entropy</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:76px; line-height:0.9; letter-spacing:-0.04em">{{ f1.bits }}</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:20px; letter-spacing:0.06em; margin-top:var(--space-2)">BITS</div>
+        <p class="text-muted" style="font-size:12px; margin-top:var(--space-4)">Every bit doubles the work. 60 is fair, 80 is strong, 100 or more survives a quantum halving.</p>
+      </div>
+      <div style="padding:var(--space-8); background:var(--color-accent); color:var(--color-bg)">
+        <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; margin-bottom:var(--space-4)">Crack time — quantum (Grover)</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:76px; line-height:0.9; letter-spacing:-0.04em">{{ f1.qBig }}</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:20px; letter-spacing:0.06em; margin-top:var(--space-2)">{{ f1.qUnit }}</div>
+        <p style="font-size:12px; margin-top:var(--space-4); opacity:0.85">A machine this large does not exist yet. This is a future-proofing estimate at 10⁶ Grover iterations per second, not today's threat.</p>
+      </div>
+    </div>
+
+    <div style="padding:var(--space-8); border-bottom:2px solid var(--color-divider)">
+      <h6 style="margin-bottom:var(--space-6)">Why you can believe the number</h6>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-8)">
+        <div><h4 style="font-size:17px">Never leaves your browser</h4><p class="text-muted" style="font-size:13px; margin:0">Open the network tab while you type. There is nothing to see — no request is made.</p></div>
+        <div><h4 style="font-size:17px">Readable source</h4><p class="text-muted" style="font-size:13px; margin:0">The whole checker is client-side JavaScript. View source and audit it yourself.</p></div>
+        <div><h4 style="font-size:17px">Published method</h4><p class="text-muted" style="font-size:13px; margin:0">zxcvbn for classical patterns; a stated Grover model for quantum, with its assumptions printed.</p></div>
+        <div><h4 style="font-size:17px">Honest about quantum</h4><p class="text-muted" style="font-size:13px; margin:0">Large-scale quantum computers do not exist. We say so on every estimate we publish.</p></div>
+      </div>
+    </div>
+
+    <div style="padding:var(--space-8); border-bottom:2px solid var(--color-divider)">
+      <h2 style="margin-bottom:var(--space-6)">Three more tools. Still free, still no sign-up.</h2>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6)">
+        <div class="card"><div class="card-kicker">Generator</div><div class="card-title">Phonetic password generator</div><div class="card-body">Turn a phrase you can say out loud into a password nothing can guess. Built for people who have to type it on a TV remote.</div><a class="btn btn-primary" href="#" style="justify-content:flex-start; margin-top:var(--space-4)">Generate one →</a></div>
+        <div class="card"><div class="card-kicker">Breach check</div><div class="card-title">800M+ leaked passwords</div><div class="card-body">Matched against Have I Been Pwned. Only the first five characters of a hash are ever sent — your password stays here.</div><a class="btn btn-primary" href="#" style="justify-content:flex-start; margin-top:var(--space-4)">Check yours →</a></div>
+        <div class="card"><div class="card-kicker">Quantum</div><div class="card-title">Full quantum analysis</div><div class="card-body">Bit-by-bit, with the Grover assumptions written out and a plain-language read on what to change.</div><a class="btn btn-primary" href="#" style="justify-content:flex-start; margin-top:var(--space-4)">Open the analysis →</a></div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 340px; border-bottom:2px solid var(--color-divider)">
+      <div style="padding:var(--space-8); border-right:2px solid var(--color-divider)">
+        <h6>Developer API</h6>
+        <h2 style="max-width:24ch">Score passwords inside your own product.</h2>
+        <p class="text-muted" style="max-width:52ch">One POST, entropy and both crack-time estimates back. No password is logged on our side either.</p>
+        <pre style="font-family:ui-monospace, Menlo, monospace; font-size:13px; background:var(--color-neutral-900); color:var(--color-neutral-100); padding:var(--space-4); margin:var(--space-4) 0; overflow:auto">POST /v1/score  { "password": "…" }
+→ { "bits": 85, "gpu_years": 8.1e6, "grover_days": 84 }</pre>
+        <div style="display:flex; gap:var(--space-3)"><a class="btn btn-primary" href="#" style="justify-content:flex-start">Read the docs</a><a class="btn btn-secondary" href="#" style="justify-content:flex-start">Pricing</a></div>
+      </div>
+      <div style="padding:var(--space-8)">
+        <h6 style="margin-bottom:var(--space-4)">Also from All Aligned Consulting</h6>
+        <div style="position:relative; width:300px; height:250px; margin-bottom:var(--space-4)">
+          <div style="position:absolute; inset:0; display:{{ a0 }}"><dc-import name="AdForgeMCP" hint-size="300px,250px"></dc-import></div>
+          <div style="position:absolute; inset:0; display:{{ a1 }}"><dc-import name="AdFlowGuideAI" hint-size="300px,250px"></dc-import></div>
+          <div style="position:absolute; inset:0; display:{{ a2 }}"><dc-import name="AdSuggestibility" hint-size="300px,250px"></dc-import></div>
+        </div>
+        <div style="position:relative; width:300px; height:250px">
+          <div style="position:absolute; inset:0; display:{{ b0 }}"><dc-import name="AdForgeMCP" hint-size="300px,250px"></dc-import></div>
+          <div style="position:absolute; inset:0; display:{{ b1 }}"><dc-import name="AdFlowGuideAI" hint-size="300px,250px"></dc-import></div>
+          <div style="position:absolute; inset:0; display:{{ b2 }}"><dc-import name="AdSuggestibility" hint-size="300px,250px"></dc-import></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:var(--space-8); border-bottom:2px solid var(--color-divider)">
+      <h2 style="margin-bottom:var(--space-6)">Questions people actually ask</h2>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--space-8) var(--space-8)">
+        <div><h4>How long would it take to crack my password?</h4><p class="text-muted" style="font-size:14px">Depends on length, character variety and the attacker's hardware. A rented GPU rig tries roughly 100 billion guesses a second offline. Eight lowercase letters fall in seconds; thirteen mixed characters take millions of years.</p></div>
+        <div><h4>What makes a password quantum resistant?</h4><p class="text-muted" style="font-size:14px">Grover's algorithm halves effective strength — 80 classical bits become 40. To hold 80 bits against a quantum attacker you need about 160 bits classically: roughly 25 random characters, or six random words.</p></div>
+        <div><h4>Is this safe to use?</h4><p class="text-muted" style="font-size:14px">Your password never leaves the browser. Disconnect from the internet and the checker still works — that is the test we would run too.</p></div>
+        <div><h4>What is entropy?</h4><p class="text-muted" style="font-size:14px">Randomness measured in bits. Each bit doubles the number of possibilities. Forty bits is a trillion guesses; sixty is a quintillion.</p></div>
+      </div>
+    </div>
+
+    <div style="padding:var(--space-8); display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:var(--space-6); font-size:13px">
+      <div><strong style="font-family:var(--font-heading); display:block; margin-bottom:var(--space-2)">MyPasswordChecker.com</strong><span class="text-muted">Free password strength analysis with quantum resistance estimates. Operated by All Aligned Consulting LLC, California.</span></div>
+      <div style="display:flex; flex-direction:column; gap:var(--space-1)"><h6>Tools</h6><a href="#">Checker</a><a href="#">Phonetic generator</a><a href="#">Breach check</a></div>
+      <div style="display:flex; flex-direction:column; gap:var(--space-1)"><h6>Developers</h6><a href="#">API docs</a><a href="#">Pricing</a><a href="#">Dashboard</a></div>
+      <div style="display:flex; flex-direction:column; gap:var(--space-1)"><h6>Legal</h6><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Quantum disclaimer</a></div>
+    </div>
+    <div style="padding:0 var(--space-8) var(--space-8)">
+      <div class="hr" style="margin-top:0"></div>
+      <div style="font-size:12px; display:flex; gap:var(--space-2); flex-wrap:wrap; align-items:baseline">
+        <span style="font-family:var(--font-heading); font-weight:800; text-transform:uppercase; letter-spacing:0.08em">Same tool, three addresses</span>
+        <a href="#">QuantumPasswordChecker.com</a><span class="text-muted">·</span><a href="#">MyQuantumPasswordChecker.com</a><span class="text-muted">·</span><a href="#">MyPasswordChecker.com</a>
+        <span class="text-muted">— typed one of the others and landed here? You are in the right place.</span>
+      </div>
+    </div>
+  </div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const DEMO = 'Cobalt-Rope-7';
+const COMMON = ['password', '123456', 'qwerty', 'letmein', 'admin', 'welcome', 'iloveyou', 'monkey', 'dragon', 'football', 'abc123', 'sunshine'];
+const UNITS = [[1, 'seconds'], [60, 'minutes'], [3600, 'hours'], [86400, 'days'], [604800, 'weeks'], [31557600, 'years'], [3.15576e10, 'thousand years'], [3.15576e13, 'million years'], [3.15576e16, 'billion years'], [3.15576e19, 'trillion years'], [3.15576e22, 'quadrillion years'], [3.15576e25, 'quintillion years']];
+
+function fmtTime(sec) {
+  if (!isFinite(sec) || sec > 3.15576e28) return ['∞', 'beyond estimate'];
+  if (sec < 1) return ['<1', 'second'];
+  let k = 0;
+  for (let i = 0; i < UNITS.length; i++) if (sec >= UNITS[i][0]) k = i;
+  const v = sec / UNITS[k][0];
+  const n = v >= 100 ? Math.round(v).toLocaleString('en-US') : v >= 10 ? String(Math.round(v)) : v.toFixed(1);
+  return [n, UNITS[k][1]];
+}
+
+class Component extends DCLogic {
+  // Two slots, three creatives. On each tick exactly ONE slot flips, and it
+  // takes the creative neither slot is currently showing (0+1+2 = 3, so the
+  // missing index is 3 - a - b). The slots therefore never show the same ad
+  // and never change at the same moment.
+  state = { p1: DEMO, s1: false, adA: 0, adB: 1, adTurn: 'B' };
+
+  componentDidMount() {
+    this._adTimer = setInterval(() => this.setState(s => (
+      s.adTurn === 'B'
+        ? { adB: 3 - s.adA - s.adB, adTurn: 'A' }
+        : { adA: 3 - s.adA - s.adB, adTurn: 'B' }
+    )), 8000);
+  }
+
+  componentWillUnmount() { clearInterval(this._adTimer); }
+  _cache = {};
+  _h = {
+    set1: e => this.setState({ p1: e.target.value }),
+    toggle1: () => this.setState(s => ({ s1: !s.s1 }))
+  };
+
+  memo(pw) {
+    if (!(pw in this._cache)) this._cache[pw] = this.analyze(pw);
+    return this._cache[pw];
+  }
+
+  analyze(pw) {
+    if (!pw) return { bits: '—', pct: '0%', label: 'Nothing to measure', cBig: '—', cUnit: '', qBig: '—', qUnit: '', notes: [{ t: 'Type a password above to see the estimate.' }] };
+    let set = 0;
+    if (/[a-z]/.test(pw)) set += 26;
+    if (/[A-Z]/.test(pw)) set += 26;
+    if (/[0-9]/.test(pw)) set += 10;
+    if (/[^a-zA-Z0-9]/.test(pw)) set += 33;
+    let bits = pw.length * Math.log2(set || 2);
+    const low = pw.toLowerCase();
+    const notes = [];
+    let pen = 0;
+    if (COMMON.some(c => low.includes(c))) { pen += Math.min(bits * 0.6, 32); notes.push({ t: 'Contains one of the ten thousand most common passwords.' }); }
+    if (/(.)\1{2,}/.test(pw)) { pen += 6; notes.push({ t: 'A character repeats three or more times in a row.' }); }
+    if (/(0123|1234|2345|3456|4567|5678|6789|abcd|bcde|qwer|wert|asdf|zxcv)/i.test(pw)) { pen += 9; notes.push({ t: 'Contains a keyboard walk or a counting sequence.' }); }
+    if (/^[a-z]+$/.test(pw)) { pen += 5; notes.push({ t: 'Lowercase letters only — no case, digits or symbols.' }); }
+    if (/^[0-9]+$/.test(pw)) { pen += 8; notes.push({ t: 'Digits only. A PIN-shaped password is guessed first.' }); }
+    if (/(19|20)\d\d/.test(pw)) { pen += 4; notes.push({ t: 'Contains something shaped like a year.' }); }
+    if (pw.length < 12) { pen += 3; notes.push({ t: 'Under twelve characters. Length beats cleverness.' }); }
+    if (!notes.length) notes.push({ t: 'No common patterns, walks or repeats found.' });
+    bits = Math.max(1, bits - pen);
+
+    const guesses = Math.pow(2, Math.max(0, bits - 1));
+    const [cBig, cUnit] = fmtTime(guesses / 1e11);
+    const [qBig, qUnit] = fmtTime(Math.pow(2, bits / 2) / 1e6);
+
+    const b = Math.round(bits);
+    const label = b < 28 ? 'Very weak' : b < 36 ? 'Weak' : b < 60 ? 'Fair' : b < 80 ? 'Strong' : b < 100 ? 'Very strong' : 'Quantum-ready';
+
+    return {
+      bits: b,
+      pct: Math.min(100, Math.round((bits / 128) * 100)) + '%',
+      label: label,
+      cBig: cBig, cUnit: cUnit.toUpperCase(),
+      qBig: qBig, qUnit: qUnit.toUpperCase(),
+      notes: notes
+    };
+  }
+
+  renderVals() {
+    const s = this.state, h = this._h;
+    const show = (slot, i) => (slot === i ? 'block' : 'none');
+    return {
+      f1: this.memo(s.p1), p1: s.p1, set1: h.set1, toggle1: h.toggle1, type1: s.s1 ? 'text' : 'password', eye1: s.s1 ? 'Hide' : 'Show',
+      a0: show(s.adA, 0), a1: show(s.adA, 1), a2: show(s.adA, 2),
+      b0: show(s.adB, 0), b1: show(s.adB, 1), b2: show(s.adB, 2)
+    };
+  }
+}
+</script>
+</body>
+</html>
