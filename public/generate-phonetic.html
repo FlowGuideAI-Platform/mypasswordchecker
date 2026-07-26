@@ -78,7 +78,10 @@
       .picked-pw .tag { flex: none; }
 
       .variations { padding: var(--space-8); }
-      .variations h6 { margin-bottom: var(--space-4); }
+      .variations-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+      .variations-head h6 { margin-bottom: 0; }
+      .variations-head .btn { flex: none; justify-content: flex-start; }
+      .variation code .diff { background: var(--color-accent-200); }
       .variation {
         display: flex; align-items: center; gap: var(--space-4);
         padding: var(--space-3) 0; border-bottom: 1px solid var(--color-divider);
@@ -172,7 +175,10 @@
             </div>
         </div>
         <div class="variations">
-            <h6>Five variations — pick one, copy it, close the tab</h6>
+            <div class="variations-head">
+                <h6>Five variations — pick one, copy it, close the tab</h6>
+                <button class="btn btn-secondary" type="button" id="diff-toggle" aria-pressed="false">Show differences</button>
+            </div>
             <div id="variations-list"></div>
         </div>
     </section>
@@ -249,6 +255,31 @@
         sliderHint.textContent = sliderLabels[slider.value].hint;
       });
 
+      // "Show differences": in each variation, tint the characters that differ
+      // (position by position) from the currently selected password. The
+      // highlight is an accent RAMP tint — the bright accent stays reserved.
+      const diffToggle = $('diff-toggle');
+      let diffMode = false;
+      let rowCodes = [];   // [{el, password}] in display order
+      function paintDiffs() {
+        const ref = pickedPw.textContent;
+        for (const { el, password } of rowCodes) {
+          if (!diffMode || password === ref) { el.textContent = password; continue; }
+          el.replaceChildren(...[...password].map((ch, k) => {
+            const s = document.createElement('span');
+            s.textContent = ch;
+            if (ch !== ref[k]) s.className = 'diff';
+            return s;
+          }));
+        }
+      }
+      diffToggle.addEventListener('click', () => {
+        diffMode = !diffMode;
+        diffToggle.textContent = diffMode ? 'Hide differences' : 'Show differences';
+        diffToggle.setAttribute('aria-pressed', String(diffMode));
+        paintDiffs();
+      });
+
       // Displayed figures come from the checker's model (single source of truth);
       // PhoneticGenerator only produces the candidates.
       function select(password) {
@@ -260,6 +291,7 @@
         numBits.textContent = r.bits;
         numQ.textContent = r.qBig;
         unitQ.textContent = r.qUnit;
+        paintDiffs();
       }
 
       function copyToClipboard(btn, text) {
@@ -310,6 +342,8 @@
           row.append(code, meta, use, copy);
           return row;
         }));
+        rowCodes = [...list.querySelectorAll('.variation code')].map((el, i) => ({ el, password: variations[i].password }));
+        paintDiffs();
 
         results.hidden = false;
         results.scrollIntoView({ block: 'nearest' });
