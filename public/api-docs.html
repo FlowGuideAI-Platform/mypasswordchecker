@@ -7,10 +7,10 @@
     <title>API Documentation - MyPasswordChecker.com</title>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="MyPasswordChecker.com API Documentation">
+    <meta property="og:title" content="API Documentation - MyPasswordChecker.com">
     <meta property="og:description" content="Complete API documentation for integrating password strength checking and quantum resistance estimates into your applications. RESTful API with JSON responses.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mypasswordchecker.com/api-docs.html">
+    <meta property="og:url" content="https://mypasswordchecker.com/api-docs">
     <meta property="og:image" content="https://mypasswordchecker.com/og-image.png">
 
     <!-- Twitter Card -->
@@ -309,8 +309,8 @@ Content-Type: application/json</div>
 
                     <p>After validating with our API, perform the actual password analysis client-side using zxcvbn:</p>
 
-                    <div class="code-block">// 1. Include zxcvbn
-<script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+                    <div class="code-block">// 1. Include zxcvbn (example for YOUR app — any copy of zxcvbn works)
+&lt;script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"&gt;&lt;/script&gt;
 
 // 2. Validate with our API
 const response = await fetch('https://mypasswordchecker.com/api/v1/check-password', {

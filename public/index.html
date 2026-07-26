@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free password strength checker with quantum resistance analysis. Test entropy, crack time instantly. 100% private, runs in your browser.">
-    <meta name="keywords" content="password strength checker, password checker, password tester, check password strength, how strong is my password, password strength test, quantum password checker, password breach check, password entropy calculator, quantum computing security">
-    <title>Password Strength Checker - Free Online Tool & Quantum Test</title>
+    <meta name="description" content="Free password strength checker. See entropy in bits, GPU crack time, and a quantum (Grover) estimate — instantly, in your browser. Nothing is ever sent.">
+    <title>How Strong Is Your Password? Free Checker with Quantum Crack Time</title>
 
     <!-- Open Graph / Facebook / LinkedIn -->
-    <meta property="og:title" content="Quantum Password Checker + Phonetic Generator + PQ Crypto | MyPasswordChecker">
-    <meta property="og:description" content="Free quantum-resistant password checker with phonetic generator, Grover algorithm analysis, and post-quantum crypto tools (Kyber-512, Dilithium). 100% client-side, privacy-first.">
+    <meta property="og:title" content="How Strong Is Your Password? Free Checker with Quantum Crack Time">
+    <meta property="og:description" content="Free password strength checker. See entropy in bits, GPU crack time, and a quantum (Grover) estimate — instantly, in your browser. Nothing is ever sent.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mypasswordchecker.com/">
     <meta property="og:image" content="https://mypasswordchecker.com/og-image.png">
@@ -21,8 +20,8 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Quantum Password Checker + Phonetic Generator + PQ Crypto">
-    <meta name="twitter:description" content="Free quantum-resistant password checker with phonetic generator, Grover analysis, and post-quantum crypto (Kyber-512, Dilithium). Privacy-first, client-side.">
+    <meta name="twitter:title" content="How Strong Is Your Password? Free Checker with Quantum Crack Time">
+    <meta name="twitter:description" content="Free password strength checker. See entropy in bits, GPU crack time, and a quantum (Grover) estimate — instantly, in your browser. Nothing is ever sent.">
     <meta name="twitter:image" content="https://mypasswordchecker.com/og-image.png">
 
     <!-- Canonical URL -->
@@ -39,139 +38,79 @@
 
     <!-- Schema.org Structured Data for AI Agents & Search Engines -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "MyPasswordChecker.com",
-      "alternateName": "My Password Checker",
-      "description": "Free password strength checker with quantum computing resistance estimates. Client-side processing ensures your password never leaves your browser.",
-      "url": "https://mypasswordchecker.com",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Any (Web-based)",
-      "browserRequirements": "Requires JavaScript",
-      "offers": {
-        "@type": "AggregateOffer",
-        "priceCurrency": "USD",
-        "lowPrice": "0",
-        "highPrice": "49",
-        "offerCount": "3",
-        "offers": [
-          {
-            "@type": "Offer",
-            "name": "Free Plan",
-            "description": "25 password checks per month",
-            "price": "0",
-            "priceCurrency": "USD"
-          },
-          {
-            "@type": "Offer",
-            "name": "Standard Plan",
-            "description": "12,000 password checks + 100 quantum estimates per month",
-            "price": "19",
-            "priceCurrency": "USD",
-            "billingDuration": "P1M"
-          },
-          {
-            "@type": "Offer",
-            "name": "Quantum Plan",
-            "description": "25,000 password checks + 5,000 quantum estimates per month",
-            "price": "49",
-            "priceCurrency": "USD",
-            "billingDuration": "P1M"
-          }
-        ]
-      },
-      "featureList": [
-        "Password strength analysis using zxcvbn",
-        "Quantum computing resistance estimates (Grover's algorithm)",
-        "Client-side processing (privacy-focused)",
-        "RESTful API for developers",
-        "Domain verification for fraud prevention",
-        "Rate limiting and usage tracking",
-        "Classical crack time estimation",
-        "Entropy calculation"
-      ],
-      "author": {
-        "@type": "Organization",
-        "name": "All Aligned Consulting LLC",
-        "alternateName": "MyPasswordChecker",
-        "url": "https://mypasswordchecker.com",
-        "address": {
-          "@type": "PostalAddress",
-          "addressRegion": "CA",
-          "addressCountry": "US"
-        }
-      },
-      "provider": {
-        "@type": "Organization",
-        "name": "All Aligned Consulting LLC",
-        "alternateName": "MyPasswordChecker",
-        "url": "https://mypasswordchecker.com",
-        "address": {
-          "@type": "PostalAddress",
-          "addressRegion": "CA",
-          "addressCountry": "US"
-        }
-      }
-    }
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "MyPasswordChecker.com",
+  "url": "https://mypasswordchecker.com/",
+  "description": "Free password strength checker. See entropy in bits, GPU crack time, and a quantum (Grover) estimate — instantly, in your browser. Nothing is ever sent.",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Any (web browser)",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "provider": {
+    "@id": "https://mypasswordchecker.com/#org"
+  }
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://mypasswordchecker.com/#org",
+  "name": "All Aligned Consulting LLC",
+  "url": "https://mypasswordchecker.com/",
+  "address": {
+    "@type": "PostalAddress",
+    "addressRegion": "CA",
+    "addressCountry": "US"
+  }
+}
     </script>
 
     <!-- FAQ Schema Markup for Rich Snippets -->
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
     {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Is my password strong enough?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A strong password should have at least 12 characters, include a mix of uppercase, lowercase, numbers, and symbols, and avoid common words or patterns. Our free checker analyzes your password using the zxcvbn algorithm (developed by Dropbox) to detect weak patterns. For quantum resistance, aim for 80+ bits of entropy."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do hackers crack passwords?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Hackers use several methods: (1) Dictionary attacks - trying common words and passwords, (2) Brute force - trying every possible combination using powerful GPUs, (3) Rainbow tables - pre-computed hashes of common passwords, and (4) Credential stuffing - using passwords leaked from other breaches. Modern GPUs can try billions of password combinations per second."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What makes a password quantum resistant?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Quantum computers using Grover's algorithm can crack passwords twice as fast (effectively halving the bits of security). A password with 80 bits of classical security becomes 40 bits against quantum attacks. To be quantum-resistant, you need at least 80 bits of quantum security, which means 160+ bits classically - typically requiring 25+ random characters or a long passphrase (6+ random words)."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How long would it take to crack my password?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Crack time depends on password complexity and the attacker's hardware. A modern GPU can try ~10 billion passwords/second. A simple 8-character password with only letters and numbers can be cracked in minutes. However, a 16-character password with mixed case, numbers, and symbols would take thousands of years. Our tool calculates both classical (GPU) and quantum (Grover's algorithm) crack time estimates."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is this password checker safe to use?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes! Your password never leaves your browser. All analysis runs client-side using JavaScript - we never transmit, store, or log your password. You can even disconnect from the internet and the tool will still work. For extra peace of mind, you can inspect the source code or test with a similar (but not identical) password."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is password entropy?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Entropy measures password randomness in bits. Each bit doubles the number of possible combinations. For example, 40 bits = 1 trillion possibilities, 60 bits = 1 quintillion. Higher entropy = stronger password. Aim for 60+ bits for good security, 80+ for excellent security, and 100+ for quantum resistance."
-          }
-        }
-      ]
+      "@type": "Question",
+      "name": "How long would it take to crack my password?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depends on length, character variety and the attacker's hardware. A rented GPU rig tries roughly 100 billion guesses a second offline. Eight lowercase letters fall in seconds; thirteen mixed characters take millions of years."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What makes a password quantum resistant?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Grover's algorithm halves effective strength — 80 classical bits become 40. To hold 80 bits against a quantum attacker you need about 160 bits classically: roughly 25 random characters, or six random words."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this safe to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Your password never leaves the browser. Disconnect from the internet and the checker still works — that is the test we would run too."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is entropy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Randomness measured in bits. Each bit doubles the number of possibilities. Forty bits is a trillion guesses; sixty is a quintillion."
+      }
     }
+  ]
+}
     </script>
 </head>
 <body>
@@ -350,37 +289,27 @@
 
             <!-- FAQ Section with Schema Markup -->
             <section style="background: white; padding: 2rem; border-radius: 0.75rem; margin-top: 2rem;">
-                <h2 style="margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
+                <h2 style="margin-bottom: 1.5rem;">Questions people actually ask</h2>
 
                 <div style="display: grid; gap: 1.5rem;">
                     <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">Is my password strong enough?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">A strong password should have at least 12 characters, include a mix of uppercase, lowercase, numbers, and symbols, and avoid common words or patterns. Our free checker analyzes your password using the zxcvbn algorithm (developed by Dropbox) to detect weak patterns. For quantum resistance, aim for 80+ bits of entropy.</p>
-                    </div>
-
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">How do hackers crack passwords?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Hackers use several methods: (1) <strong>Dictionary attacks</strong> - trying common words and passwords, (2) <strong>Brute force</strong> - trying every possible combination using powerful GPUs, (3) <strong>Rainbow tables</strong> - pre-computed hashes of common passwords, and (4) <strong>Credential stuffing</strong> - using passwords leaked from other breaches. Modern GPUs can try billions of password combinations per second.</p>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">How long would it take to crack my password?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Depends on length, character variety and the attacker's hardware. A rented GPU rig tries roughly 100 billion guesses a second offline. Eight lowercase letters fall in seconds; thirteen mixed characters take millions of years.</p>
                     </div>
 
                     <div>
                         <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">What makes a password quantum resistant?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Quantum computers using Grover's algorithm can crack passwords twice as fast (effectively halving the bits of security). A password with 80 bits of classical security becomes 40 bits against quantum attacks. To be quantum-resistant, you need at least 80 bits of <em>quantum</em> security, which means 160+ bits classically - typically requiring 25+ random characters or a long passphrase (6+ random words).</p>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Grover's algorithm halves effective strength — 80 classical bits become 40. To hold 80 bits against a quantum attacker you need about 160 bits classically: roughly 25 random characters, or six random words.</p>
                     </div>
 
                     <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">How long would it take to crack my password?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Crack time depends on password complexity and the attacker's hardware. A modern GPU can try ~10 billion passwords/second. A simple 8-character password with only letters and numbers can be cracked in minutes. However, a 16-character password with mixed case, numbers, and symbols would take thousands of years. Our tool calculates both classical (GPU) and quantum (Grover's algorithm) crack time estimates.</p>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">Is this safe to use?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Your password never leaves the browser. Disconnect from the internet and the checker still works — that is the test we would run too.</p>
                     </div>
 
                     <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">Is this password checker safe to use?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Yes! Your password <strong>never leaves your browser</strong>. All analysis runs client-side using JavaScript - we never transmit, store, or log your password. You can even disconnect from the internet and the tool will still work. For extra peace of mind, you can inspect the source code or test with a similar (but not identical) password.</p>
-                    </div>
-
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">What is password entropy?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Entropy measures password randomness in bits. Each bit doubles the number of possible combinations. For example, 40 bits = 1 trillion possibilities, 60 bits = 1 quintillion. Higher entropy = stronger password. Aim for 60+ bits for good security, 80+ for excellent security, and 100+ for quantum resistance.</p>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">What is entropy?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Randomness measured in bits. Each bit doubles the number of possibilities. Forty bits is a trillion guesses; sixty is a quintillion.</p>
                     </div>
                 </div>
             </section>
@@ -440,7 +369,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+    <script src="/js/vendor/zxcvbn-4.4.2.js"></script>
     <script src="/js/quantum-estimator.js?v=2"></script>
     <script src="/js/ads-config.js?v=4"></script>
     <script src="/js/ad-tracking.js"></script>

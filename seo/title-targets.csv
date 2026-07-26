@@ -1,0 +1,5 @@
+Page,NewTitle,NewMetaDescription
+/,"How Strong Is Your Password? Free Checker with Quantum Crack Time","Free password strength checker. See entropy in bits, GPU crack time, and a quantum (Grover) estimate — instantly, in your browser. Nothing is ever sent."
+/generate-phonetic,"Phonetic Password Generator — Say It, Don't Guess It","Turn a phrase you can say out loud into a password nothing can guess. Free, no sign-up, runs in your browser."
+/password-cracker-test,"Password Cracker Test — How Long to Crack Your Password","Run your password against a real attack model: GPU brute force, dictionary and quantum. See the exact crack time in seconds, days or millennia. Free, in-browser."
+/password-api,"Password Strength API — Entropy & Crack Time in One POST","Score any password server-side or client-side: entropy, GPU and quantum crack-time estimates in one POST. Free tier available."

@@ -3,17 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Generate quantum-resistant passwords from memorable phrases using phonetic substitution">
-    <title>Phonetic Password Generator - MyPasswordChecker.com</title>
+    <meta name="description" content="Turn a phrase you can say out loud into a password nothing can guess. Free, no sign-up, runs in your browser.">
+    <title>Phonetic Password Generator — Say It, Don't Guess It</title>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Phonetic Password Generator - MyPasswordChecker.com">
-    <meta property="og:description" content="Turn memorable phrases into quantum-resistant passwords">
+    <meta property="og:title" content="Phonetic Password Generator — Say It, Don't Guess It">
+    <meta property="og:description" content="Turn a phrase you can say out loud into a password nothing can guess. Free, no sign-up, runs in your browser.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mypasswordchecker.com/generate-phonetic.html">
+    <meta property="og:url" content="https://mypasswordchecker.com/generate-phonetic">
     <meta property="og:image" content="https://mypasswordchecker.com/og-image.png">
 
     <link rel="canonical" href="https://mypasswordchecker.com/generate-phonetic">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Phonetic Password Generator",
+  "url": "https://mypasswordchecker.com/generate-phonetic",
+  "description": "Turn a phrase you can say out loud into a password nothing can guess. Free, no sign-up, runs in your browser.",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Any (web browser)",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+    </script>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
 
@@ -331,7 +347,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+    <script src="/js/vendor/zxcvbn-4.4.2.js"></script>
     <script src="/js/quantum-estimator.js?v=2"></script>
     <script src="/js/phonetic-generator.js?v=1"></script>
     <script>
