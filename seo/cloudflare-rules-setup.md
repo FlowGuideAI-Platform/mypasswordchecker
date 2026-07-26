@@ -19,7 +19,7 @@ the `*.html` wildcard:
 | # | Rule name | Wildcard pattern (Request URL) | Target URL | Preserve query string |
 |---|---|---|---|---|
 | 1 | `www-to-apex` | `https://www.mypasswordchecker.com/*` | `https://mypasswordchecker.com/${1}` | **ON** |
-| 2 | `index-html-to-root` | `https://mypasswordchecker.com/index.html` | `https://mypasswordchecker.com/` | OFF |
+| 2 | `index-html-to-root` | see note below — exact URL, so NOT wildcard type | `https://mypasswordchecker.com/` | OFF |
 | 3 | `merge-free-checker` | `https://mypasswordchecker.com/free-password-checker*` | `https://mypasswordchecker.com/` | OFF |
 | 4 | `merge-api-docs` | `https://mypasswordchecker.com/api-docs*` | `https://mypasswordchecker.com/docs` | OFF |
 | 5 | `strip-html-extension` | `https://mypasswordchecker.com/*.html` | `https://mypasswordchecker.com/${1}` | OFF |
@@ -27,6 +27,13 @@ the `*.html` wildcard:
 Uses 5 of the 10 free Single Redirect slots.
 
 Notes:
+- **Rule 2 cannot be wildcard type** (the dashboard rejects a wildcard pattern with
+  no `*` in it). Build it as: When incoming requests match → **Custom filter
+  expression** → `(http.host eq "mypasswordchecker.com" and http.request.uri.path
+  eq "/index.html")` → Then: URL redirect, Type **Static**, URL
+  `https://mypasswordchecker.com/`, status **301**, preserve query string OFF.
+  Keep it ABOVE rule 5 in the list so `/index.html` never falls through to the
+  generic `.html`-stripper (which would send it to `/index`, adding a hop).
 - Rule 3 catches both `/free-password-checker` and `/free-password-checker.html` (D3).
 - Rule 4 catches both `/api-docs` and `/api-docs.html` (D2).
 - Rule 5 turns today's **307** (Workers Static Assets `html_handling`) into a proper
