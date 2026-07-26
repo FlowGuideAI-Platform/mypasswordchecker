@@ -67,6 +67,23 @@ Tracked production copies of the redesign rail creatives exist at
 nothing serves that creative yet). The Phase 3 rail should iframe these three; the two
 legacy creatives stay untouched until the old slots are removed.
 
+## Phase 3 regression results (2026-07-25, local wrangler dev + Playwright)
+
+- PASS — typing 17 chars in the checker fired **zero** network requests (beacons/fetch/XHR).
+- PASS — click inside a rail creative fired `POST /api/track-click` (405 locally where no API
+  worker runs; the production endpoint returned 200 `{ok:true}` for the same payload earlier today)
+  and appended `utm_term=direct` from the parent's sessionStorage — same-origin access intact.
+- PASS — exactly two bright-accent fields on the page: `.meter-fill` and `.cell-quantum`
+  (`.btn-primary` is a design-system component, per the prototype's own stylesheet).
+- PASS — mobile 390×844: input bottom at 360px (above fold), Show/Hide 44px, visual order
+  matches README §2 exactly.
+- Owner copy changes vs the handoff (Jack, 2026-07-25): FGAI creative's Databricks badge →
+  "MINUTES, NOT DAYS / answer guided questions, get a finished draft" (FGAI teal); rail heading
+  "Also from All Aligned Consulting" → "More tools we build".
+- Legacy creatives (`forgemcp-ad-300x250`, `fgai-ad-300x250-redesigned`, `rotating-combo-ad`)
+  remain in /ads/ — premium.html still uses rotating-combo; the other two are now unreferenced
+  by the homepage (kept until premium's next-round redesign).
+
 ## Phase 3 regression checklist (must match this baseline)
 
 - [ ] Both creatives load (200) from their unchanged `/ads/...` URLs in the new right rail.

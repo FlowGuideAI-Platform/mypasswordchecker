@@ -5,8 +5,11 @@ export const CLASSICAL_GUESSES_PER_SEC = 1e11; // one rented GPU rig, offline, l
 export const GROVER_ITERS_PER_SEC = 1e6;       // sequential oracle queries + QEC overhead — NOT GPU-parallel
 export const TARGET_BITS = 100;
 
-export const DEMO_PASSWORD = 'Cobalt-Rope-7';  // design-pinned demo (DESIGN.md §2); values verified by analyze() test
+export const DEMO_PASSWORD = 'Cobalt-Rope-7';  // design-pinned demo (DESIGN.md §2); contract enforced by scripts/test-crack-model.mjs
 export const METER_FULL_BITS = 128;            // strength-meter full scale
+
+export const SECONDS_PER_DAY = 86400;
+export const SECONDS_PER_YEAR = 31557600;      // Julian year
 
 const SUPERSCRIPTS = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
 const pow10 = (n) => '10' + String(Math.round(Math.log10(n))).split('').map(d => SUPERSCRIPTS[d]).join('');
@@ -18,7 +21,7 @@ export const CAPTIONS = {
   target: `Target: ${TARGET_BITS} bits`,
 };
 
-const UNITS = [[1, 'seconds'], [60, 'minutes'], [3600, 'hours'], [86400, 'days'], [604800, 'weeks'], [31557600, 'years'], [3.15576e10, 'thousand years'], [3.15576e13, 'million years'], [3.15576e16, 'billion years'], [3.15576e19, 'trillion years'], [3.15576e22, 'quadrillion years'], [3.15576e25, 'quintillion years']];
+const UNITS = [[1, 'seconds'], [60, 'minutes'], [3600, 'hours'], [SECONDS_PER_DAY, 'days'], [7 * SECONDS_PER_DAY, 'weeks'], [SECONDS_PER_YEAR, 'years'], [SECONDS_PER_YEAR * 1e3, 'thousand years'], [SECONDS_PER_YEAR * 1e6, 'million years'], [SECONDS_PER_YEAR * 1e9, 'billion years'], [SECONDS_PER_YEAR * 1e12, 'trillion years'], [SECONDS_PER_YEAR * 1e15, 'quadrillion years'], [SECONDS_PER_YEAR * 1e18, 'quintillion years']];
 
 const TIME_CAP = UNITS[UNITS.length - 1][0] * 1000; // ~10²¹ years — "beyond estimate"
 

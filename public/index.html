@@ -27,16 +27,15 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://mypasswordchecker.com/">
 
-    <!-- SEO & AI Agent Meta -->
     <meta name="author" content="MyPasswordChecker.com">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow">
 
-    <link rel="stylesheet" href="/css/styles.css?v=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/css/modernist.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
 
-
-    <!-- Schema.org Structured Data for AI Agents & Search Engines -->
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -70,8 +69,6 @@
   }
 }
     </script>
-
-    <!-- FAQ Schema Markup for Rich Snippets -->
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -112,349 +109,371 @@
   ]
 }
     </script>
+
+    <style>
+      /* Page layout — 1a Modernist homepage. Shared components (topnav, numeral
+         cells, footer, domains strip) live in modernist.css; this block is only
+         this page's grids and ordering. The two bright-accent FIELDS on this
+         page are the meter fill and the quantum result cell (colour budget —
+         a third accent field is a defect). */
+      .shell { max-width: 1280px; margin: 0 auto; }
+
+      .hero { display: grid; grid-template-columns: 7fr 5fr; border-bottom: 2px solid var(--color-divider); }
+      .hero-left { border-right: 2px solid var(--color-divider); }
+      .hero-copy { padding: var(--space-8) var(--space-8) 0; }
+      .hero-lead { padding: 0 var(--space-8) var(--space-8); }
+      .hero h1 { font-size: 60px; margin: 0 0 var(--space-4); max-width: 15ch; }
+      .lead { font-size: 17px; max-width: 48ch; margin: 0; }
+      .method-note { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); font-size: 13px; }
+      .method-note strong { display: block; font-family: var(--font-heading); }
+
+      .hero-panel, .hero-weak { background: var(--color-surface); }
+      .hero-panel { padding: var(--space-8) var(--space-8) 0; }
+      .hero-weak { padding: 0 var(--space-8) var(--space-8); }
+      .pw-row { display: flex; gap: var(--space-2); }
+      .pw-row .input { flex: 1; font-family: ui-monospace, Menlo, monospace; }
+      .pw-row .btn { min-width: 64px; justify-content: flex-start; }
+      .meter { height: 10px; background: var(--color-neutral-300); margin: var(--space-6) 0 var(--space-2); }
+      .meter-fill { height: 10px; background: var(--color-accent); width: 0; }
+      .strength-row {
+        display: flex; justify-content: space-between; font-size: 12px;
+        letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
+      }
+      .weak-list { list-style: none; margin: 0; padding: 0; }
+      .weak-list li { display: flex; gap: var(--space-2); font-size: 13px; padding: var(--space-1) 0; }
+      .weak-list .dash { color: var(--color-accent); }
+
+      .results { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 2px solid var(--color-divider); }
+      .cell { padding: var(--space-8); }
+      .cell-gpu, .cell-entropy { border-right: 2px solid var(--color-divider); }
+      .cell-quantum { background: var(--color-accent); color: var(--color-bg); }
+      .cell-quantum .caption { opacity: 0.85; }
+
+      .trust, .tools, .faq { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-8); }
+      .trust-grid h4 { font-size: 17px; }
+      .trust-grid p { font-size: 13px; margin: 0; }
+      .trust h6, .tools h2, .faq h2 { margin-bottom: var(--space-6); }
+
+      .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+      .tools-grid .btn { justify-content: flex-start; margin-top: var(--space-4); }
+
+      .api-rail { display: grid; grid-template-columns: 1fr 340px; border-bottom: 2px solid var(--color-divider); }
+      .api-strip { padding: var(--space-8); border-right: 2px solid var(--color-divider); }
+      .api-strip h2 { max-width: 24ch; }
+      .api-strip .lead-muted { max-width: 52ch; }
+      .api-strip pre {
+        font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+        background: var(--color-neutral-900); color: var(--color-neutral-100);
+        padding: var(--space-4); margin: var(--space-4) 0; overflow: auto;
+      }
+      .api-buttons { display: flex; gap: var(--space-3); }
+      .api-buttons .btn { justify-content: flex-start; }
+
+      .ad-rail { padding: var(--space-8) var(--space-4); }
+      .ad-rail h6 { margin-bottom: var(--space-4); }
+      .ad-slot { position: relative; width: 300px; height: 250px; }
+      .ad-slot + .ad-slot { margin-top: var(--space-4); }
+      .ad-creative { position: absolute; inset: 0; display: none; }
+      .ad-creative iframe { width: 300px; height: 250px; border: 0; display: block; }
+      /* Static first paint matches initAdRail's initial (0,1) pair; the script
+         normalizes immediately and rotation takes over. */
+      .ad-slot[data-slot="a"] .ad-creative:nth-child(1) { display: block; }
+      .ad-slot[data-slot="b"] .ad-creative:nth-child(2) { display: block; }
+
+      .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+      .faq-grid p { font-size: 14px; margin: 0; }
+
+      /* ── Mobile (README §2: first-class, single column, reordered) ──
+         The hero/results/api-rail wrappers flatten via display:contents so
+         their children join one flex column and take the mandated order. */
+      @media (max-width: 768px) {
+        .shell { display: flex; flex-direction: column; }
+        .hero, .hero-left, .hero-right, .results, .api-rail { display: contents; }
+
+        .hero-copy { order: 1; }
+        .hero-panel { order: 2; }
+        .cell-gpu { order: 3; }
+        .cell-entropy { order: 4; }
+        .cell-quantum { order: 5; }
+        .hero-weak { order: 6; }
+        .hero-lead { order: 7; }
+        .trust { order: 8; }
+        .tools { order: 9; }
+        .ad-rail { order: 10; }
+        .api-strip { order: 11; }
+        .faq { order: 12; }
+        .site-footer { order: 13; }
+        .domains-strip { order: 14; }
+
+        /* rules horizontal-only */
+        .cell-gpu, .cell-entropy, .api-strip { border-right: 0; }
+        .hero-panel, .cell-gpu, .cell-entropy, .cell-quantum,
+        .hero-lead, .ad-rail, .api-strip { border-bottom: 2px solid var(--color-divider); }
+
+        .hero-copy { padding: var(--space-4) var(--space-4) 0; }
+        .hero h1 { font-size: 40px; }
+        .eyebrow { margin-bottom: var(--space-3); }
+        .hero-panel, .hero-weak, .hero-lead { padding: var(--space-4); }
+        .pw-row .btn, .pw-row .input { min-height: 44px; }
+
+        .cell { padding: var(--space-4); }
+
+        .trust, .tools, .faq, .api-strip, .ad-rail { padding: var(--space-4); }
+        .trust-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+        .tools-grid { grid-template-columns: 1fr; }
+        .faq-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+      }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
-                <nav class="nav">
-                    <a href="/">Password Checker</a>
-                    <a href="/premium">Premium</a>
-                    <a href="/password-api">Developer API</a>
-                    <a href="/about">About</a>
-                    <a href="/pricing">Pricing</a>
-                </nav>
+<div class="shell">
+
+    <nav class="topnav" aria-label="Main">
+        <a class="wordmark" href="/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD700" aria-hidden="true"><path d="M6 10V7a6 6 0 1 1 12 0v3h1.5v12h-15V10H6zm2.2 0h7.6V7a3.8 3.8 0 0 0-7.6 0v3z"/></svg>
+            MyPasswordChecker<span class="tld">.com</span>
+        </a>
+        <div class="topnav-links">
+            <a href="/">Checker</a>
+            <a href="/generate-phonetic">Phonetic Generator</a>
+            <a href="/premium">Breach Check</a>
+            <a href="/password-api">Developer API</a>
+            <a href="/pricing">Pricing</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-left">
+            <div class="hero-copy">
+                <div class="eyebrow">Runs in your browser — nothing is sent</div>
+                <h1>How strong is your password?</h1>
+            </div>
+            <div class="hero-lead">
+                <p class="lead">A free strength test with entropy, GPU crack time, and a quantum resistance estimate — the only checker that models Grover's algorithm. Nothing you type leaves this page.</p>
+                <div class="hr"></div>
+                <div class="method-note">
+                    <div><strong>zxcvbn pattern matching</strong><span class="text-muted">Dropbox's library, run client-side</span></div>
+                    <div><strong>Grover's algorithm model</strong><span class="text-muted">Halves effective key strength</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="hero-panel">
+                <label class="panel-label" for="pw">Your password</label>
+                <div class="pw-row">
+                    <input class="input" type="password" id="pw" value="Cobalt-Rope-7" placeholder="Type or paste it" autocomplete="off" spellcheck="false">
+                    <button class="btn btn-secondary" type="button" id="pw-toggle">Show</button>
+                </div>
+                <div class="meter" aria-hidden="true"><div class="meter-fill" id="meter-fill"></div></div>
+                <div class="strength-row">
+                    <span id="strength-label">Very strong</span><span class="text-muted" id="target-label">Target: 100 bits</span>
+                </div>
+            </div>
+            <div class="hero-weak">
+                <div class="hr"></div>
+                <div class="panel-label">What weakens it</div>
+                <ul class="weak-list" id="weak-list">
+                    <li><span class="dash">—</span><span>No common patterns, walks or repeats found.</span></li>
+                </ul>
             </div>
         </div>
     </header>
 
-    <!-- Page carousel (top) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/about">← About</a>
-        <a class="page-nav-link" href="/generate-phonetic">Phonetic Generator →</a>
-    </nav>
-
-    <main>
-        <div class="container">
-            <!-- Hero Section -->
-            <section class="hero">
-                <div class="quantum-badge">✨ Now with Optional Quantum Resistance Estimates</div>
-                <h1>How Strong Is Your Password?</h1>
-                <p>Test your password strength for free.</p>
-                <p>See estimated crack times against quantum computing attacks.</p>
-                <p>All checks run in your browser - we never see your password.</p>
-            </section>
-
-            <!-- Password Checker -->
-            <div class="checker-card">
-                <div class="input-group">
-                    <label for="password-input">Enter Your Password</label>
-                    <div class="password-input-wrapper">
-                        <input
-                            type="password"
-                            id="password-input"
-                            class="password-input"
-                            placeholder="Type your password here..."
-                            autocomplete="off"
-                            spellcheck="false"
-                        >
-                        <button type="button" class="toggle-visibility" id="toggle-btn" aria-label="Toggle password visibility">
-                            👁️
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Strength Meter -->
-                <div class="strength-meter" id="strength-meter" style="display: none;">
-                    <div class="strength-bar-container">
-                        <div class="strength-bar" id="strength-bar"></div>
-                    </div>
-                    <div class="strength-label" id="strength-label"></div>
-                </div>
-
-                <!-- Classical Crack Time Display -->
-                <div class="crack-time-display" id="crack-time-display" style="display: none;">
-                    <h3>🖥️ Classical Computing Crack Time</h3>
-                    <p>Estimated time to crack with modern GPUs:</p>
-                    <p class="crack-time-value" id="classical-time">-</p>
-                    <p style="margin-top: 0.5rem; font-size: 0.8rem;">
-                        <strong>Entropy:</strong> <span id="entropy-bits">-</span> bits
-                    </p>
-                    <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.8; font-style: italic;">
-                        Entropy measures randomness/unpredictability. Higher entropy = harder to guess. Each bit doubles the difficulty.
-                    </p>
-                </div>
-
-                <!-- Feedback -->
-                <div id="feedback-section" style="display: none; margin-top: 1rem;">
-                    <div class="alert alert-info" id="feedback-warning"></div>
-                    <div id="feedback-suggestions"></div>
-                </div>
-            </div>
-
-            <!-- Recommended Security Tools (moved below the checker) -->
-            <section class="affiliate-section">
-                <div class="affiliate-title">🔒 Recommended Security Tools</div>
-                <div class="affiliate-links" id="affiliate-links-container">
-                    <!-- Affiliate links loaded from ads-config.js -->
-                </div>
-            </section>
-
-            <!-- Premium Features CTA -->
-            <section class="quantum-cta">
-                <h2>🔮 Quantum Analysis + Password Generator + Breach Check</h2>
-                <p>Get detailed quantum resistance estimates, generate quantum-resistant passwords from memorable phrases, AND check if your password appears in 800+ million known breaches.</p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0; font-size: 0.9rem;">
-                    <div>
-                        <strong>✓ Quantum Crack Time Analysis</strong><br>
-                        <span style="opacity: 0.9;">Theoretical estimates using Grover's algorithm</span>
-                    </div>
-                    <div>
-                        <strong>✓ Phonetic Password Generator</strong><br>
-                        <span style="opacity: 0.9;">Turn phrases into quantum-resistant passwords</span>
-                    </div>
-                    <div>
-                        <strong>✓ Password Breach Check</strong><br>
-                        <span style="opacity: 0.9;">Check 800M+ breached passwords (HIBP)</span>
-                    </div>
-                </div>
-                <p style="font-size: 0.9rem; opacity: 0.9; margin-top: -0.25rem;">
-                    <em>Free for everyone — no sign-up required.</em>
-                </p>
-                <button class="btn" onclick="window.location.href='/premium'" style="font-weight: 600;">
-                    🔬 Open Quantum Analysis
-                </button>
-                <button class="btn" onclick="window.location.href='/generate-phonetic'" style="font-weight: 600;">
-                    🔤 Generate a Password
-                </button>
-                <button class="btn" onclick="window.location.href='/premium'" style="font-weight: 600;">
-                    🔍 Check Breaches
-                </button>
-            </section>
-
-            <!-- Ad Section - Two Ads Side by Side -->
-            <section class="ad-section">
-                <div class="ad-slots">
-                    <div class="ad-slot-banner" id="index-ad-banner-1">
-                        <!-- Ad: ForgeMCP — fixed 300x250 creative, scaled to fill the slot -->
-                        <iframe src="/ads/forgemcp-ad-300x250" title="ForgeMCP — Engineering MCP servers for Claude" loading="lazy"></iframe>
-                    </div>
-                    <div class="ad-slot-banner" id="index-ad-banner-2">
-                        <!-- Ad: FlowGuideAI — fixed 300x250 creative, scaled to fill the slot -->
-                        <iframe src="/ads/fgai-ad-300x250-redesigned" title="FlowGuideAI — AI compliance document generator" loading="lazy"></iframe>
-                    </div>
-                </div>
-                <script>
-                    // Ad creatives are locked to 300x250 internally; scale each iframe up so
-                    // the ad fills the full (fluid) width of its .ad-slot-banner column.
-                    (function () {
-                        const NATIVE_WIDTH = 300;
-                        const fit = (slot) => {
-                            const frame = slot.querySelector('iframe');
-                            if (frame) frame.style.transform = 'scale(' + (slot.clientWidth / NATIVE_WIDTH) + ')';
-                        };
-                        const slots = document.querySelectorAll('.ad-section .ad-slot-banner');
-                        if ('ResizeObserver' in window) {
-                            const observer = new ResizeObserver((entries) => entries.forEach((e) => fit(e.target)));
-                            slots.forEach((slot) => observer.observe(slot));
-                        } else {
-                            const run = () => slots.forEach(fit);
-                            run();
-                            window.addEventListener('resize', run);
-                        }
-                    })();
-                </script>
-            </section>
-
-            <!-- How It Works -->
-            <section style="background: white; padding: 2rem; border-radius: 0.75rem; margin-top: 2rem;">
-                <h2 style="margin-bottom: 1rem;">How It Works</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">🔒 100% Private</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Your password never leaves your browser. All analysis runs client-side using JavaScript.</p>
-                    </div>
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">🧮 Smart Analysis</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Uses an open-source library to detect patterns, common passwords, and calculate entropy.</p>
-                    </div>
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">⚛️ Quantum Estimates</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Premium feature provides theoretical quantum resistance estimates using Grover's algorithm modeling.</p>
-                        <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem; font-style: italic; opacity: 0.8;">⚠️ Note: Large-scale quantum computers don't yet exist. These are theoretical estimates for future-proofing, not current threats.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- FAQ Section with Schema Markup -->
-            <section style="background: white; padding: 2rem; border-radius: 0.75rem; margin-top: 2rem;">
-                <h2 style="margin-bottom: 1.5rem;">Questions people actually ask</h2>
-
-                <div style="display: grid; gap: 1.5rem;">
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">How long would it take to crack my password?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Depends on length, character variety and the attacker's hardware. A rented GPU rig tries roughly 100 billion guesses a second offline. Eight lowercase letters fall in seconds; thirteen mixed characters take millions of years.</p>
-                    </div>
-
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">What makes a password quantum resistant?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Grover's algorithm halves effective strength — 80 classical bits become 40. To hold 80 bits against a quantum attacker you need about 160 bits classically: roughly 25 random characters, or six random words.</p>
-                    </div>
-
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">Is this safe to use?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Your password never leaves the browser. Disconnect from the internet and the checker still works — that is the test we would run too.</p>
-                    </div>
-
-                    <div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.125rem;">What is entropy?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Randomness measured in bits. Each bit doubles the number of possibilities. Forty bits is a trillion guesses; sixty is a quintillion.</p>
-                    </div>
-                </div>
-            </section>
+    <section class="results" aria-label="Results">
+        <div class="cell cell-gpu">
+            <div class="kicker">Crack time — modern GPU</div>
+            <div class="numeral" id="num-gpu">8.1</div>
+            <div class="unit" id="unit-gpu">MILLION YEARS</div>
+            <p class="caption text-muted" id="caption-gpu">At 10¹¹ guesses per second — a single rented GPU rig, offline against a leaked hash.</p>
         </div>
-    </main>
+        <div class="cell cell-entropy">
+            <div class="kicker">Entropy</div>
+            <div class="numeral" id="num-bits">85</div>
+            <div class="unit">BITS</div>
+            <p class="caption text-muted" id="caption-entropy">Every bit doubles the work. 60 is fair, 80 is strong, 100 or more survives a quantum halving.</p>
+        </div>
+        <div class="cell cell-quantum">
+            <div class="kicker">Crack time — quantum (Grover)</div>
+            <div class="numeral" id="num-q">12</div>
+            <div class="unit" id="unit-q">WEEKS</div>
+            <p class="caption" id="caption-q">A machine this large does not exist yet. This is a future-proofing estimate at 10⁶ Grover iterations per second, not today's threat.</p>
+        </div>
+    </section>
 
-    <!-- Page carousel (bottom) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/about">← About</a>
-        <a class="page-nav-link" href="/generate-phonetic">Phonetic Generator →</a>
-    </nav>
+    <section class="trust">
+        <h6>Why you can believe the number</h6>
+        <div class="trust-grid">
+            <div><h4>Never leaves your browser</h4><p class="text-muted">Open the network tab while you type. There is nothing to see — no request is made.</p></div>
+            <div><h4>Readable source</h4><p class="text-muted">The whole checker is client-side JavaScript. View source and audit it yourself.</p></div>
+            <div><h4>Published method</h4><p class="text-muted">zxcvbn for classical patterns; a stated Grover model for quantum, with its assumptions printed.</p></div>
+            <div><h4>Honest about quantum</h4><p class="text-muted">Large-scale quantum computers do not exist. We say so on every estimate we publish.</p></div>
+        </div>
+    </section>
 
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>MyPasswordChecker.com</h4>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Tools</h4>
-                    <ul>
-                        <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium">Premium Tools</a></li>
-                        <li><a href="/docs">API Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms of Service</a></li>
-                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Developer</h4>
-                    <ul>
-                        <li><a href="/dashboard">Dashboard</a></li>
-                        <li><a href="/pricing">API Pricing</a></li>
-                        <li><a href="/docs">Documentation</a></li>
-                    </ul>
-                </div>
+    <section class="tools">
+        <h2>Three more tools. Still free, still no sign-up.</h2>
+        <div class="tools-grid">
+            <div class="card">
+                <div class="card-kicker">Generator</div>
+                <div class="card-title">Phonetic password generator</div>
+                <div class="card-body">Turn a phrase you can say out loud into a password nothing can guess. Built for people who have to type it on a TV remote.</div>
+                <a class="btn btn-primary" href="/generate-phonetic">Generate one →</a>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
-                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
-                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
-                    This service is also available at:
-                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
-                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
-                </p>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
+            <div class="card">
+                <div class="card-kicker">Breach check</div>
+                <div class="card-title">800M+ leaked passwords</div>
+                <div class="card-body">Matched against Have I Been Pwned. Only the first five characters of a hash are ever sent — your password stays here.</div>
+                <a class="btn btn-primary" href="/premium">Check yours →</a>
+            </div>
+            <div class="card">
+                <div class="card-kicker">Quantum</div>
+                <div class="card-title">Full quantum analysis</div>
+                <div class="card-body">Bit-by-bit, with the Grover assumptions written out and a plain-language read on what to change.</div>
+                <a class="btn btn-primary" href="/premium">Open the analysis →</a>
             </div>
         </div>
+    </section>
+
+    <section class="api-rail">
+        <div class="api-strip">
+            <h6>Developer API</h6>
+            <h2>Score passwords inside your own product.</h2>
+            <p class="text-muted lead-muted">One POST, entropy and both crack-time estimates back. No password is logged on our side either.</p>
+            <pre>POST /v1/score  { "password": "…" }
+→ { "bits": <span id="api-bits">85</span>, "gpu_years": <span id="api-gpu">8.1e6</span>, "grover_days": <span id="api-grover">83</span> }</pre>
+            <div class="api-buttons">
+                <a class="btn btn-primary" href="/docs">Read the docs</a>
+                <a class="btn btn-secondary" href="/pricing">Pricing</a>
+            </div>
+        </div>
+        <aside class="ad-rail" aria-label="More tools we build">
+            <h6>More tools we build</h6>
+            <div class="ad-slot" data-slot="a">
+                <div class="ad-creative"><iframe src="/ads/forgemcp-300x250" title="ForgeMCP — Engineering MCP servers" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/flowguideai-300x250" title="FlowGuideAI — AI documentation generator" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/suggestibility-300x250" title="suggestibility.ai — AI expert review board" scrolling="no" loading="lazy"></iframe></div>
+            </div>
+            <!-- Slot B's creatives are cloned from slot A at init so the roster
+                 and its order have exactly one source (rotation indexes by DOM
+                 position — a mismatched order would show the same ad twice). -->
+            <div class="ad-slot" data-slot="b"></div>
+        </aside>
+    </section>
+
+    <section class="faq">
+        <h2>Questions people actually ask</h2>
+        <div class="faq-grid">
+            <div><h4>How long would it take to crack my password?</h4><p class="text-muted">Depends on length, character variety and the attacker's hardware. A rented GPU rig tries roughly 100 billion guesses a second offline. Eight lowercase letters fall in seconds; thirteen mixed characters take millions of years.</p></div>
+            <div><h4>What makes a password quantum resistant?</h4><p class="text-muted">Grover's algorithm halves effective strength — 80 classical bits become 40. To hold 80 bits against a quantum attacker you need about 160 bits classically: roughly 25 random characters, or six random words.</p></div>
+            <div><h4>Is this safe to use?</h4><p class="text-muted">Your password never leaves the browser. Disconnect from the internet and the checker still works — that is the test we would run too.</p></div>
+            <div><h4>What is entropy?</h4><p class="text-muted">Randomness measured in bits. Each bit doubles the number of possibilities. Forty bits is a trillion guesses; sixty is a quintillion.</p></div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div>
+            <strong>MyPasswordChecker.com</strong>
+            <span class="text-muted">Free password strength analysis with quantum resistance estimates. Operated by All Aligned Consulting LLC, California.</span>
+        </div>
+        <div class="footer-col"><h6>Tools</h6><a href="/">Checker</a><a href="/generate-phonetic">Phonetic generator</a><a href="/premium">Breach check</a></div>
+        <div class="footer-col"><h6>Developers</h6><a href="/docs">API docs</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+        <div class="footer-col"><h6>Legal</h6><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/disclaimer">Quantum disclaimer</a></div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="/js/vendor/zxcvbn-4.4.2.js"></script>
-    <script src="/js/quantum-estimator.js?v=2"></script>
-    <script src="/js/ads-config.js?v=4"></script>
+    <div class="domains-strip">
+        <div class="hr"></div>
+        <div class="domains-row">
+            <span class="domains-kicker">Same tool, three addresses</span>
+            <a href="https://quantumpasswordchecker.com">QuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://myquantumpasswordchecker.com">MyQuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://mypasswordchecker.com">MyPasswordChecker.com</a>
+            <span class="text-muted">— typed one of the others and landed here? You are in the right place.</span>
+        </div>
+    </div>
+
+</div>
+
+    <!-- Traffic-source capture for the house-ad funnel (runs once on load; never on input) -->
     <script src="/js/ad-tracking.js"></script>
+    <!-- Ad rail: runs before the zxcvbn parse so revenue content never waits on it -->
+    <script src="/js/ad-rotation.js"></script>
     <script>
-        // Load affiliate links on page load.
-        // Ad slots use static iframes (see .ad-slot-banner markup) — no JS render.
-        window.addEventListener('load', () => {
-            renderAffiliateLinks('affiliate-links-container');
+      (function () {
+        var slotA = document.querySelector('.ad-slot[data-slot="a"]');
+        var slotB = document.querySelector('.ad-slot[data-slot="b"]');
+        slotA.querySelectorAll('.ad-creative').forEach(function (n) {
+          slotB.appendChild(n.cloneNode(true));
         });
+        initAdRail();
+      })();
     </script>
-    <script>
-        // Password input handling
-        const passwordInput = document.getElementById('password-input');
-        const toggleBtn = document.getElementById('toggle-btn');
-        const strengthMeter = document.getElementById('strength-meter');
-        const strengthBar = document.getElementById('strength-bar');
-        const strengthLabel = document.getElementById('strength-label');
-        const crackTimeDisplay = document.getElementById('crack-time-display');
-        const classicalTime = document.getElementById('classical-time');
-        const entropyBits = document.getElementById('entropy-bits');
-        const feedbackSection = document.getElementById('feedback-section');
-        const feedbackWarning = document.getElementById('feedback-warning');
-        const feedbackSuggestions = document.getElementById('feedback-suggestions');
+    <!-- Real zxcvbn, self-hosted; must load before the checker module -->
+    <script src="/js/vendor/zxcvbn-4.4.2.js"></script>
 
-        // Toggle password visibility
-        toggleBtn.addEventListener('click', () => {
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            toggleBtn.textContent = type === 'password' ? '👁️' : '🙈';
-        });
+    <script type="module">
+      import { analyze, CAPTIONS, DEMO_PASSWORD, SECONDS_PER_YEAR, SECONDS_PER_DAY } from '/js/crack-model.js';
 
-        // Analyze password on input
-        passwordInput.addEventListener('input', () => {
-            const password = passwordInput.value;
+      const $ = (id) => document.getElementById(id);
+      const input = $('pw');
+      const toggle = $('pw-toggle');
+      const meterFill = $('meter-fill');
+      const strengthLabelEl = $('strength-label');
+      const numGpu = $('num-gpu'), unitGpu = $('unit-gpu');
+      const numBits = $('num-bits');
+      const numQ = $('num-q'), unitQ = $('unit-q');
+      const weakList = $('weak-list');
 
-            if (password.length === 0) {
-                strengthMeter.style.display = 'none';
-                crackTimeDisplay.style.display = 'none';
-                feedbackSection.style.display = 'none';
-                return;
-            }
+      // Captions and the API demo figures are generated from the model's constants
+      // so a printed rate can never contradict a computed value (the static HTML
+      // text is a no-JS fallback carrying the same strings).
+      $('caption-gpu').textContent = CAPTIONS.gpu;
+      $('caption-entropy').textContent = CAPTIONS.entropy;
+      $('caption-q').textContent = CAPTIONS.quantum;
+      $('target-label').textContent = CAPTIONS.target;
+      const demo = analyze(DEMO_PASSWORD);
+      $('api-bits').textContent = demo.bits;
+      $('api-gpu').textContent = (demo.classicalSeconds / SECONDS_PER_YEAR).toPrecision(2).replace('e+', 'e');
+      $('api-grover').textContent = Math.round(demo.quantumSeconds / SECONDS_PER_DAY);
 
-            // Get analysis
-            const result = QuantumEstimator.estimateTimes(password);
-            const indicator = QuantumEstimator.getStrengthIndicator(result.zxcvbn.score);
+      // Synchronous recalculation on every keystroke — no debounce, no spinner,
+      // no async, and never a network request (the trust row promises this).
+      let lastNotesKey;
+      function render() {
+        const r = analyze(input.value);
+        meterFill.style.width = r.pct;
+        strengthLabelEl.textContent = r.label;
+        numGpu.textContent = r.cBig;
+        unitGpu.textContent = r.cUnit;
+        numBits.textContent = r.bits;
+        numQ.textContent = r.qBig;
+        unitQ.textContent = r.qUnit;
+        const notesKey = r.notes.join('\n');
+        if (notesKey === lastNotesKey) return;
+        lastNotesKey = notesKey;
+        weakList.replaceChildren(...r.notes.map((t) => {
+          const li = document.createElement('li');
+          const dash = document.createElement('span');
+          dash.className = 'dash';
+          dash.textContent = '—';
+          const text = document.createElement('span');
+          text.textContent = t;
+          li.append(dash, text);
+          return li;
+        }));
+      }
 
-            // Update strength meter
-            strengthMeter.style.display = 'block';
-            strengthBar.style.width = indicator.width;
-            strengthBar.style.backgroundColor = indicator.color;
-            strengthLabel.textContent = indicator.label;
-            strengthLabel.style.color = indicator.color;
+      input.addEventListener('input', render);
+      toggle.addEventListener('click', () => {
+        const hidden = input.type === 'password';
+        input.type = hidden ? 'text' : 'password';
+        toggle.textContent = hidden ? 'Hide' : 'Show';
+      });
 
-            // Update crack time display with technical notation if available
-            crackTimeDisplay.style.display = 'block';
-            const humanLabel = result.classical.human.label;
-            const technicalLabel = result.classical.human.technical;
-            classicalTime.innerHTML = technicalLabel
-                ? `${humanLabel}<br><span style="font-size: 0.85em; opacity: 0.7;">(${technicalLabel})</span>`
-                : humanLabel;
-            entropyBits.textContent = result.bits.toFixed(1);
-
-            // Update feedback
-            if (result.zxcvbn.feedback.warning || result.zxcvbn.feedback.suggestions) {
-                feedbackSection.style.display = 'block';
-
-                if (result.zxcvbn.feedback.warning) {
-                    feedbackWarning.style.display = 'block';
-                    feedbackWarning.textContent = '⚠️ ' + result.zxcvbn.feedback.warning;
-                } else {
-                    feedbackWarning.style.display = 'none';
-                }
-
-                if (result.zxcvbn.feedback.suggestions && result.zxcvbn.feedback.suggestions.length > 0) {
-                    feedbackSuggestions.innerHTML = '<p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>Suggestions:</strong></p><ul style="margin-left: 1.5rem; font-size: 0.875rem;">' +
-                        result.zxcvbn.feedback.suggestions.map(s => '<li>' + s + '</li>').join('') +
-                        '</ul>';
-                } else {
-                    feedbackSuggestions.innerHTML = '';
-                }
-            } else {
-                feedbackSection.style.display = 'none';
-            }
-        });
-
+      // The design-pinned demo has one source: the model's export. The HTML
+      // value attribute is only the no-JS fallback.
+      input.value = DEMO_PASSWORD;
+      render();
     </script>
 </body>
 </html>
