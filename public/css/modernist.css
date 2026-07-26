@@ -3,7 +3,16 @@
    scoped to body per the handoff README (the prototype's .t-modernist scope is dropped).
    One adjustment, required by the colour budget: body-size links take the deep ramp
    step — the base accent is tuned to ~3:1 (chrome and large type only). */
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap');
+/* Archivo self-hosted (variable font, latin subset) — replaces the handoff's
+   Google Fonts @import: the serialized cross-origin chain cost ~13 mobile
+   perf points, and self-hosting also keeps the no-third-party story clean. */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/archivo-latin.woff2') format('woff2');
+}
 
 :root {
   --color-bg: #f3f2f2;
