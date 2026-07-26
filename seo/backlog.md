@@ -49,16 +49,18 @@ alongside the last recovery-tracking row) and re-check every trigger below.
 
 ## Performance (post-rebuild Lighthouse, mobile)
 
-- Gate result: **SEO 100 on all three pages ✓**. Performance: homepage 67 vs 80
-  baseline on like-for-like live runs (pre-font-fix). Diagnostics show no
-  structural problem: TBT 100–140 ms, CLS 0, TTFB ~220 ms, zero render-blocking
-  resources. The deltas come from the richer page (6 lazy ad iframes vs 2,
-  Archivo webfont vs system fonts) plus heavy lab-run variance (same URL scored
-  66 and 98 in consecutive runs on the preview host).
+- Final gate result (live, post-purge, font fix in): **SEO 100 on all three ✓**;
+  homepage perf **98 vs 80 baseline (+18)**; /generate-phonetic 78 and
+  /password-cracker-test 78 (TBT ~100 ms, CLS 0 — the ~4 s lab LCP under mobile
+  throttling is the 60px webfont H1 + full-fat page; the old generate-phonetic
+  page that scored 99 was a bare page with no design system). Recorded in
+  baseline-lighthouse.csv.
 - Fix shipped 2026-07-26: Archivo self-hosted (public/fonts/archivo-latin.woff2,
   35 KB variable, font-display swap + preload) replacing the Google Fonts
-  @import chain; measured +3 to +8 perf points. Re-measure LIVE after the next
-  cache purge and update the post-rebuild rows if materially different.
+  @import chain — this is what took the homepage from 67 to 98.
+- Lighthouse gotcha for future runs: a single headless run can produce phantom
+  "CSP issue" flags + TBT 0 (scripts not executed) — re-run before believing a
+  bad number; the live pages were verified functional in a real browser.
 - If GSC/CrUX field data ever shows real LCP/INP issues: next lever is
   async-initializing zxcvbn (822 KB parse) with a graceful pre-load checker
   state — costs the "synchronous on every keystroke" simplicity, so only if
