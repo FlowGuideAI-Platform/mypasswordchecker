@@ -142,8 +142,10 @@ const PhoneticGenerator = (() => {
     const maxBoosts = maxBoostAttempts[aggressiveness] || 10;
 
     // Add timestamp-based seed for uniqueness (add iteration to ensure different seeds)
-    const timeSeed = (Date.now() + iterationIndex * 1000) % 10000;
-    const randomSeed = Math.random() + (iterationIndex * 0.1);
+    // Prime stride: i*1000 % 100 === 0, which made every variation share one
+    // substitution mask. 7919 keeps iterations distinct at every modulus used.
+    const timeSeed = (Date.now() + iterationIndex * 7919) % 10000;
+    const randomSeed = Math.random() + (iterationIndex * 0.37);
 
     // Clean phrase
     const words = phrase.toLowerCase().trim().split(/\s+/).filter(w => w.length > 0);
@@ -191,12 +193,13 @@ const PhoneticGenerator = (() => {
 
         if (!subs) return char; // No substitution available
 
-        // Decide whether to substitute (using time + random for variability)
-        const shouldSub = ((timeSeed + wordIndex + charIndex + randomSeed) % 100) / 100 < subChance;
+        // Per-character randomness. The old form compared subChance against
+        // (timeSeed + …) % 100, which is nearly constant within one variation —
+        // substitution became all-or-nothing per password instead of per char.
+        const shouldSub = Math.random() < subChance;
 
         if (shouldSub) {
-          // Pick random substitution (time-seeded for variability)
-          const subIndex = Math.floor(((timeSeed + charIndex + randomSeed * 1000) % subs.length));
+          const subIndex = Math.floor(Math.random() * subs.length);
           return subs[subIndex];
         }
 
@@ -209,7 +212,7 @@ const PhoneticGenerator = (() => {
     let pattern;
     if (aggressiveness === 'very-low') {
       // Level 1: Minimal capitalization - mostly lowercase
-      if (Math.random() > 0.5) {
+      if ((timeSeed + iterationIndex) % 2 === 0) {
         capitalized = transformedWords;
         pattern = 'lowercase';
       } else {
@@ -223,12 +226,12 @@ const PhoneticGenerator = (() => {
     } else if (aggressiveness === 'medium') {
       // Level 3: Use camelCase or bookend patterns
       const mediumPatterns = ['camel', 'bookend'];
-      pattern = mediumPatterns[Math.floor((timeSeed + randomSeed * 100) % mediumPatterns.length)];
+      pattern = mediumPatterns[(Math.floor(timeSeed + randomSeed * 100) + iterationIndex) % mediumPatterns.length];
       capitalized = applyCapitalization(transformedWords, pattern, timeSeed, randomSeed);
     } else if (aggressiveness === 'high') {
       // Level 4: Use alternate or random patterns (more chaotic)
       const highPatterns = ['alternate', 'random'];
-      pattern = highPatterns[Math.floor((timeSeed + randomSeed * 100) % highPatterns.length)];
+      pattern = highPatterns[(Math.floor(timeSeed + randomSeed * 100) + iterationIndex) % highPatterns.length];
       capitalized = applyCapitalization(transformedWords, pattern, timeSeed, randomSeed);
     } else {
       // Level 5: Use first letter capitalization for NATO words
@@ -244,15 +247,15 @@ const PhoneticGenerator = (() => {
     } else if (aggressiveness === 'low') {
       // Level 2: Use hyphen or underscore only (readable but more secure than space)
       const level2Separators = ['-', '_'];
-      separator = level2Separators[Math.floor((timeSeed + randomSeed * 200) % level2Separators.length)];
+      separator = level2Separators[(Math.floor(timeSeed + randomSeed * 200) + iterationIndex) % level2Separators.length];
     } else if (aggressiveness === 'medium') {
       // Level 3: Use moderate special chars
       const level3Separators = ['_', '-', '~', '^'];
-      separator = level3Separators[Math.floor((timeSeed + randomSeed * 200) % level3Separators.length)];
+      separator = level3Separators[(Math.floor(timeSeed + randomSeed * 200) + iterationIndex) % level3Separators.length];
     } else if (aggressiveness === 'high') {
       // Level 4: Use aggressive special chars
       const level4Separators = ['~', '^', '=', '+', '*', '&', '%', '#'];
-      separator = level4Separators[Math.floor((timeSeed + randomSeed * 200) % level4Separators.length)];
+      separator = level4Separators[(Math.floor(timeSeed + randomSeed * 200) + iterationIndex) % level4Separators.length];
     } else {
       // Level 5: Always use hyphen for NATO phonetic words
       separator = '-';
@@ -350,10 +353,20 @@ const PhoneticGenerator = (() => {
    */
   function generateMultiple(phrase, count = 5, options = {}) {
     const variations = [];
+    // "Noticeably different" guarantee: reject a candidate whose normalized
+    // form (case/separators stripped) repeats one we already kept, and retry
+    // with a fresh iteration seed. Bounded so short phrases still fill up.
+    const seen = new Set();
+    const norm = (pw) => pw.toLowerCase().replace(/[^a-z0-9]/g, '');
+    let attempt = 0;
+    const maxAttempts = count * 4;
 
-    for (let i = 0; i < count; i++) {
-      // Pass iteration index to ensure different seeds for each variation
-      const variation = generateVariation(phrase, options, i);
+    while (variations.length < count && attempt < maxAttempts) {
+      const variation = generateVariation(phrase, options, attempt);
+      attempt++;
+      const key = norm(variation.password);
+      if (seen.has(key) && attempt < maxAttempts) continue;
+      seen.add(key);
 
       // Get full analysis using quantum estimator
       const analysis = QuantumEstimator.estimateTimes(variation.password);
