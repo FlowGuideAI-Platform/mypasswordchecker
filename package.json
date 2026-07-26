@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "MyPasswordChecker.com - Password strength analysis with quantum resistance estimates",
   "scripts": {
-    "dev": "wrangler pages dev public --port 8080",
-    "deploy": "wrangler pages deploy public",
-    "deploy:workers": "wrangler deploy"
+    "dev": "wrangler dev --config wrangler-static.toml --port 8080",
+    "test": "node scripts/test-crack-model.mjs",
+    "deploy": "bash scripts/deploy-static.sh",
+    "deploy:api": "wrangler deploy"
   },
   "keywords": [
     "password",
