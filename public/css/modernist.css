@@ -255,6 +255,10 @@ textarea.input { min-height: 90px; resize: vertical; }
   letter-spacing: -0.02em; color: var(--color-text); text-decoration: none;
 }
 .wordmark .tld { color: var(--color-accent-700); }
+/* Owner decision 2026-07-25: the lock mark takes the .com's deep red — the
+   gold #FFD700 mark is lost on the light ground. (Gold remains right for dark
+   surfaces per the handoff; the SVG fill attribute stays as that fallback.) */
+.wordmark svg { fill: var(--color-accent-700); }
 .topnav-links {
   display: flex; gap: var(--space-6); font-size: 12px;
   text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
