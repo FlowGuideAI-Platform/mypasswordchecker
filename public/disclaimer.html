@@ -9,148 +9,197 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://mypasswordchecker.com/disclaimer">
 
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/modernist.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128272;</text></svg>">
+
+    <style>
+      /* Page layout — /disclaimer in the 1a system. Shared components come from
+         modernist.css. Tokens only; zero radius; no shadows or animations. */
+      .hero { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .hero h1 { margin: 0 0 var(--space-2); }
+      .updated { font-size: 12px; margin: 0; }
+
+      .doc { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .doc-inner { max-width: 76ch; }
+      .doc h2 { font-size: 25px; margin: var(--space-8) 0 var(--space-3); }
+      .doc h3 { font-size: 17px; margin: var(--space-6) 0 var(--space-2); }
+      .doc ul { margin: var(--space-2) 0 var(--space-3); padding-left: 1.4em; }
+      .doc li { margin-bottom: var(--space-1); }
+
+      .callout { border: 2px solid var(--color-divider); background: var(--color-surface); padding: var(--space-4); }
+      .callout p { margin: 0; }
+      .callout + h2 { margin-top: var(--space-8); }
+      .callout-close { margin-top: var(--space-8); }
+
+      .legal-line { padding: 0 var(--space-8) var(--space-8); font-size: 12px; }
+      .legal-line p { margin: 0 0 var(--space-1); }
+
+      @media (max-width: 768px) {
+        .hero, .doc { padding: var(--space-4); }
+        .legal-line { padding: 0 var(--space-4) var(--space-4); }
+      }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
-                <nav class="nav">
-                    <a href="/">Password Checker</a>
-                    <a href="/password-api">Developer API</a>
-                    <a href="/docs">Docs</a>
-                    <a href="/pricing">Pricing</a>
-                </nav>
-            </div>
+<div class="shell">
+
+    <nav class="topnav" aria-label="Main">
+        <a class="wordmark" href="/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD700" aria-hidden="true"><path d="M6 10V7a6 6 0 1 1 12 0v3h1.5v12h-15V10H6zm2.2 0h7.6V7a3.8 3.8 0 0 0-7.6 0v3z"/></svg>
+            MyPasswordChecker<span class="tld">.com</span>
+        </a>
+        <div class="topnav-links">
+            <a href="/">Checker</a>
+            <a href="/generate-phonetic">Phonetic Generator</a>
+            <a href="/premium">Breach Check</a>
+            <a href="/password-api">Developer API</a>
+            <a href="/pricing">Pricing</a>
         </div>
+    </nav>
+
+    <header class="hero">
+        <div class="eyebrow">Legal</div>
+        <h1>Quantum Estimate Disclaimer</h1>
+        <p class="updated text-muted"><em>Last Updated: October 11, 2024</em></p>
     </header>
-    <main>
-        <div class="container">
-            <div class="checker-card" style="max-width: 900px; margin: 2rem auto;">
-                <h1>Quantum Estimate Disclaimer</h1>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;"><em>Last Updated: October 11, 2024</em></p>
 
-                <div class="alert alert-warning" style="margin-bottom: 2rem;">
-                    <strong>⚠️ IMPORTANT:</strong> Quantum resistance estimates provided by MyPasswordChecker.com are theoretical, educational, and speculative. We make absolutely no guarantee of accuracy in real-world quantum attack scenarios.
-                </div>
+    <main class="doc">
+        <div class="doc-inner">
+            <div class="callout" role="note">
+                <p><strong>IMPORTANT:</strong> Quantum resistance estimates provided by MyPasswordChecker.com are theoretical, educational, and speculative. We make absolutely no guarantee of accuracy in real-world quantum attack scenarios.</p>
+            </div>
 
-                <h2>What Our Quantum Estimates Represent</h2>
-                <p>Our quantum crack time estimates apply <strong>Grover's algorithm</strong> to model how a theoretical quantum computer might brute-force a password. Grover's algorithm provides a quadratic speedup (square root of search space) over classical brute-force attacks.</p>
+            <h2>What Our Quantum Estimates Represent</h2>
+            <p>Our quantum crack time estimates apply <strong>Grover's algorithm</strong> to model how a theoretical quantum computer might brute-force a password. Grover's algorithm provides a quadratic speedup (square root of search space) over classical brute-force attacks.</p>
 
-                <h2>Critical Limitations</h2>
+            <h2>Critical Limitations</h2>
 
-                <h3>1. Theoretical Model Only</h3>
-                <p>Our estimates are based on idealized quantum computing models. Real quantum computers face significant practical challenges:</p>
-                <ul>
-                    <li><strong>Error Rates:</strong> Current quantum computers have high error rates requiring extensive error correction</li>
-                    <li><strong>Coherence Time:</strong> Quantum states degrade quickly, limiting computation time</li>
-                    <li><strong>Gate Depth:</strong> Complex operations require many quantum gates, increasing error</li>
-                    <li><strong>Physical Qubits:</strong> Thousands of physical qubits may be needed for each logical qubit</li>
-                </ul>
+            <h3>1. Theoretical Model Only</h3>
+            <p>Our estimates are based on idealized quantum computing models. Real quantum computers face significant practical challenges:</p>
+            <ul>
+                <li><strong>Error Rates:</strong> Current quantum computers have high error rates requiring extensive error correction</li>
+                <li><strong>Coherence Time:</strong> Quantum states degrade quickly, limiting computation time</li>
+                <li><strong>Gate Depth:</strong> Complex operations require many quantum gates, increasing error</li>
+                <li><strong>Physical Qubits:</strong> Thousands of physical qubits may be needed for each logical qubit</li>
+            </ul>
 
-                <h3>2. Speculative Hardware Assumptions</h3>
-                <p>We provide three scenarios (pessimistic, plausible, optimistic) with different Grover iteration rates:</p>
-                <ul>
-                    <li>10³ iterations/second (pessimistic)</li>
-                    <li>10⁵ iterations/second (plausible)</li>
-                    <li>10⁷ iterations/second (optimistic)</li>
-                </ul>
-                <p><strong>These are educated guesses.</strong> Actual quantum computer performance for password cracking is unknown and may never reach these rates.</p>
+            <h3>2. Speculative Hardware Assumptions</h3>
+            <p>We provide three scenarios (pessimistic, plausible, optimistic) with different Grover iteration rates:</p>
+            <ul>
+                <li>10&sup3; iterations/second (pessimistic)</li>
+                <li>10&#8309; iterations/second (plausible)</li>
+                <li>10&#8311; iterations/second (optimistic)</li>
+            </ul>
+            <p><strong>These are educated guesses.</strong> Actual quantum computer performance for password cracking is unknown and may never reach these rates.</p>
 
-                <h3>3. Password Hashing Not Modeled</h3>
-                <p>Our estimates assume direct password comparison. Real systems use:</p>
-                <ul>
-                    <li><strong>Memory-hard hashing</strong> (bcrypt, scrypt, Argon2) which reduces quantum advantage</li>
-                    <li><strong>Slow hash functions</strong> that require significant time per attempt</li>
-                    <li><strong>Salting</strong> which prevents rainbow table attacks</li>
-                </ul>
-                <p>These defenses are not fully accounted for in our quantum model.</p>
+            <h3>3. Password Hashing Not Modeled</h3>
+            <p>Our estimates assume direct password comparison. Real systems use:</p>
+            <ul>
+                <li><strong>Memory-hard hashing</strong> (bcrypt, scrypt, Argon2) which reduces quantum advantage</li>
+                <li><strong>Slow hash functions</strong> that require significant time per attempt</li>
+                <li><strong>Salting</strong> which prevents rainbow table attacks</li>
+            </ul>
+            <p>These defenses are not fully accounted for in our quantum model.</p>
 
-                <h3>4. Current State of Quantum Computing</h3>
-                <p>As of 2024:</p>
-                <ul>
-                    <li>No quantum computer can break real passwords</li>
-                    <li>Largest quantum computers have ~1000 noisy qubits</li>
-                    <li>Error-corrected logical qubits are still research-stage</li>
-                    <li>Password cracking requires millions of coherent operations</li>
-                </ul>
+            <h3>4. Current State of Quantum Computing</h3>
+            <p>As of 2024:</p>
+            <ul>
+                <li>No quantum computer can break real passwords</li>
+                <li>Largest quantum computers have ~1000 noisy qubits</li>
+                <li>Error-corrected logical qubits are still research-stage</li>
+                <li>Password cracking requires millions of coherent operations</li>
+            </ul>
 
-                <h2>What You Should NOT Do</h2>
-                <p><strong>Do not:</strong></p>
-                <ul>
-                    <li>Make security decisions based solely on our quantum estimates</li>
-                    <li>Assume passwords rated "safe" against quantum attacks are truly secure</li>
-                    <li>Rely on these estimates for compliance or certification</li>
-                    <li>Use these numbers in legal, financial, or mission-critical contexts</li>
-                </ul>
+            <h2>What You Should NOT Do</h2>
+            <p><strong>Do not:</strong></p>
+            <ul>
+                <li>Make security decisions based solely on our quantum estimates</li>
+                <li>Assume passwords rated "safe" against quantum attacks are truly secure</li>
+                <li>Rely on these estimates for compliance or certification</li>
+                <li>Use these numbers in legal, financial, or mission-critical contexts</li>
+            </ul>
 
-                <h2>What You SHOULD Do</h2>
-                <p><strong>Best practices for password security:</strong></p>
-                <ul>
-                    <li>Use long, random passphrases (4-5 words from a word list)</li>
-                    <li>Use a password manager</li>
-                    <li>Enable multi-factor authentication (MFA) wherever possible</li>
-                    <li>Use unique passwords for each account</li>
-                    <li>Keep systems and software updated</li>
-                </ul>
-                <p><strong>MFA provides far better protection than any password strength alone.</strong></p>
+            <h2>What You SHOULD Do</h2>
+            <p><strong>Best practices for password security:</strong></p>
+            <ul>
+                <li>Use long, random passphrases (4-5 words from a word list)</li>
+                <li>Use a password manager</li>
+                <li>Enable multi-factor authentication (MFA) wherever possible</li>
+                <li>Use unique passwords for each account</li>
+                <li>Keep systems and software updated</li>
+            </ul>
+            <p><strong>MFA provides far better protection than any password strength alone.</strong></p>
 
-                <h2>Educational Purpose</h2>
-                <p>Our quantum estimates are provided for:</p>
-                <ul>
-                    <li>Educational understanding of quantum threats</li>
-                    <li>Comparative analysis (classical vs quantum models)</li>
-                    <li>Awareness of future security challenges</li>
-                </ul>
+            <h2>Educational Purpose</h2>
+            <p>Our quantum estimates are provided for:</p>
+            <ul>
+                <li>Educational understanding of quantum threats</li>
+                <li>Comparative analysis (classical vs quantum models)</li>
+                <li>Awareness of future security challenges</li>
+            </ul>
 
-                <h2>No Liability</h2>
-                <p>MyPasswordChecker.com and its operators are not liable for:</p>
-                <ul>
-                    <li>Security breaches resulting from passwords deemed "likely quantum resistant"</li>
-                    <li>Decisions made based on our quantum estimates</li>
-                    <li>Inaccuracy of theoretical models</li>
-                    <li>Changes in quantum computing capabilities</li>
-                </ul>
+            <h2>No Liability</h2>
+            <p>MyPasswordChecker.com and its operators are not liable for:</p>
+            <ul>
+                <li>Security breaches resulting from passwords deemed "likely quantum resistant"</li>
+                <li>Decisions made based on our quantum estimates</li>
+                <li>Inaccuracy of theoretical models</li>
+                <li>Changes in quantum computing capabilities</li>
+            </ul>
 
-                <h2>Professional Advice</h2>
-                <p>For critical security decisions, consult with qualified cybersecurity professionals and cryptographers. Do not rely solely on automated tools.</p>
+            <h2>Professional Advice</h2>
+            <p>For critical security decisions, consult with qualified cybersecurity professionals and cryptographers. Do not rely solely on automated tools.</p>
 
-                <h2>Sources and Methodology</h2>
-                <p>Our quantum model is based on:</p>
-                <ul>
-                    <li>Grover's algorithm (Grover, 1996)</li>
-                    <li>NIST guidance on post-quantum cryptography</li>
-                    <li>Published academic research on quantum attacks</li>
-                    <li>Conservative assumptions about quantum hardware</li>
-                </ul>
+            <h2>Sources and Methodology</h2>
+            <p>Our quantum model is based on:</p>
+            <ul>
+                <li>Grover's algorithm (Grover, 1996)</li>
+                <li>NIST guidance on post-quantum cryptography</li>
+                <li>Published academic research on quantum attacks</li>
+                <li>Conservative assumptions about quantum hardware</li>
+            </ul>
 
-                <h2>Updates</h2>
-                <p>We may update our quantum model as research progresses. Check this page for the latest methodology and disclaimers.</p>
+            <h2>Updates</h2>
+            <p>We may update our quantum model as research progresses. Check this page for the latest methodology and disclaimers.</p>
 
-                <h2>Questions?</h2>
-                <p>Contact us: <a href="mailto:support@mypasswordchecker.com">support@mypasswordchecker.com</a></p>
+            <h2>Questions?</h2>
+            <p>Contact us: <a href="mailto:support@mypasswordchecker.com">support@mypasswordchecker.com</a></p>
 
-                <div class="alert alert-info" style="margin-top: 2rem;">
-                    <strong>Bottom Line:</strong> Treat quantum estimates as interesting theoretical exercises, not security guarantees. Use strong, unique passwords + MFA for real security.
-                </div>
+            <div class="callout callout-close" role="note">
+                <p><strong>Bottom Line:</strong> Treat quantum estimates as interesting theoretical exercises, not security guarantees. Use strong, unique passwords + MFA for real security.</p>
             </div>
         </div>
     </main>
-    <footer>
-        <div class="container">
-            <div class="footer-bottom" style="padding: 2rem 0; text-align: center;">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
-                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
-                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
-                    This service is also available at:
-                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
-                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
-                </p>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
-            </div>
+
+    <footer class="site-footer">
+        <div>
+            <strong>MyPasswordChecker.com</strong>
+            <span class="text-muted">Free password strength analysis with quantum resistance estimates. Operated by All Aligned Consulting LLC, California.</span>
         </div>
+        <div class="footer-col"><h6>Tools</h6><a href="/">Checker</a><a href="/generate-phonetic">Phonetic generator</a><a href="/premium">Breach check</a></div>
+        <div class="footer-col"><h6>Developers</h6><a href="/docs">API docs</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+        <div class="footer-col"><h6>Legal</h6><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/disclaimer">Quantum disclaimer</a></div>
     </footer>
+
+    <div class="domains-strip">
+        <div class="hr"></div>
+        <div class="domains-row">
+            <span class="domains-kicker">Same tool, three addresses</span>
+            <a href="https://quantumpasswordchecker.com">QuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://myquantumpasswordchecker.com">MyQuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://mypasswordchecker.com">MyPasswordChecker.com</a>
+            <span class="text-muted">— typed one of the others and landed here? You are in the right place.</span>
+        </div>
+    </div>
+
+    <div class="legal-line text-muted">
+        <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved.</p>
+        <p>Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
+    </div>
+
+</div>
+
+    <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

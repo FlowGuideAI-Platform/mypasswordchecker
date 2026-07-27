@@ -9,296 +9,171 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://mypasswordchecker.com/docs">
 
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/modernist.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
     <style>
-        .docs-container {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
+        /* Page layout — /docs in the 1a system. Shared components come from
+           modernist.css. Reference page kept linear: sections stacked between
+           2px rules, no sticky chrome. Colour budget: bright red appears only
+           through .card-kicker (no primary buttons on this page). */
+        .hero { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+        .hero h1 { font-size: 60px; margin: 0 0 var(--space-4); max-width: 20ch; }
+        .lead { font-size: 17px; max-width: 56ch; margin: 0; }
 
-        .docs-sidebar {
-            position: sticky;
-            top: 2rem;
-            height: fit-content;
-            background: var(--bg-secondary);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-        }
+        .toc { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+        .toc h6 { margin-bottom: var(--space-3); }
+        .toc-row { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); font-size: 13px; }
 
-        .docs-sidebar h3 {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
+        .doc-section { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+        .doc-section h2 { margin-bottom: var(--space-4); }
+        .doc-section h3 { margin-top: var(--space-6); }
+        .doc-section > p, .doc-section ul.doc-list { max-width: 72ch; }
+        ul.doc-list { line-height: 1.8; padding-left: var(--space-6); margin: var(--space-3) 0; }
 
-        .docs-sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        code {
+            font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+            background: var(--color-neutral-200); padding: 1px 5px;
         }
-
-        .docs-sidebar li {
-            margin-bottom: 0.5rem;
+        .code-block {
+            font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.6;
+            background: var(--color-neutral-900); color: var(--color-neutral-100);
+            padding: var(--space-4); overflow: auto; white-space: pre;
+            margin: var(--space-3) 0; max-width: 100%;
         }
-
-        .docs-sidebar a {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: block;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            transition: background 0.2s;
-        }
-
-        .docs-sidebar a:hover {
-            background: rgba(79, 70, 229, 0.1);
-            color: var(--primary-color);
-        }
-
-        .docs-content {
-            max-width: 800px;
-        }
-
-        .docs-content h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .docs-content h2 {
-            font-size: 1.5rem;
-            margin-top: 3rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .docs-content h3 {
-            font-size: 1.25rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
         .endpoint-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.25rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            font-family: 'Courier New', monospace;
+            display: inline-block; font-family: ui-monospace, Menlo, monospace;
+            font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+            padding: 2px 8px; background: var(--color-neutral-900); color: var(--color-neutral-100);
         }
 
-        .endpoint-badge.post {
-            background: #10b981;
-            color: white;
+        .callout {
+            border: 2px solid var(--color-divider); background: var(--color-surface);
+            padding: var(--space-4); margin: var(--space-4) 0; font-size: 14px; max-width: 72ch;
         }
+        .callout p { margin: 0; }
 
-        .endpoint-badge.get {
-            background: #3b82f6;
-            color: white;
-        }
+        .table-wrap { overflow-x: auto; margin: var(--space-3) 0; }
+        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin: var(--space-4) 0; }
 
-        .param-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-            font-size: 0.9rem;
-        }
-
-        .param-table th {
-            background: var(--bg-secondary);
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .param-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .param-table code {
-            background: var(--bg-secondary);
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-size: 0.875rem;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .feature-card {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .feature-card h4 {
-            margin-bottom: 0.5rem;
-            color: var(--primary-color);
+        .timestamp {
+            margin-top: var(--space-8); padding-top: var(--space-4);
+            border-top: 1px solid var(--color-divider); font-size: 13px;
         }
 
         @media (max-width: 768px) {
-            .docs-container {
-                grid-template-columns: 1fr;
-            }
-
-            .docs-sidebar {
-                position: static;
-            }
-        }
-
-        .timestamp {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-style: italic;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
+            .hero, .toc, .doc-section { padding: var(--space-4); }
+            .hero h1 { font-size: 40px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .toc-row a { min-height: 44px; display: inline-flex; align-items: center; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
-                <nav class="nav">
-                    <a href="/">Password Checker</a>
-                    <a href="/premium">Premium</a>
-                    <a href="/password-api">Developer API</a>
-                    <a href="/docs">Docs</a>
-                    <a href="/pricing">Pricing</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+<div class="shell">
 
-    <!-- Page carousel (top) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/password-api">← Developer API</a>
-        <a class="page-nav-link" href="/pricing">Pricing →</a>
+    <nav class="topnav" aria-label="Main">
+        <a class="wordmark" href="/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD700" aria-hidden="true"><path d="M6 10V7a6 6 0 1 1 12 0v3h1.5v12h-15V10H6zm2.2 0h7.6V7a3.8 3.8 0 0 0-7.6 0v3z"/></svg>
+            MyPasswordChecker<span class="tld">.com</span>
+        </a>
+        <div class="topnav-links">
+            <a href="/">Checker</a>
+            <a href="/generate-phonetic">Phonetic Generator</a>
+            <a href="/premium">Breach Check</a>
+            <a href="/password-api">Developer API</a>
+            <a href="/pricing">Pricing</a>
+        </div>
     </nav>
 
-    <main>
-        <div class="container">
-            <div class="docs-container">
-                <!-- Sidebar Navigation -->
-                <aside class="docs-sidebar">
-                    <h3>Getting Started</h3>
-                    <ul>
-                        <li><a href="#overview">Overview</a></li>
-                        <li><a href="#authentication">Authentication</a></li>
-                        <li><a href="#quick-start">Quick Start</a></li>
-                        <li><a href="#rate-limits">Rate Limits</a></li>
-                    </ul>
+    <header class="hero">
+        <div class="eyebrow">REST API · authentication · endpoints · errors</div>
+        <h1>Developer Documentation</h1>
+        <p class="lead">Everything you need to integrate password strength analysis and quantum resistance estimates into your application.</p>
+    </header>
 
-                    <h3 style="margin-top: 2rem;">API Reference</h3>
-                    <ul>
-                        <li><a href="#password-check">Password Check</a></li>
-                        <li><a href="#quantum-estimate">Quantum Estimate</a></li>
-                        <li><a href="#phonetic-generator">Phonetic Generator</a></li>
-                        <li><a href="#breach-check">Breach Check</a></li>
-                    </ul>
+    <section class="toc" aria-label="Contents">
+        <h6>On this page</h6>
+        <nav class="toc-row">
+            <a href="#overview">Overview</a>
+            <a href="#authentication">Authentication</a>
+            <a href="#quick-start">Quick Start</a>
+            <a href="#rate-limits">Rate Limits</a>
+            <a href="#domain-verification">Domain and IP Verification</a>
+            <a href="#password-check">Password Check</a>
+            <a href="#quantum-estimate">Quantum Estimate</a>
+            <a href="#phonetic-generator">Phonetic Generator</a>
+            <a href="#breach-check">Breach Check</a>
+            <a href="#best-practices">Best Practices</a>
+            <a href="#code-examples">Code Examples</a>
+            <a href="#error-handling">Error Handling</a>
+            <a href="#support">Support</a>
+        </nav>
+    </section>
 
-                    <h3 style="margin-top: 2rem;">Guides</h3>
-                    <ul>
-                        <li><a href="#best-practices">Best Practices</a></li>
-                        <li><a href="#code-examples">Code Examples</a></li>
-                        <li><a href="#error-handling">Error Handling</a></li>
-                    </ul>
+    <!-- Overview -->
+    <section id="overview" class="doc-section">
+        <h6>Getting started</h6>
+        <h2>Overview</h2>
+        <p>
+            MyPasswordChecker.com provides a powerful REST API for password security analysis. Our API enables you to:
+        </p>
+        <div class="card-grid">
+            <article class="card">
+                <div class="card-title">Password Analysis</div>
+                <p class="card-body">Real-time strength scoring, entropy calculation, and crack time estimation using industry-standard algorithms.</p>
+            </article>
+            <article class="card">
+                <div class="card-title">Quantum Estimates</div>
+                <p class="card-body">Theoretical quantum computing resistance analysis using Grover's algorithm across multiple scenarios.</p>
+            </article>
+            <article class="card">
+                <div class="card-title">Password Generation</div>
+                <p class="card-body">Transform memorable phrases into quantum-resistant passwords with phonetic substitution techniques.</p>
+            </article>
+        </div>
+    </section>
 
-                    <h3 style="margin-top: 2rem;">Resources</h3>
-                    <ul>
-                        <li><a href="#support">Support</a></li>
-                        <li><a href="/dashboard">Dashboard</a></li>
-                        <li><a href="/pricing">Pricing</a></li>
-                    </ul>
-                </aside>
+    <!-- Authentication -->
+    <section id="authentication" class="doc-section">
+        <h6>Getting started</h6>
+        <h2>Authentication</h2>
+        <p>All API requests require authentication using your API key. You can obtain an API key from the <a href="/dashboard">Developer Dashboard</a>.</p>
 
-                <!-- Main Content -->
-                <div class="docs-content">
-                    <h1>Developer Documentation</h1>
-                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 2rem;">
-                        Everything you need to integrate password strength analysis and quantum resistance estimates into your application.
-                    </p>
+        <h3>API Key Format</h3>
+        <p>API keys follow the format: <code>mpc_{32_hex_characters}</code></p>
 
-                    <!-- Overview -->
-                    <section id="overview">
-                        <h2>🚀 Overview</h2>
-                        <p>
-                            MyPasswordChecker.com provides a powerful REST API for password security analysis. Our API enables you to:
-                        </p>
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <h4>🔍 Password Analysis</h4>
-                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Real-time strength scoring, entropy calculation, and crack time estimation using industry-standard algorithms.
-                                </p>
-                            </div>
-                            <div class="feature-card">
-                                <h4>⚛️ Quantum Estimates</h4>
-                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Theoretical quantum computing resistance analysis using Grover's algorithm across multiple scenarios.
-                                </p>
-                            </div>
-                            <div class="feature-card">
-                                <h4>✨ Password Generation</h4>
-                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Transform memorable phrases into quantum-resistant passwords with phonetic substitution techniques.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
+        <h3>Including Your API Key</h3>
+        <p>Add your API key to request headers using one of these methods:</p>
 
-                    <!-- Authentication -->
-                    <section id="authentication">
-                        <h2>🔑 Authentication</h2>
-                        <p>All API requests require authentication using your API key. You can obtain an API key from the <a href="/dashboard" style="color: var(--primary-color);">Developer Dashboard</a>.</p>
+        <pre class="code-block">X-API-Key: mpc_27adf42267ca40a88b37d3a7388dd085</pre>
 
-                        <h3>API Key Format</h3>
-                        <p>API keys follow the format: <code>mpc_{32_hex_characters}</code></p>
+        <p>Or using Bearer token format:</p>
 
-                        <h3>Including Your API Key</h3>
-                        <p>Add your API key to request headers using one of these methods:</p>
+        <pre class="code-block">Authorization: Bearer mpc_27adf42267ca40a88b37d3a7388dd085</pre>
 
-                        <div class="code-block" style="margin: 1rem 0;">X-API-Key: mpc_27adf42267ca40a88b37d3a7388dd085</div>
+        <div class="callout">
+            <p><strong>Security Warning:</strong> Never expose your API key in client-side code or public repositories. Always call the API from your backend server.</p>
+        </div>
+    </section>
 
-                        <p style="margin-top: 1rem;">Or using Bearer token format:</p>
+    <!-- Quick Start -->
+    <section id="quick-start" class="doc-section">
+        <h6>Getting started</h6>
+        <h2>Quick Start</h2>
+        <p>Make your first API request in seconds:</p>
 
-                        <div class="code-block" style="margin: 1rem 0;">Authorization: Bearer mpc_27adf42267ca40a88b37d3a7388dd085</div>
+        <h3>1. Get Your API Key</h3>
+        <p>Sign up at the <a href="/dashboard">Developer Dashboard</a> to receive your free API key with 50 requests per month. <a href="#domain-verification">Domain verification</a> required for activation.</p>
 
-                        <div class="alert alert-warning" style="margin-top: 1.5rem;">
-                            <strong>⚠️ Security Warning:</strong> Never expose your API key in client-side code or public repositories. Always call the API from your backend server.
-                        </div>
-                    </section>
-
-                    <!-- Quick Start -->
-                    <section id="quick-start">
-                        <h2>⚡ Quick Start</h2>
-                        <p>Make your first API request in seconds:</p>
-
-                        <h3>1. Get Your API Key</h3>
-                        <p>Sign up at the <a href="/dashboard" style="color: var(--primary-color);">Developer Dashboard</a> to receive your free API key with 50 requests per month. Domain verification required for activation.</p>
-
-                        <h3>2. Make Your First Request</h3>
-                        <div class="code-block">curl -X POST https://mypasswordchecker.com/api/v1/check-password \
+        <h3>2. Make Your First Request</h3>
+        <pre class="code-block">curl -X POST https://mypasswordchecker.com/api/v1/check-password \
   -H "Content-Type: application/json" \
   -H "X-API-Key: YOUR_API_KEY" \
-  -d '{"password":"MyP@ssw0rd123"}'</div>
+  -d '{"password":"MyP@ssw0rd123"}'</pre>
 
-                        <h3>3. Parse the Response</h3>
-                        <div class="code-block">{
+        <h3>3. Parse the Response</h3>
+        <pre class="code-block">{
   "strength": "medium",
   "score": 2,
   "entropy": 45.6,
@@ -310,139 +185,163 @@
     "warning": "This is a commonly used pattern",
     "suggestions": ["Add more unique characters"]
   }
-}</div>
-                    </section>
+}</pre>
+    </section>
 
-                    <!-- Rate Limits -->
-                    <section id="rate-limits">
-                        <h2>📊 Rate Limits</h2>
-                        <p>Rate limits vary by plan tier. All responses include rate limit headers:</p>
+    <!-- Rate Limits -->
+    <section id="rate-limits" class="doc-section">
+        <h6>Getting started</h6>
+        <h2>Rate Limits</h2>
+        <p>Rate limits vary by plan tier. All responses include rate limit headers:</p>
 
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Header</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>X-RateLimit-Limit</code></td>
-                                    <td>Total requests allowed this month</td>
-                                </tr>
-                                <tr>
-                                    <td><code>X-RateLimit-Remaining</code></td>
-                                    <td>Requests remaining this month</td>
-                                </tr>
-                                <tr>
-                                    <td><code>X-RateLimit-Reset</code></td>
-                                    <td>Unix timestamp when quota resets</td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Header</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>X-RateLimit-Limit</code></td>
+                        <td>Total requests allowed this month</td>
+                    </tr>
+                    <tr>
+                        <td><code>X-RateLimit-Remaining</code></td>
+                        <td>Requests remaining this month</td>
+                    </tr>
+                    <tr>
+                        <td><code>X-RateLimit-Reset</code></td>
+                        <td>Unix timestamp when quota resets</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                        <p style="margin-top: 1.5rem;">See our <a href="/pricing" style="color: var(--primary-color);">Pricing page</a> for detailed quota information per plan.</p>
-                    </section>
+        <p>See our <a href="/pricing">Pricing page</a> for detailed quota information per plan.</p>
+    </section>
 
-                    <!-- Password Check Endpoint -->
-                    <section id="password-check">
-                        <h2>🔍 Password Check API</h2>
-                        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/check-password</code></p>
+    <!-- Domain and IP Verification -->
+    <section id="domain-verification" class="doc-section">
+        <h6>Getting started</h6>
+        <h2>Domain and IP Verification</h2>
+        <p>API keys require domain verification for activation: add the domains your requests will come from in <a href="/domains">Domain Verification</a>. This is the API's fraud protection — a key only works for domains you have verified, so it cannot be quietly repointed somewhere else.</p>
+        <p>Requests for a domain you have not verified are refused with <code>403 Forbidden</code> ("Domain not verified") — see <a href="#error-handling">Error Handling</a>.</p>
+        <p>Plans that include an IP allowlist restrict a key further, to the addresses you list. The plan comparison on the <a href="/pricing">Pricing page</a> shows which tiers include it.</p>
 
-                        <p style="margin-top: 1rem;">Analyze password strength using advanced pattern detection and entropy calculation.</p>
+        <div class="callout">
+            <p><strong>Verification is required on every tier</strong> — including the Free API. Manage your verified domains in <a href="/domains">Domain Verification</a> and monitor key usage in the <a href="/dashboard">Dashboard</a>.</p>
+        </div>
+    </section>
 
-                        <h3>Request Parameters</h3>
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Parameter</th>
-                                    <th>Type</th>
-                                    <th>Required</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>password</code></td>
-                                    <td>string</td>
-                                    <td>Yes</td>
-                                    <td>The password to analyze</td>
-                                </tr>
-                            </tbody>
-                        </table>
+    <!-- Password Check Endpoint -->
+    <section id="password-check" class="doc-section">
+        <h6>API reference</h6>
+        <h2>Password Check API</h2>
+        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/check-password</code></p>
 
-                        <h3>Response Fields</h3>
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Field</th>
-                                    <th>Type</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>strength</code></td>
-                                    <td>string</td>
-                                    <td>Strength category: "very weak", "weak", "medium", "strong", "very strong"</td>
-                                </tr>
-                                <tr>
-                                    <td><code>score</code></td>
-                                    <td>integer</td>
-                                    <td>Numeric score from 0 (worst) to 4 (best)</td>
-                                </tr>
-                                <tr>
-                                    <td><code>entropy</code></td>
-                                    <td>float</td>
-                                    <td>Entropy in bits (higher is better)</td>
-                                </tr>
-                                <tr>
-                                    <td><code>crack_time</code></td>
-                                    <td>object</td>
-                                    <td>Estimated time to crack with modern hardware</td>
-                                </tr>
-                                <tr>
-                                    <td><code>feedback</code></td>
-                                    <td>object</td>
-                                    <td>Warnings and suggestions for improvement</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </section>
+        <p>Analyze password strength using advanced pattern detection and entropy calculation.</p>
 
-                    <!-- Quantum Estimate Endpoint -->
-                    <section id="quantum-estimate">
-                        <h2>⚛️ Quantum Estimate API</h2>
-                        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/estimate-quantum</code></p>
+        <h3>Request Parameters</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>password</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>The password to analyze</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                        <p style="margin-top: 1rem;">Calculate theoretical quantum computing resistance using Grover's algorithm.</p>
+        <h3>Response Fields</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>strength</code></td>
+                        <td>string</td>
+                        <td>Strength category: "very weak", "weak", "medium", "strong", "very strong"</td>
+                    </tr>
+                    <tr>
+                        <td><code>score</code></td>
+                        <td>integer</td>
+                        <td>Numeric score from 0 (worst) to 4 (best)</td>
+                    </tr>
+                    <tr>
+                        <td><code>entropy</code></td>
+                        <td>float</td>
+                        <td>Entropy in bits (higher is better)</td>
+                    </tr>
+                    <tr>
+                        <td><code>crack_time</code></td>
+                        <td>object</td>
+                        <td>Estimated time to crack with modern hardware</td>
+                    </tr>
+                    <tr>
+                        <td><code>feedback</code></td>
+                        <td>object</td>
+                        <td>Warnings and suggestions for improvement</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-                        <div class="alert alert-info" style="margin: 1.5rem 0;">
-                            <strong>ℹ️ Note:</strong> This endpoint requires a Basic Quantum plan or higher. See the <a href="/pricing" style="color: var(--primary-color);">Pricing page</a> for tier details.
-                        </div>
+    <!-- Quantum Estimate Endpoint -->
+    <section id="quantum-estimate" class="doc-section">
+        <h6>API reference</h6>
+        <h2>Quantum Estimate API</h2>
+        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/estimate-quantum</code></p>
 
-                        <h3>Request Parameters</h3>
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Parameter</th>
-                                    <th>Type</th>
-                                    <th>Required</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>password</code></td>
-                                    <td>string</td>
-                                    <td>Yes</td>
-                                    <td>The password to analyze</td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <p>Calculate theoretical quantum computing resistance using Grover's algorithm.</p>
 
-                        <h3>Response Structure</h3>
-                        <div class="code-block">{
+        <div class="callout">
+            <p><strong>Note:</strong> This endpoint requires a Basic Quantum plan or higher. See the <a href="/pricing">Pricing page</a> for tier details.</p>
+        </div>
+
+        <h3>Request Parameters</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>password</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>The password to analyze</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Response Structure</h3>
+        <pre class="code-block">{
   "entropy_bits": 45.6,
   "classical": {
     "time_display": "3 months",
@@ -464,53 +363,56 @@
   },
   "quantum_resistant": false,
   "recommendation": "Password should have 80+ bits..."
-}</div>
-                    </section>
+}</pre>
+    </section>
 
-                    <!-- Phonetic Generator Endpoint -->
-                    <section id="phonetic-generator">
-                        <h2>✨ Phonetic Generator API</h2>
-                        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/generate-phonetic</code></p>
+    <!-- Phonetic Generator Endpoint -->
+    <section id="phonetic-generator" class="doc-section">
+        <h6>API reference</h6>
+        <h2>Phonetic Generator API</h2>
+        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/generate-phonetic</code></p>
 
-                        <p style="margin-top: 1rem;">Transform memorable phrases into strong, quantum-resistant passwords.</p>
+        <p>Transform memorable phrases into strong, quantum-resistant passwords.</p>
 
-                        <h3>Request Parameters</h3>
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Parameter</th>
-                                    <th>Type</th>
-                                    <th>Required</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>phrase</code></td>
-                                    <td>string</td>
-                                    <td>Yes</td>
-                                    <td>Memorable phrase to convert</td>
-                                </tr>
-                                <tr>
-                                    <td><code>aggressiveness</code></td>
-                                    <td>string</td>
-                                    <td>No</td>
-                                    <td>"low", "medium" (default), or "high"</td>
-                                </tr>
-                                <tr>
-                                    <td><code>count</code></td>
-                                    <td>integer</td>
-                                    <td>No</td>
-                                    <td>Number of variations (1-5, default: 5)</td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <h3>Request Parameters</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>phrase</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Memorable phrase to convert</td>
+                    </tr>
+                    <tr>
+                        <td><code>aggressiveness</code></td>
+                        <td>string</td>
+                        <td>No</td>
+                        <td>"low", "medium" (default), or "high"</td>
+                    </tr>
+                    <tr>
+                        <td><code>count</code></td>
+                        <td>integer</td>
+                        <td>No</td>
+                        <td>Number of variations (1-5, default: 5)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                        <h3>Example Response</h3>
-                        <div class="code-block">{
+        <h3>Example Response</h3>
+        <pre class="code-block">{
   "variations": [
     {
-      "password": "1L0v3&H1k1ng^In+Y0s3m1t3!7",
+      "password": "1L0v3&amp;H1k1ng^In+Y0s3m1t3!7",
       "entropy": 84.3,
       "length": 27,
       "quantum_resistant": true,
@@ -518,47 +420,50 @@
       "quantum_time": "1.60 years"
     }
   ]
-}</div>
-                    </section>
+}</pre>
+    </section>
 
-                    <!-- Breach Check Endpoint -->
-                    <section id="breach-check">
-                        <h2>🔍 Breach Check API</h2>
-                        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/breach-check</code></p>
+    <!-- Breach Check Endpoint -->
+    <section id="breach-check" class="doc-section">
+        <h6>API reference</h6>
+        <h2>Breach Check API</h2>
+        <p><span class="endpoint-badge post">POST</span> <code>/api/v1/breach-check</code></p>
 
-                        <p style="margin-top: 1rem;">Check if a password appears in known data breaches using the Have I Been Pwned database with k-anonymity privacy protection.</p>
+        <p>Check if a password appears in known data breaches using the Have I Been Pwned database with k-anonymity privacy protection.</p>
 
-                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; margin: 1.5rem 0; border-radius: 0.25rem;">
-                            <strong>🔒 Privacy Protection:</strong> This endpoint uses k-anonymity - only the first 5 characters of the SHA-1 hash are sent to HIBP, ensuring 99.9875% of your password hash remains private. Neither we nor HIBP ever see the actual password.
-                        </div>
+        <div class="callout">
+            <p><strong>Privacy Protection:</strong> This endpoint uses k-anonymity - only the first 5 characters of the SHA-1 hash are sent to HIBP, ensuring 99.9875% of your password hash remains private. Neither we nor HIBP ever see the actual password.</p>
+        </div>
 
-                        <h3>Request Parameters</h3>
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Parameter</th>
-                                    <th>Type</th>
-                                    <th>Required</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>password_hash</code></td>
-                                    <td>string</td>
-                                    <td>Yes</td>
-                                    <td>SHA-1 hash of password (40 hex characters)</td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <h3>Request Parameters</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>password_hash</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>SHA-1 hash of password (40 hex characters)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                        <h3>Example Request</h3>
-                        <div class="code-block">// Hash password client-side using SHA-1
+        <h3>Example Request</h3>
+        <pre class="code-block">// Hash password client-side using SHA-1
 const encoder = new TextEncoder();
 const data = encoder.encode(password);
 const hashBuffer = await crypto.subtle.digest('SHA-1', data);
 const hashArray = Array.from(new Uint8Array(hashBuffer));
-const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+const passwordHash = hashArray.map(b =&gt; b.toString(16).padStart(2, '0')).join('');
 
 // Send to API
 const response = await fetch('https://mypasswordchecker.com/api/v1/breach-check', {
@@ -568,14 +473,14 @@ const response = await fetch('https://mypasswordchecker.com/api/v1/breach-check'
     'X-API-Key': 'YOUR_API_KEY'
   },
   body: JSON.stringify({ password_hash: passwordHash })
-});</div>
+});</pre>
 
-                        <h3>Example Response (Password Found in Breaches)</h3>
-                        <div class="code-block">{
+        <h3>Example Response (Password Found in Breaches)</h3>
+        <pre class="code-block">{
   "success": true,
   "pwned": true,
   "breach_count": 3861493,
-  "message": "⚠️ Password found in 3,861,493 data breaches. Change immediately!",
+  "message": "Password found in 3,861,493 data breaches. Change immediately!",
   "privacy_details": {
     "method": "k-anonymity",
     "prefix_sent": "5BAA6",
@@ -587,14 +492,14 @@ const response = await fetch('https://mypasswordchecker.com/api/v1/breach-check'
     "breach_checks_quota": 50,
     "breach_checks_remaining": 35
   }
-}</div>
+}</pre>
 
-                        <h3>Example Response (Password Not Found)</h3>
-                        <div class="code-block">{
+        <h3>Example Response (Password Not Found)</h3>
+        <pre class="code-block">{
   "success": true,
   "pwned": false,
   "breach_count": 0,
-  "message": "✅ Password not found in known data breaches.",
+  "message": "Password not found in known data breaches.",
   "privacy_details": {
     "method": "k-anonymity",
     "prefix_sent": "8F3A2",
@@ -606,110 +511,116 @@ const response = await fetch('https://mypasswordchecker.com/api/v1/breach-check'
     "breach_checks_quota": 50,
     "breach_checks_remaining": 34
   }
-}</div>
+}</pre>
 
-                        <h3>Response Fields</h3>
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Field</th>
-                                    <th>Type</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>pwned</code></td>
-                                    <td>boolean</td>
-                                    <td>Whether password appears in breaches</td>
-                                </tr>
-                                <tr>
-                                    <td><code>breach_count</code></td>
-                                    <td>integer</td>
-                                    <td>Number of times password found in breaches</td>
-                                </tr>
-                                <tr>
-                                    <td><code>message</code></td>
-                                    <td>string</td>
-                                    <td>User-friendly message about breach status</td>
-                                </tr>
-                                <tr>
-                                    <td><code>privacy_details</code></td>
-                                    <td>object</td>
-                                    <td>Information about k-anonymity protection used</td>
-                                </tr>
-                                <tr>
-                                    <td><code>usage</code></td>
-                                    <td>object</td>
-                                    <td>Your current breach check quota usage</td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <h3>Response Fields</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>pwned</code></td>
+                        <td>boolean</td>
+                        <td>Whether password appears in breaches</td>
+                    </tr>
+                    <tr>
+                        <td><code>breach_count</code></td>
+                        <td>integer</td>
+                        <td>Number of times password found in breaches</td>
+                    </tr>
+                    <tr>
+                        <td><code>message</code></td>
+                        <td>string</td>
+                        <td>User-friendly message about breach status</td>
+                    </tr>
+                    <tr>
+                        <td><code>privacy_details</code></td>
+                        <td>object</td>
+                        <td>Information about k-anonymity protection used</td>
+                    </tr>
+                    <tr>
+                        <td><code>usage</code></td>
+                        <td>object</td>
+                        <td>Your current breach check quota usage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                        <h3>Quota Limits by Tier</h3>
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Tier</th>
-                                    <th>Monthly Breach Checks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Free API</td>
-                                    <td>50</td>
-                                </tr>
-                                <tr>
-                                    <td>Standard</td>
-                                    <td>2,500</td>
-                                </tr>
-                                <tr>
-                                    <td>Basic Quantum</td>
-                                    <td>10,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Standard Quantum</td>
-                                    <td>25,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Large Quantum</td>
-                                    <td>50,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Super Quantum</td>
-                                    <td>200,000</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </section>
+        <h3>Quota Limits by Tier</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Monthly Breach Checks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Free API</td>
+                        <td>50</td>
+                    </tr>
+                    <tr>
+                        <td>Standard</td>
+                        <td>2,500</td>
+                    </tr>
+                    <tr>
+                        <td>Basic Quantum</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>Standard Quantum</td>
+                        <td>25,000</td>
+                    </tr>
+                    <tr>
+                        <td>Large Quantum</td>
+                        <td>50,000</td>
+                    </tr>
+                    <tr>
+                        <td>Super Quantum</td>
+                        <td>200,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-                    <!-- Best Practices -->
-                    <section id="best-practices">
-                        <h2>💡 Best Practices</h2>
+    <!-- Best Practices -->
+    <section id="best-practices" class="doc-section">
+        <h6>Guides</h6>
+        <h2>Best Practices</h2>
 
-                        <h3>Security Recommendations</h3>
-                        <ul style="line-height: 1.8;">
-                            <li><strong>Never send passwords from client-side:</strong> Always call our API from your backend to protect API keys</li>
-                            <li><strong>Use HTTPS:</strong> Our API only accepts HTTPS connections for secure data transmission</li>
-                            <li><strong>Implement rate limit handling:</strong> Check response headers and handle 429 errors gracefully</li>
-                            <li><strong>Rotate API keys:</strong> Periodically regenerate keys if you suspect compromise</li>
-                        </ul>
+        <h3>Security Recommendations</h3>
+        <ul class="doc-list">
+            <li><strong>Never send passwords from client-side:</strong> Always call our API from your backend to protect API keys</li>
+            <li><strong>Use HTTPS:</strong> Our API only accepts HTTPS connections for secure data transmission</li>
+            <li><strong>Implement rate limit handling:</strong> Check response headers and handle 429 errors gracefully</li>
+            <li><strong>Rotate API keys:</strong> Periodically regenerate keys if you suspect compromise</li>
+        </ul>
 
-                        <h3>Integration Tips</h3>
-                        <ul style="line-height: 1.8;">
-                            <li><strong>Cache responses:</strong> Password strength doesn't change; cache results for identical passwords</li>
-                            <li><strong>Set timeouts:</strong> Configure reasonable request timeouts (recommended: 5 seconds)</li>
-                            <li><strong>Monitor usage:</strong> Track your API usage in the <a href="/dashboard" style="color: var(--primary-color);">Dashboard</a></li>
-                            <li><strong>Verify domains:</strong> Add your domains in <a href="/domains" style="color: var(--primary-color);">Domain Verification</a> for fraud protection</li>
-                        </ul>
-                    </section>
+        <h3>Integration Tips</h3>
+        <ul class="doc-list">
+            <li><strong>Cache responses:</strong> Password strength doesn't change; cache results for identical passwords</li>
+            <li><strong>Set timeouts:</strong> Configure reasonable request timeouts (recommended: 5 seconds)</li>
+            <li><strong>Monitor usage:</strong> Track your API usage in the <a href="/dashboard">Dashboard</a></li>
+            <li><strong>Verify domains:</strong> Add your domains in <a href="/domains">Domain Verification</a> for fraud protection</li>
+        </ul>
+    </section>
 
-                    <!-- Code Examples -->
-                    <section id="code-examples">
-                        <h2>💻 Code Examples</h2>
+    <!-- Code Examples -->
+    <section id="code-examples" class="doc-section">
+        <h6>Guides</h6>
+        <h2>Code Examples</h2>
 
-                        <h3>JavaScript (Node.js)</h3>
-                        <div class="code-block">const response = await fetch('https://mypasswordchecker.com/api/v1/check-password', {
+        <h3>JavaScript (Node.js)</h3>
+        <pre class="code-block">const response = await fetch('https://mypasswordchecker.com/api/v1/check-password', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -720,10 +631,10 @@ const response = await fetch('https://mypasswordchecker.com/api/v1/breach-check'
 
 const data = await response.json();
 console.log('Strength:', data.strength);
-console.log('Crack time:', data.crack_time.display);</div>
+console.log('Crack time:', data.crack_time.display);</pre>
 
-                        <h3>Python</h3>
-                        <div class="code-block">import requests
+        <h3>Python</h3>
+        <pre class="code-block">import requests
 import os
 
 response = requests.post(
@@ -737,156 +648,121 @@ response = requests.post(
 
 data = response.json()
 print(f"Strength: {data['strength']}")
-print(f"Crack time: {data['crack_time']['display']}")</div>
+print(f"Crack time: {data['crack_time']['display']}")</pre>
 
-                        <h3>cURL</h3>
-                        <div class="code-block">curl -X POST https://mypasswordchecker.com/api/v1/check-password \
+        <h3>cURL</h3>
+        <pre class="code-block">curl -X POST https://mypasswordchecker.com/api/v1/check-password \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $MPC_API_KEY" \
-  -d '{"password":"MyP@ssw0rd123"}'</div>
-                    </section>
+  -d '{"password":"MyP@ssw0rd123"}'</pre>
+    </section>
 
-                    <!-- Error Handling -->
-                    <section id="error-handling">
-                        <h2>⚠️ Error Handling</h2>
-                        <p>The API uses standard HTTP status codes:</p>
+    <!-- Error Handling -->
+    <section id="error-handling" class="doc-section">
+        <h6>Guides</h6>
+        <h2>Error Handling</h2>
+        <p>The API uses standard HTTP status codes:</p>
 
-                        <table class="param-table">
-                            <thead>
-                                <tr>
-                                    <th>Status Code</th>
-                                    <th>Description</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>200</code></td>
-                                    <td>Success</td>
-                                    <td>Request processed successfully</td>
-                                </tr>
-                                <tr>
-                                    <td><code>400</code></td>
-                                    <td>Bad Request</td>
-                                    <td>Check request parameters</td>
-                                </tr>
-                                <tr>
-                                    <td><code>401</code></td>
-                                    <td>Unauthorized</td>
-                                    <td>Verify your API key is correct</td>
-                                </tr>
-                                <tr>
-                                    <td><code>403</code></td>
-                                    <td>Forbidden</td>
-                                    <td>Domain not verified or tier access denied</td>
-                                </tr>
-                                <tr>
-                                    <td><code>429</code></td>
-                                    <td>Rate Limit Exceeded</td>
-                                    <td>Wait until quota resets or upgrade plan</td>
-                                </tr>
-                                <tr>
-                                    <td><code>500</code></td>
-                                    <td>Server Error</td>
-                                    <td>Retry with exponential backoff</td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Status Code</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>200</code></td>
+                        <td>Success</td>
+                        <td>Request processed successfully</td>
+                    </tr>
+                    <tr>
+                        <td><code>400</code></td>
+                        <td>Bad Request</td>
+                        <td>Check request parameters</td>
+                    </tr>
+                    <tr>
+                        <td><code>401</code></td>
+                        <td>Unauthorized</td>
+                        <td>Verify your API key is correct</td>
+                    </tr>
+                    <tr>
+                        <td><code>403</code></td>
+                        <td>Forbidden</td>
+                        <td>Domain not verified or tier access denied</td>
+                    </tr>
+                    <tr>
+                        <td><code>429</code></td>
+                        <td>Rate Limit Exceeded</td>
+                        <td>Wait until quota resets or upgrade plan</td>
+                    </tr>
+                    <tr>
+                        <td><code>500</code></td>
+                        <td>Server Error</td>
+                        <td>Retry with exponential backoff</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                        <h3>Error Response Format</h3>
-                        <div class="code-block">{
+        <h3>Error Response Format</h3>
+        <pre class="code-block">{
   "error": "Rate limit exceeded",
   "message": "You have used all 25 requests for this month",
   "quota_reset": 1730419200
-}</div>
-                    </section>
+}</pre>
+    </section>
 
-                    <!-- Support -->
-                    <section id="support">
-                        <h2>🛟 Support</h2>
-                        <p>Need help? Here are your options:</p>
+    <!-- Support -->
+    <section id="support" class="doc-section">
+        <h6>Resources</h6>
+        <h2>Support</h2>
+        <p>Need help? Here are your options:</p>
 
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <h4>📊 Dashboard</h4>
-                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Monitor usage and manage your account in the <a href="/dashboard" style="color: var(--primary-color);">Developer Dashboard</a>
-                                </p>
-                            </div>
-                            <div class="feature-card">
-                                <h4>💰 Pricing</h4>
-                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    View plans and features on our <a href="/pricing" style="color: var(--primary-color);">Pricing page</a>
-                                </p>
-                            </div>
-                            <div class="feature-card">
-                                <h4>🔒 Security</h4>
-                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    Read our <a href="/privacy" style="color: var(--primary-color);">Privacy Policy</a> and <a href="/terms" style="color: var(--primary-color);">Terms of Service</a>
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <div class="timestamp">
-                        Last updated: June 1, 2026
-                    </div>
-                </div>
-            </div>
+        <div class="card-grid">
+            <article class="card">
+                <div class="card-title">Dashboard</div>
+                <p class="card-body">Monitor usage and manage your account in the <a href="/dashboard">Developer Dashboard</a></p>
+            </article>
+            <article class="card">
+                <div class="card-title">Pricing</div>
+                <p class="card-body">View plans and features on our <a href="/pricing">Pricing page</a></p>
+            </article>
+            <article class="card">
+                <div class="card-title">Security</div>
+                <p class="card-body">Read our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a></p>
+            </article>
         </div>
-    </main>
 
-    <!-- Page carousel (bottom) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/password-api">← Developer API</a>
-        <a class="page-nav-link" href="/pricing">Pricing →</a>
-    </nav>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>MyPasswordChecker.com</h4>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Tools</h4>
-                    <ul>
-                        <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium">Premium Tools</a></li>
-                        <li><a href="/docs">API Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms of Service</a></li>
-                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Developer</h4>
-                    <ul>
-                        <li><a href="/dashboard">Dashboard</a></li>
-                        <li><a href="/pricing">API Pricing</a></li>
-                        <li><a href="/docs">Developer Docs</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
-                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
-                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
-                    This service is also available at:
-                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
-                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
-                </p>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
-            </div>
+        <div class="timestamp text-muted">
+            Last updated: June 1, 2026
         </div>
+    </section>
+
+    <footer class="site-footer">
+        <div>
+            <strong>MyPasswordChecker.com</strong>
+            <span class="text-muted">Free password strength analysis with quantum resistance estimates. Operated by All Aligned Consulting LLC, California.</span>
+        </div>
+        <div class="footer-col"><h6>Tools</h6><a href="/">Checker</a><a href="/generate-phonetic">Phonetic generator</a><a href="/premium">Breach check</a></div>
+        <div class="footer-col"><h6>Developers</h6><a href="/docs">API docs</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+        <div class="footer-col"><h6>Legal</h6><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/disclaimer">Quantum disclaimer</a></div>
     </footer>
+
+    <div class="domains-strip">
+        <div class="hr"></div>
+        <div class="domains-row">
+            <span class="domains-kicker">Same tool, three addresses</span>
+            <a href="https://quantumpasswordchecker.com">QuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://myquantumpasswordchecker.com">MyQuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://mypasswordchecker.com">MyPasswordChecker.com</a>
+            <span class="text-muted">— typed one of the others and landed here? You are in the right place.</span>
+        </div>
+    </div>
+
+</div>
 
     <script>
         // Smooth scrolling for anchor links
@@ -899,31 +775,6 @@ print(f"Crack time: {data['crack_time']['display']}")</div>
                         behavior: 'smooth',
                         block: 'start'
                     });
-                }
-            });
-        });
-
-        // Highlight active section in sidebar
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('section[id]');
-            const scrollPosition = window.scrollY + 100;
-
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.offsetHeight;
-                const sectionId = section.getAttribute('id');
-
-                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                    document.querySelectorAll('.docs-sidebar a').forEach(link => {
-                        link.style.background = '';
-                        link.style.color = '';
-                    });
-
-                    const activeLink = document.querySelector(`.docs-sidebar a[href="#${sectionId}"]`);
-                    if (activeLink) {
-                        activeLink.style.background = 'rgba(79, 70, 229, 0.1)';
-                        activeLink.style.color = 'var(--primary-color)';
-                    }
                 }
             });
         });

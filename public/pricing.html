@@ -24,7 +24,9 @@
     <!-- SEO -->
     <meta name="robots" content="index, follow">
 
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/modernist.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128272;</text></svg>">
 
     <!-- Schema.org FAQ Structured Data -->
     <script type="application/ld+json">
@@ -75,408 +77,355 @@
       ]
     }
     </script>
+
+    <style>
+      /* Page layout — /pricing in the 1a system. Shared components come from
+         modernist.css. Colour budget: bright red appears only through
+         .btn-primary and .card-kicker. */
+      .hero { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .hero h1 { font-size: 60px; margin: 0 0 var(--space-4); max-width: 18ch; }
+      .lead { font-size: 17px; max-width: 56ch; margin: 0 0 var(--space-2); }
+
+      .section { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .section h2 { margin-bottom: var(--space-6); }
+
+      .free-grid { display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-8); align-items: start; }
+      .free-grid p { font-size: 14px; max-width: 44ch; }
+
+      .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+      .plans-grid .card-title, .free-grid .card-title { font-size: 28px; letter-spacing: -0.02em; }
+      .card-title .per { font-size: 13px; font-weight: 400; letter-spacing: 0; }
+      .plan-features { list-style: none; margin: 0; padding: 0; font-size: 13px; flex: 1; }
+      .plan-features li { padding: var(--space-1) 0; border-bottom: 1px solid var(--color-divider); }
+      .plan-features li:last-child { border-bottom: 0; }
+      .card .btn { width: 100%; justify-content: flex-start; text-align: left; margin-top: var(--space-2); }
+
+      .enterprise { grid-column: 1 / -1; }
+      .enterprise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+      .enterprise h3 { margin-bottom: var(--space-2); }
+      .enterprise .card-body { font-size: 14px; max-width: 44ch; margin-top: var(--space-3); }
+      .enterprise-note { font-size: 13px; margin: var(--space-3) 0 0; }
+
+      .table-wrap { overflow-x: auto; }
+      .table .th-price { display: block; font-weight: 400; text-transform: none; }
+
+      .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+      .faq-grid p { font-size: 14px; margin: 0; }
+
+      @media (max-width: 768px) {
+        .hero { padding: var(--space-4); }
+        .hero h1 { font-size: 40px; }
+        .section { padding: var(--space-4); }
+        .free-grid, .plans-grid, .enterprise-grid, .faq-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+        .card .btn { min-height: 44px; }
+      }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
-                <nav class="nav">
-                    <a href="/">Password Checker</a>
-                    <a href="/premium">Premium</a>
-                    <a href="/password-api">Developer API</a>
-                    <a href="/docs">Docs</a>
-                    <a href="/pricing">Pricing</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+<div class="shell">
 
-    <!-- Page carousel (top) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/docs">← Docs</a>
-        <a class="page-nav-link" href="/about">About →</a>
+    <nav class="topnav" aria-label="Main">
+        <a class="wordmark" href="/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD700" aria-hidden="true"><path d="M6 10V7a6 6 0 1 1 12 0v3h1.5v12h-15V10H6zm2.2 0h7.6V7a3.8 3.8 0 0 0-7.6 0v3z"/></svg>
+            MyPasswordChecker<span class="tld">.com</span>
+        </a>
+        <div class="topnav-links">
+            <a href="/">Checker</a>
+            <a href="/generate-phonetic">Phonetic Generator</a>
+            <a href="/premium">Breach Check</a>
+            <a href="/password-api">Developer API</a>
+            <a href="/pricing">Pricing</a>
+        </div>
     </nav>
 
-    <main>
-        <div class="container">
-            <div class="pricing-section">
-                <h1 style="text-align: center; margin-bottom: 1rem;">API Pricing</h1>
-                <p style="text-align: center; font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 0.5rem;">
-                    Simple, transparent pricing. Pay only for what you use.
-                </p>
-                <p style="text-align: center; font-size: 0.95rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 3rem;">
-                    Free web tool available - no API key needed for basic checking.
-                </p>
+    <header class="hero">
+        <div class="eyebrow">Password API · free tier to enterprise</div>
+        <h1>API Pricing</h1>
+        <p class="lead">Simple, transparent pricing. Pay only for what you use.</p>
+        <p class="lead text-muted">Free web tool available - no API key needed for basic checking.</p>
+    </header>
 
-                <!-- Premium Tools - free browser-based tools -->
-                <div style="margin-bottom: 3rem;">
-                    <div class="pricing-card featured" style="max-width: 600px; margin: 0 auto;">
-                        <div class="featured-badge" style="background: #059669;">Free for Everyone</div>
-                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Premium Tools</h3>
-                        <div style="font-size: 1.125rem; color: #059669; margin-bottom: 1rem; font-weight: 600;">Quantum analysis &bull; password generator &bull; breach check</div>
-                        <div class="price" style="color: #059669;">FREE</div>
-                        <ul class="pricing-features">
-                            <li>Quantum resistance analysis (unlimited)</li>
-                            <li>Phonetic password generator (unlimited)</li>
-                            <li>Password breach check (HIBP)</li>
-                            <li>Grover algorithm estimates</li>
-                            <li>3 quantum scenario calculations</li>
-                            <li>No sign-up &bull; runs in your browser</li>
-                        </ul>
-                        <a href="/premium" class="btn btn-primary" style="width: 100%; background: #059669;">Open Premium Tools</a>
+    <section class="section" aria-label="Free browser tools">
+        <div class="free-grid">
+            <div>
+                <h2>Browser tools</h2>
+                <p class="text-muted">Quantum resistance analysis, the phonetic password generator and breach checking are free for everyone on this site — no sign-up needed, and everything runs in your browser. Only the API has paid plans.</p>
+            </div>
+            <article class="card">
+                <div class="card-kicker">Free for everyone</div>
+                <div class="card-title">FREE</div>
+                <ul class="plan-features">
+                    <li>Quantum resistance analysis (unlimited)</li>
+                    <li>Phonetic password generator (unlimited)</li>
+                    <li>Password breach check (HIBP)</li>
+                    <li>Grover algorithm estimates</li>
+                    <li>3 quantum scenario calculations</li>
+                    <li>No sign-up &bull; runs in your browser</li>
+                </ul>
+                <a href="/premium" class="btn btn-primary">Open the free tools</a>
+            </article>
+        </div>
+    </section>
+
+    <section class="section" aria-label="API access plans">
+        <h2>API Access Plans</h2>
+        <div class="plans-grid">
+            <article class="card">
+                <div class="card-kicker">Free API</div>
+                <div class="card-title">$0 <span class="per">/forever</span></div>
+                <ul class="plan-features">
+                    <li><strong>50</strong> password checks per MONTH</li>
+                    <li>Entropy calculation</li>
+                    <li>Pattern detection</li>
+                    <li>Crack time estimates</li>
+                    <li>Overage: $0.20/request</li>
+                    <li>Community support</li>
+                </ul>
+                <a href="/dashboard" class="btn btn-primary">Get Started Free</a>
+            </article>
+
+            <article class="card">
+                <div class="card-kicker">Standard</div>
+                <div class="card-title">$2.50 <span class="per">/month</span></div>
+                <ul class="plan-features">
+                    <li><strong>12,000</strong> password checks/mo</li>
+                    <li><strong>100</strong> quantum estimates/mo</li>
+                    <li><strong>100</strong> phonetic generations/mo</li>
+                    <li>All free features</li>
+                    <li>Overage: $0.0125/request</li>
+                    <li>Email support</li>
+                    <li>99.9% uptime SLA</li>
+                </ul>
+                <a href="/dashboard" class="btn btn-primary">Upgrade to Standard</a>
+            </article>
+
+            <article class="card">
+                <div class="card-kicker">Basic Quantum — Best Value</div>
+                <div class="card-title">$5 <span class="per">/month</span></div>
+                <ul class="plan-features">
+                    <li><strong>50,000</strong> password checks/mo</li>
+                    <li><strong>1,000</strong> quantum estimates/mo</li>
+                    <li><strong>1,000</strong> phonetic generations/mo</li>
+                    <li><strong>100</strong> PQ key generations/mo</li>
+                    <li>Kyber-512 + Dilithium keys</li>
+                    <li>Domain verification</li>
+                    <li>Overage: $0.0125/request</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="/dashboard" class="btn btn-primary">Get Basic Quantum</a>
+            </article>
+
+            <article class="card">
+                <div class="card-kicker">Standard Quantum</div>
+                <div class="card-title">$20 <span class="per">/month</span></div>
+                <ul class="plan-features">
+                    <li><strong>300,000</strong> password checks/mo</li>
+                    <li><strong>10,000</strong> quantum estimates/mo</li>
+                    <li><strong>10,000</strong> phonetic generations/mo</li>
+                    <li><strong>2,000</strong> PQ key generations/mo</li>
+                    <li><strong>2,000</strong> breach checks/mo</li>
+                    <li>Post-quantum cryptography</li>
+                    <li>Domain verification + IP allowlist</li>
+                    <li>Overage: $0.0125/request</li>
+                    <li>Priority support</li>
+                    <li>99.9% uptime SLA</li>
+                </ul>
+                <a href="/dashboard" class="btn btn-primary">Get Standard Quantum</a>
+            </article>
+
+            <article class="card">
+                <div class="card-kicker">Large Quantum</div>
+                <div class="card-title">$40 <span class="per">/month</span></div>
+                <ul class="plan-features">
+                    <li><strong>800,000</strong> standard checks/mo</li>
+                    <li><strong>50,000</strong> quantum estimates/mo</li>
+                    <li><strong>50,000</strong> phonetic generations/mo</li>
+                    <li><strong>10,000</strong> breach checks/mo</li>
+                    <li>Post-quantum crypto (Kyber + Dilithium)</li>
+                    <li>Overage: $0.0100 per request</li>
+                    <li>Dedicated priority support</li>
+                    <li>99.99% uptime SLA</li>
+                </ul>
+                <a href="/dashboard" class="btn btn-primary">Get Large Quantum</a>
+            </article>
+
+            <article class="card">
+                <div class="card-kicker">XL Quantum</div>
+                <div class="card-title">$60 <span class="per">/month</span></div>
+                <ul class="plan-features">
+                    <li><strong>2,000,000</strong> standard checks/mo</li>
+                    <li><strong>200,000</strong> quantum estimates/mo</li>
+                    <li><strong>200,000</strong> phonetic generations/mo</li>
+                    <li><strong>40,000</strong> breach checks/mo</li>
+                    <li>Post-quantum crypto (Kyber + Dilithium)</li>
+                    <li>Overage: $0.0090 per request</li>
+                    <li>Priority email support</li>
+                    <li>99.99% uptime SLA</li>
+                </ul>
+                <a href="/dashboard" class="btn btn-primary">Get XL Quantum</a>
+            </article>
+
+            <article class="card enterprise">
+                <div class="enterprise-grid">
+                    <div>
+                        <div class="card-kicker">Enterprise</div>
+                        <h3>Super Quantum</h3>
+                        <div class="card-title">$99 <span class="per">/month</span></div>
+                        <p class="card-body">Ultimate tier for extreme-volume use. Perfect for enterprises processing millions of password checks daily.</p>
                     </div>
-                </div>
-
-                <!-- API Pricing Tiers -->
-                <h2 style="margin-bottom: 1.5rem;">API Access Plans</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
-                    <div class="pricing-card">
-                        <h3>Free API</h3>
-                        <div class="price">$0<span class="price-period">/forever</span></div>
-                        <ul class="pricing-features">
-                            <li><strong>50</strong> password checks per MONTH</li>
-                            <li>Entropy calculation</li>
-                            <li>Pattern detection</li>
-                            <li>Crack time estimates</li>
-                            <li>Overage: $0.20/request</li>
-                            <li>Community support</li>
-                        </ul>
-                        <a href="/dashboard" class="btn btn-secondary" style="width: 100%;">Get Started Free</a>
-                    </div>
-
-                    <div class="pricing-card">
-                        <h3>Standard</h3>
-                        <div class="price">$2.50<span class="price-period">/month</span></div>
-                        <ul class="pricing-features">
-                            <li><strong>12,000</strong> password checks/mo</li>
-                            <li><strong>100</strong> quantum estimates/mo</li>
-                            <li><strong>100</strong> phonetic generations/mo</li>
-                            <li>All free features</li>
-                            <li>Overage: $0.0125/request</li>
-                            <li>Email support</li>
-                            <li>99.9% uptime SLA</li>
-                        </ul>
-                        <a href="/dashboard" class="btn btn-primary" style="width: 100%;">Upgrade to Standard</a>
-                    </div>
-
-                    <div class="pricing-card featured">
-                        <div class="featured-badge">Best Value</div>
-                        <h3>Basic Quantum</h3>
-                        <div class="price">$5<span class="price-period">/month</span></div>
-                        <ul class="pricing-features">
-                            <li><strong>50,000</strong> password checks/mo</li>
-                            <li><strong>1,000</strong> quantum estimates/mo</li>
-                            <li><strong>1,000</strong> phonetic generations/mo</li>
-                            <li><strong>100</strong> PQ key generations/mo</li>
-                            <li>Kyber-512 + Dilithium keys</li>
-                            <li>Domain verification</li>
-                            <li>Overage: $0.0125/request</li>
-                            <li>Priority support</li>
-                        </ul>
-                        <a href="/dashboard" class="btn btn-primary" style="width: 100%;">Get Basic Quantum</a>
-                    </div>
-
-                    <div class="pricing-card">
-                        <h3>Standard Quantum</h3>
-                        <div class="price">$20<span class="price-period">/month</span></div>
-                        <ul class="pricing-features">
-                            <li><strong>300,000</strong> password checks/mo</li>
-                            <li><strong>10,000</strong> quantum estimates/mo</li>
-                            <li><strong>10,000</strong> phonetic generations/mo</li>
-                            <li><strong>2,000</strong> PQ key generations/mo</li>
-                            <li><strong>2,000</strong> breach checks/mo</li>
-                            <li>Post-quantum cryptography</li>
-                            <li>Domain verification + IP allowlist</li>
-                            <li>Overage: $0.0125/request</li>
-                            <li>Priority support</li>
-                            <li>99.9% uptime SLA</li>
-                        </ul>
-                        <a href="/dashboard" class="btn btn-primary" style="width: 100%;">Get Standard Quantum</a>
-                    </div>
-
-                    <div class="pricing-card">
-                        <h3>Large Quantum</h3>
-                        <div class="price">$40<span class="price-period">/month</span></div>
-                        <ul class="pricing-features">
-                            <li><strong>800,000</strong> standard checks/mo</li>
-                            <li><strong>50,000</strong> quantum estimates/mo</li>
-                            <li><strong>50,000</strong> phonetic generations/mo</li>
-                            <li><strong>10,000</strong> breach checks/mo</li>
+                    <div>
+                        <ul class="plan-features">
+                            <li><strong>10,000,000</strong> standard checks/month</li>
+                            <li><strong>1,000,000</strong> quantum estimates/month</li>
+                            <li><strong>1,000,000</strong> phonetic generations/month</li>
+                            <li><strong>400,000</strong> breach checks/month</li>
                             <li>Post-quantum crypto (Kyber + Dilithium)</li>
-                            <li>Overage: $0.0100 per request</li>
+                            <li>Overage: <strong>$0.0075</strong> per request</li>
                             <li>Dedicated priority support</li>
                             <li>99.99% uptime SLA</li>
                         </ul>
-                        <a href="/dashboard" class="btn btn-primary" style="width: 100%;">Get Large Quantum</a>
-                    </div>
-
-                    <div class="pricing-card">
-                        <h3>XL Quantum</h3>
-                        <div class="price">$60<span class="price-period">/month</span></div>
-                        <ul class="pricing-features">
-                            <li><strong>2,000,000</strong> standard checks/mo</li>
-                            <li><strong>200,000</strong> quantum estimates/mo</li>
-                            <li><strong>200,000</strong> phonetic generations/mo</li>
-                            <li><strong>40,000</strong> breach checks/mo</li>
-                            <li>Post-quantum crypto (Kyber + Dilithium)</li>
-                            <li>Overage: $0.0090 per request</li>
-                            <li>Priority email support</li>
-                            <li>99.99% uptime SLA</li>
-                        </ul>
-                        <a href="/dashboard" class="btn btn-primary" style="width: 100%;">Get XL Quantum</a>
+                        <a href="/dashboard" class="btn btn-primary">Get Started</a>
+                        <p class="enterprise-note text-muted">Domain verification required &bull; Setup support at <a href="mailto:enterprise@mypasswordchecker.com">enterprise@mypasswordchecker.com</a></p>
                     </div>
                 </div>
-
-                <!-- Super Quantum Enterprise Tier -->
-                <div style="margin-top: 2rem; background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%); border-radius: 0.75rem; padding: 2rem; color: white; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
-                        <div style="flex: 1; min-width: 300px;">
-                            <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem;">
-                                ENTERPRISE
-                            </div>
-                            <h3 style="font-size: 2rem; margin-bottom: 0.5rem; color: white;">Super Quantum</h3>
-                            <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem;">
-                                $99<span style="font-size: 1.25rem; font-weight: 400; opacity: 0.9;">/month</span>
-                            </div>
-                            <p style="opacity: 0.9; line-height: 1.6; margin-bottom: 1.5rem;">
-                                Ultimate tier for extreme-volume use. Perfect for enterprises processing millions of password checks daily.
-                            </p>
-                        </div>
-
-                        <div style="flex: 1; min-width: 300px;">
-                            <ul style="list-style: none; padding: 0; margin: 0 0 1.5rem 0;">
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>10,000,000</strong> standard checks/month</span>
-                                </li>
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>1,000,000</strong> quantum estimates/month</span>
-                                </li>
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>1,000,000</strong> phonetic generations/month</span>
-                                </li>
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span><strong>400,000</strong> breach checks/month</span>
-                                </li>
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span>Post-quantum crypto (Kyber + Dilithium)</span>
-                                </li>
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span>Overage: <strong>$0.0075</strong> per request</span>
-                                </li>
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span>Dedicated priority support</span>
-                                </li>
-                                <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.25rem;">✓</span>
-                                    <span>99.99% uptime SLA</span>
-                                </li>
-                            </ul>
-                            <a href="/dashboard" class="btn" style="width: 100%; background: white; color: #1e3a8a; font-weight: 700; border: none; padding: 1rem; font-size: 1.125rem; text-decoration: none; display: inline-block; text-align: center; border-radius: 0.5rem; transition: all 0.2s; margin-bottom: 0.75rem;">
-                                Get Started
-                            </a>
-                            <p style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-align: center; margin: 0;">
-                                Domain verification required • Setup support at <a href="mailto:enterprise@mypasswordchecker.com" style="color: white; text-decoration: underline;">enterprise@mypasswordchecker.com</a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comparison Table -->
-                <div style="margin-top: 2rem;">
-                    <h2 style="margin-bottom: 1.5rem; text-align: center;">Feature Comparison</h2>
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 0.5rem; font-size: 0.875rem;">
-                            <thead>
-                                <tr style="background: var(--bg-secondary);">
-                                    <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color);">Feature</th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Free</th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Standard<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$2.50/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Basic<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$5/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Std Quantum<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$20/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">Large<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$40/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color);">XL<br><span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);">$60/mo</span></th>
-                                    <th style="padding: 0.75rem; text-align: center; border: 1px solid var(--border-color); background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%); color: white;">Super<br><span style="font-size: 0.75rem; font-weight: normal; opacity: 0.9;">$99/mo</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Password Checks</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50/month</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">12K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">300K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">800K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">2M/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">10M/mo</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Quantum Estimates</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">100/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">1K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">10K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">200K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">1M/mo</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Phonetic Password Gen</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">100/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">1K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">10K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">50K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">200K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">1M/mo</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Breach Checks</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">2K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">10K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">40K/mo</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">400K/mo</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Domain Verification</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Required</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Required</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Required</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Required</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Required</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Required</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">Required + IP</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Overage Pricing</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">$0.20/req</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">$0.0125/req</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">$0.0125/req</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">$0.0125/req</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">$0.0100/req</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">$0.0090/req</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">$0.0075/req</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Uptime SLA</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">-</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">99.9%</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">99.9%</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">99.9%</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">99.99%</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">99.99%</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">99.99%</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; border: 1px solid var(--border-color);">Support</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Community</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Email</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Priority</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Priority</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Dedicated</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color);">Dedicated</td>
-                                    <td style="padding: 0.5rem; text-align: center; border: 1px solid var(--border-color); font-weight: 600;">Dedicated</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- FAQs -->
-                <div style="margin-top: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-                    <h2 style="margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
-
-                    <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem;">
-                        <h3 style="margin-bottom: 0.5rem;">How does billing work?</h3>
-                        <p style="color: var(--text-secondary);">Plans are billed monthly. Overage charges are calculated at the end of each billing cycle. You'll receive an invoice via email.</p>
-                    </div>
-
-                    <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem;">
-                        <h3 style="margin-bottom: 0.5rem;">Can I change plans?</h3>
-                        <p style="color: var(--text-secondary);">Yes! Upgrade or downgrade anytime from your dashboard. Changes take effect at the start of your next billing cycle.</p>
-                    </div>
-
-                    <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem;">
-                        <h3 style="margin-bottom: 0.5rem;">What happens if I exceed my quota?</h3>
-                        <p style="color: var(--text-secondary);">Free plan requests are blocked. Paid plans allow overage at $0.0125 per request, automatically billed at month-end.</p>
-                    </div>
-
-                    <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem;">
-                        <h3 style="margin-bottom: 0.5rem;">Do you offer refunds?</h3>
-                        <p style="color: var(--text-secondary);">We offer a 7-day money-back guarantee on your first month. Contact support for refund requests.</p>
-                    </div>
-
-                    <div style="background: white; padding: 1.5rem; border-radius: 0.5rem;">
-                        <h3 style="margin-bottom: 0.5rem;">Is there a free trial?</h3>
-                        <p style="color: var(--text-secondary);">Yes! The Free plan includes 50 requests per month forever. No credit card required to start.</p>
-                    </div>
-
-                </div>
-
-            </div>
+            </article>
         </div>
-    </main>
+    </section>
 
-    <!-- Page carousel (bottom) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/docs">← Docs</a>
-        <a class="page-nav-link" href="/about">About →</a>
-    </nav>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>MyPasswordChecker.com</h4>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Tools</h4>
-                    <ul>
-                        <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium">Premium Tools</a></li>
-                        <li><a href="/docs">API Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms of Service</a></li>
-                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Developer</h4>
-                    <ul>
-                        <li><a href="/dashboard">Dashboard</a></li>
-                        <li><a href="/pricing">API Pricing</a></li>
-                        <li><a href="/docs">Documentation</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
-                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
-                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
-                    This service is also available at:
-                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
-                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
-                </p>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
-            </div>
+    <section class="section" aria-label="Feature comparison">
+        <h2>Feature Comparison</h2>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Free</th>
+                        <th>Standard<span class="th-price">$2.50/mo</span></th>
+                        <th>Basic<span class="th-price">$5/mo</span></th>
+                        <th>Std Quantum<span class="th-price">$20/mo</span></th>
+                        <th>Large<span class="th-price">$40/mo</span></th>
+                        <th>XL<span class="th-price">$60/mo</span></th>
+                        <th>Super<span class="th-price">$99/mo</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Password Checks</td>
+                        <td>50/month</td>
+                        <td>12K/mo</td>
+                        <td>50K/mo</td>
+                        <td>300K/mo</td>
+                        <td>800K/mo</td>
+                        <td>2M/mo</td>
+                        <td><strong>10M/mo</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Quantum Estimates</td>
+                        <td>-</td>
+                        <td>100/mo</td>
+                        <td>1K/mo</td>
+                        <td>10K/mo</td>
+                        <td>50K/mo</td>
+                        <td>200K/mo</td>
+                        <td><strong>1M/mo</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Phonetic Password Gen</td>
+                        <td>-</td>
+                        <td>100/mo</td>
+                        <td>1K/mo</td>
+                        <td>10K/mo</td>
+                        <td>50K/mo</td>
+                        <td>200K/mo</td>
+                        <td><strong>1M/mo</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Breach Checks</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>2K/mo</td>
+                        <td>10K/mo</td>
+                        <td>40K/mo</td>
+                        <td><strong>400K/mo</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Domain Verification</td>
+                        <td>Required</td>
+                        <td>Required</td>
+                        <td>Required</td>
+                        <td>Required</td>
+                        <td>Required</td>
+                        <td>Required</td>
+                        <td><strong>Required + IP</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Overage Pricing</td>
+                        <td>$0.20/req</td>
+                        <td>$0.0125/req</td>
+                        <td>$0.0125/req</td>
+                        <td>$0.0125/req</td>
+                        <td>$0.0100/req</td>
+                        <td>$0.0090/req</td>
+                        <td><strong>$0.0075/req</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Uptime SLA</td>
+                        <td>-</td>
+                        <td>99.9%</td>
+                        <td>99.9%</td>
+                        <td>99.9%</td>
+                        <td>99.99%</td>
+                        <td>99.99%</td>
+                        <td><strong>99.99%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Support</td>
+                        <td>Community</td>
+                        <td>Email</td>
+                        <td>Priority</td>
+                        <td>Priority</td>
+                        <td>Dedicated</td>
+                        <td>Dedicated</td>
+                        <td><strong>Dedicated</strong></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </section>
+
+    <section class="section" aria-label="Frequently asked questions">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-grid">
+            <div><h4>How does billing work?</h4><p class="text-muted">Plans are billed monthly. Overage charges are calculated at the end of each billing cycle. You'll receive an invoice via email.</p></div>
+            <div><h4>Can I change plans?</h4><p class="text-muted">Yes! Upgrade or downgrade anytime from your dashboard. Changes take effect at the start of your next billing cycle.</p></div>
+            <div><h4>What happens if I exceed my quota?</h4><p class="text-muted">Free plan requests are blocked. Paid plans allow overage at $0.0125 per request, automatically billed at month-end.</p></div>
+            <div><h4>Do you offer refunds?</h4><p class="text-muted">We offer a 7-day money-back guarantee on your first month. Contact support for refund requests.</p></div>
+            <div><h4>Is there a free trial?</h4><p class="text-muted">Yes! The Free plan includes 50 requests per month forever. No credit card required to start.</p></div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div>
+            <strong>MyPasswordChecker.com</strong>
+            <span class="text-muted">Free password strength analysis with quantum resistance estimates. Operated by All Aligned Consulting LLC, California.</span>
+        </div>
+        <div class="footer-col"><h6>Tools</h6><a href="/">Checker</a><a href="/generate-phonetic">Phonetic generator</a><a href="/premium">Breach check</a></div>
+        <div class="footer-col"><h6>Developers</h6><a href="/docs">API docs</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+        <div class="footer-col"><h6>Legal</h6><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/disclaimer">Quantum disclaimer</a></div>
     </footer>
+
+    <div class="domains-strip">
+        <div class="hr"></div>
+        <div class="domains-row">
+            <span class="domains-kicker">Same tool, three addresses</span>
+            <a href="https://quantumpasswordchecker.com">QuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://myquantumpasswordchecker.com">MyQuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://mypasswordchecker.com">MyPasswordChecker.com</a>
+            <span class="text-muted">— typed one of the others and landed here? You are in the right place.</span>
+        </div>
+    </div>
+
+</div>
 </body>
 </html>

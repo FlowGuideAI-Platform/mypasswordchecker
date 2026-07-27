@@ -29,7 +29,7 @@
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "MyPasswordChecker Premium Tools",
+      "name": "Free Quantum Password Tools",
       "url": "https://mypasswordchecker.com/premium",
       "applicationCategory": "SecurityApplication",
       "operatingSystem": "Any (browser-based)",
@@ -48,413 +48,323 @@
     }
     </script>
 
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/modernist.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+
+    <style>
+      /* Page layout — /premium in the 1a system. Shared components (topnav,
+         cells, ad rail, footer, domains strip) come from modernist.css.
+         The ONE bright-accent field on this page is the quantum (plausible)
+         crack-time cell — the equivalent of the homepage's quantum cell. */
+      .hero { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .hero h1 { font-size: 60px; margin: 0 0 var(--space-4); max-width: 18ch; }
+      .lead { font-size: 17px; max-width: 56ch; margin: 0; }
+
+      .page-loading { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+
+      .tool { display: grid; grid-template-columns: 5fr 7fr; border-bottom: 2px solid var(--color-divider); }
+      .tool-panel { background: var(--color-surface); padding: var(--space-8); border-right: 2px solid var(--color-divider); }
+      .tool-note { padding: var(--space-8); }
+      .tool-note p { font-size: 13px; max-width: 52ch; }
+      .tool-panel .btn { justify-content: flex-start; margin-top: var(--space-4); }
+      .tool-panel .input { font-family: ui-monospace, Menlo, monospace; }
+
+      .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 2px solid var(--color-divider); }
+      .stat-grid .cell + .cell { border-left: 2px solid var(--color-divider); }
+      .stat-value {
+        font-family: var(--font-heading); font-weight: 800;
+        font-size: 48px; line-height: 1; letter-spacing: -0.03em;
+      }
+
+      .crack-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 2px solid var(--color-divider); }
+      .crack-grid .cell + .cell { border-left: 2px solid var(--color-divider); }
+      .crack-value {
+        font-family: var(--font-heading); font-weight: 800;
+        font-size: 24px; line-height: 1.15; letter-spacing: -0.02em;
+        min-height: 56px;
+      }
+      .crack-bits { font-size: 12px; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-divider); }
+      .crack-accent { background: var(--color-accent); color: var(--color-bg); }
+      .crack-accent .caption, .crack-accent .crack-bits { opacity: 0.85; }
+      .crack-accent .crack-bits { border-top-color: color-mix(in srgb, var(--color-bg) 40%, transparent); }
+
+      .explain { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .explain p { font-size: 13px; }
+      .alert { border: 1px solid var(--color-divider); background: var(--color-surface); padding: var(--space-3); font-size: 13px; margin-bottom: var(--space-3); }
+      .best-practices { background: var(--color-surface); padding: var(--space-3); font-size: 13px; }
+      .best-practices ul { margin: var(--space-2) 0 0; padding-left: var(--space-4); }
+      .best-practices li { padding: 2px 0; }
+
+      .breach-outcome { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .breach-status { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; margin-bottom: var(--space-4); }
+      .breach-figure {
+        font-family: var(--font-heading); font-weight: 800;
+        font-size: 48px; line-height: 1; letter-spacing: -0.03em; margin: var(--space-3) 0;
+      }
+      .privacy-details { background: var(--color-surface); padding: var(--space-3); font-size: 13px; max-width: 64ch; }
+      .privacy-details code { font-family: ui-monospace, Menlo, monospace; background: var(--color-neutral-300); padding: 1px 5px; }
+      .breach-problem { border: 1px solid var(--color-divider); padding: var(--space-3); font-size: 13px; margin-top: var(--space-4); }
+
+      .body-rail { display: grid; grid-template-columns: 1fr 340px; border-bottom: 2px solid var(--color-divider); }
+      .body-main { padding: var(--space-8); border-right: 2px solid var(--color-divider); }
+      .tool-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+      .tool-cards .btn { justify-content: flex-start; margin-top: var(--space-2); align-self: flex-start; }
+
+      @media (max-width: 768px) {
+        .hero { padding: var(--space-4); }
+        .hero h1 { font-size: 40px; }
+        .page-loading { padding: var(--space-4); }
+        .tool, .stat-grid, .crack-grid, .explain, .body-rail { display: block; }
+        .tool-panel { border-right: 0; border-bottom: 2px solid var(--color-divider); padding: var(--space-4); }
+        .tool-note { padding: var(--space-4); }
+        .stat-grid .cell + .cell, .crack-grid .cell + .cell { border-left: 0; border-top: 2px solid var(--color-divider); }
+        .explain { padding: var(--space-4); }
+        .explain > div + div { margin-top: var(--space-6); }
+        .breach-outcome { padding: var(--space-4); }
+        .body-main { padding: var(--space-4); border-right: 0; border-bottom: 2px solid var(--color-divider); }
+        .tool-cards { grid-template-columns: 1fr; }
+        .tool-panel .btn, .tool-panel .input { min-height: 44px; }
+      }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
-                <nav class="nav">
-                    <a href="/">Password Checker</a>
-                    <a href="/premium">Premium</a>
-                    <a href="/password-api">Developer API</a>
-                    <a href="/about">About</a>
-                    <a href="/pricing">Pricing</a>
-                </nav>
-            </div>
+<div class="shell">
+
+    <nav class="topnav" aria-label="Main">
+        <a class="wordmark" href="/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD700" aria-hidden="true"><path d="M6 10V7a6 6 0 1 1 12 0v3h1.5v12h-15V10H6zm2.2 0h7.6V7a3.8 3.8 0 0 0-7.6 0v3z"/></svg>
+            MyPasswordChecker<span class="tld">.com</span>
+        </a>
+        <div class="topnav-links">
+            <a href="/">Checker</a>
+            <a href="/generate-phonetic">Phonetic Generator</a>
+            <a href="/premium">Breach Check</a>
+            <a href="/password-api">Developer API</a>
+            <a href="/pricing">Pricing</a>
         </div>
+    </nav>
+
+    <header class="hero">
+        <div class="eyebrow">Quantum analysis · breach check — free, no sign-up</div>
+        <h1>Free quantum password tools</h1>
+        <p class="lead">The full quantum resistance analysis and an 800-million-password breach check, side by side. Both run entirely in your browser — nothing you type is transmitted or stored, and nothing here asks for an account.</p>
     </header>
 
-    <!-- Page carousel (top) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/">← Home</a>
-        <a class="page-nav-link" href="/password-api">Developer API →</a>
-    </nav>
+    <!-- Legacy verification state (paywall disabled — hidden immediately on load) -->
+    <div id="verification-loading" class="page-loading">
+        <p class="text-muted" style="margin: 0;">Loading tools…</p>
+    </div>
 
-    <main>
-        <div class="container">
-            <!-- Verification State -->
-            <div id="verification-loading" style="text-align: center; padding: 4rem 0;">
-                <div class="loading" style="width: 50px; height: 50px; border-width: 5px;"></div>
-                <p style="margin-top: 1rem; color: var(--text-secondary);">Verifying your payment...</p>
+    <!-- Legacy access gate — never shown while the paywall is disabled. -->
+    <div id="payment-required" style="display: none;">
+        <div class="page-loading">
+            <h2>Access</h2>
+            <p class="text-muted">These tools are free for everyone. If you are seeing this screen, a legacy access gate has been re-enabled.</p>
+            <div id="paypal-button-container" style="max-width: 400px;"></div>
+            <p id="payment-error" style="display: none;"></p>
+            <p style="font-size: 13px;"><a href="/">Back to the free checker</a></p>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div id="premium-content" style="display: none;">
+
+        <section class="tool" aria-label="Quantum password analysis">
+            <div class="tool-panel">
+                <label class="panel-label" for="quantum-password-input">Password for quantum analysis</label>
+                <div class="pw-row">
+                    <input
+                        class="input"
+                        type="password"
+                        id="quantum-password-input"
+                        placeholder="Type or paste it"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <button class="btn btn-secondary" type="button" id="quantum-toggle-btn" aria-label="Toggle password visibility">Show</button>
+                </div>
+                <p class="text-muted" style="font-size: 13px; margin: var(--space-3) 0 0;">Results update as you type. Analysis is synchronous and local — no request is made.</p>
             </div>
+            <div class="tool-note">
+                <h6>Quantum resistance estimate</h6>
+                <p class="text-muted">Theoretical crack-time analysis using Grover's algorithm. We apply Grover modelling (quadratic speedup) to brute-force resistance: a password with 80 bits of classical security has roughly 40 bits against a quantum adversary. Three hardware scenarios are shown, from early machines to optimistic future rates.</p>
+                <p class="text-muted"><strong>Important:</strong> large-scale quantum computers capable of password cracking do not yet exist. These are future-proofing estimates, not current threats, and we make no guarantee of accuracy in real-world quantum attack scenarios. <a href="/disclaimer">Read the full quantum disclaimer</a>.</p>
+                <p class="text-muted"><strong>Privacy:</strong> we never transmit or store your password. All analysis runs in your browser.</p>
+            </div>
+        </section>
 
-            <!-- Payment Required -->
-            <div id="payment-required" style="display: none;">
-                <div class="checker-card" style="text-align: center; padding: 3rem;">
-                    <h1>🔮 Quantum Password Analysis</h1>
-                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin: 1rem 0 2rem;">
-                        Get 24-hour unlimited access to quantum analysis + password generator for just $1.00
-                    </p>
+        <div id="quantum-results-display" style="display: none;">
+            <section class="stat-grid" aria-label="Password analysis">
+                <div class="cell">
+                    <div class="kicker">Entropy</div>
+                    <div class="stat-value" id="q-entropy">-</div>
+                    <p class="caption text-muted">Bits of randomness. Every bit doubles the attacker's work.</p>
+                </div>
+                <div class="cell">
+                    <div class="kicker">Strength score</div>
+                    <div class="stat-value" id="q-strength">-</div>
+                    <p class="caption text-muted">zxcvbn pattern-matching score, 0 to 4.</p>
+                </div>
+                <div class="cell">
+                    <div class="kicker">Length</div>
+                    <div class="stat-value" id="q-length">-</div>
+                    <p class="caption text-muted">Length beats cleverness — each character multiplies the work.</p>
+                </div>
+            </section>
 
-                    <!-- PayPal Button Container -->
-                    <div id="paypal-button-container" style="max-width: 400px; margin: 0 auto;"></div>
-                    <p id="payment-error" style="color: #dc2626; margin-top: 1rem; display: none;"></p>
-                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 1rem;">
-                        Secure payment via PayPal • No account required
-                    </p>
+            <section class="crack-grid" aria-label="Estimated crack times">
+                <div class="cell">
+                    <div class="kicker">Classical — GPU</div>
+                    <div class="crack-value" id="classical-crack-time">-</div>
+                    <p class="caption text-muted">Modern GPU at 10⁹ attempts per second.</p>
+                    <div class="crack-bits">Bits of security: <span id="classical-bits">-</span></div>
+                </div>
+                <div class="cell">
+                    <div class="kicker">Quantum — pessimistic</div>
+                    <div class="crack-value" id="quantum-pessimistic-time">-</div>
+                    <p class="caption text-muted">Early quantum hardware, 10³ Grover iterations per second.</p>
+                    <div class="crack-bits">Effective bits: <span id="quantum-pessimistic-bits">-</span></div>
+                </div>
+                <div class="cell crack-accent">
+                    <div class="kicker">Quantum — plausible</div>
+                    <div class="crack-value" id="quantum-plausible-time">-</div>
+                    <p class="caption">Near-term capability, 10⁵ Grover iterations per second. A machine this large does not exist yet.</p>
+                    <div class="crack-bits">Effective bits: <span id="quantum-plausible-bits">-</span></div>
+                </div>
+                <div class="cell">
+                    <div class="kicker">Quantum — optimistic</div>
+                    <div class="crack-value" id="quantum-optimistic-time">-</div>
+                    <p class="caption text-muted">Future high-rate machines, 10⁷ Grover iterations per second.</p>
+                    <div class="crack-bits">Effective bits: <span id="quantum-optimistic-bits">-</span></div>
+                </div>
+            </section>
 
-                    <div style="margin: 2rem 0; padding: 2rem; background: var(--bg-secondary); border-radius: 0.5rem; text-align: left;">
-                        <h3 style="margin-bottom: 1rem;">Need multiple queries? Get API access:</h3>
-                        <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem;">
-                            <li>Quantum Monthly Plan: 5,000 quantum + 25,000 standard checks/month for $40/mo</li>
-                            <li>Standard Plan: 12,000 classical checks/month for $19/mo</li>
-                            <li>Get API key for automated integration</li>
-                        </ul>
-                        <a href="/dashboard" class="btn btn-secondary">
-                            Go to Developer Dashboard
-                        </a>
-                    </div>
+            <section class="explain" aria-label="Interpretation and recommendations">
+                <div>
+                    <h4>Understanding these numbers</h4>
+                    <p class="text-muted"><strong>Classical attacks</strong> use GPUs and ASICs to try billions of passwords per second. <strong>Quantum attacks</strong> use Grover's algorithm, which provides a quadratic speedup — the square root of the search space — so 80 bits of classical security become roughly 40 bits of quantum security.</p>
+                    <p class="text-muted"><strong>Important:</strong> real-world quantum computers face significant overhead from error correction, coherence limitations and circuit depth. Memory-hard password hashing (bcrypt, Argon2) further reduces quantum advantage. Use long, random passphrases and enable MFA for best security.</p>
+                </div>
+                <div id="recommendations-section">
+                    <h4>Recommendations</h4>
+                    <div id="recommendations-content"></div>
+                </div>
+            </section>
+        </div>
 
-                    <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                        <a href="/" style="color: var(--primary-color);">← Back to free checker</a>
-                    </p>
+        <section class="tool" aria-label="Password breach check">
+            <div class="tool-panel">
+                <label class="panel-label" for="breach-password-input">Password to check for breaches</label>
+                <div class="pw-row">
+                    <input
+                        class="input"
+                        type="password"
+                        id="breach-password-input"
+                        placeholder="Enter password to check"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                </div>
+                <button class="btn btn-primary" type="button" id="check-breach-btn" onclick="checkPasswordBreach()">Check for breaches</button>
+                <div id="breach-loading" style="display: none;">
+                    <p class="text-muted" style="font-size: 13px; margin: var(--space-3) 0 0;">Checking breach database…</p>
+                </div>
+                <div id="breach-error" class="breach-problem" style="display: none;">
+                    <strong>Error:</strong> <span id="breach-error-message"></span>
                 </div>
             </div>
+            <div class="tool-note">
+                <h6>Breach check — 800M+ known passwords</h6>
+                <p class="text-muted">Checks whether this password appears in more than 800 million passwords exposed in known data breaches, via the Have I Been Pwned Pwned Passwords database. A password that has ever leaked falls to a dictionary attack in seconds, no matter how strong it looks.</p>
+                <p class="text-muted"><strong>Privacy first:</strong> the password is hashed with SHA-1 in your browser and only the first 5 characters of the hash are sent (k-anonymity), so 99.9875% of the hash never leaves this page. Neither we nor HIBP ever see the password itself.</p>
+            </div>
+        </section>
 
-            <!-- Main Content (after verification) -->
-            <div id="premium-content" style="display: none;">
-                <!-- Affiliate Links Section -->
-                <section class="affiliate-section">
-                    <div class="affiliate-title">🔒 Recommended Security Tools - Premium Partners</div>
-                    <div class="affiliate-links">
-                        <a href="https://1password.com/?utm_source=mypasswordchecker&utm_medium=referral&utm_campaign=security_tools" class="affiliate-link" target="_blank" rel="noopener">1Password Premium</a>
-                        <a href="https://www.keepersecurity.com/?utm_source=mypasswordchecker&utm_medium=referral&utm_campaign=security_tools" class="affiliate-link" target="_blank" rel="noopener">Keeper Security</a>
-                        <a href="https://refer-nordvpn.com/IJNclnIXLoD" class="affiliate-link" target="_blank" rel="noopener">NordVPN</a>
-                        <a href="https://www.kqzyfj.com/click-101572704-12217359" class="affiliate-link" target="_blank" rel="noopener sponsored">Malwarebytes 25% off</a>
-                        <a href="https://www.anrdoezrs.net/click-101572704-15845334" class="affiliate-link" target="_blank" rel="noopener sponsored">PCmatic VPN</a>
-                        <a href="https://lifelock.norton.com/?utm_source=mypasswordchecker&utm_medium=referral&utm_campaign=security_tools" class="affiliate-link" target="_blank" rel="noopener">LifeLock Identity Protection</a>
-                    </div>
-                </section>
-
-                <div class="quantum-results">
-                    <h2 style="text-align: center; margin-bottom: 0.5rem;">🔮 Quantum Resistance Estimate</h2>
-                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
-                        Theoretical crack time analysis using Grover's algorithm
-                    </p>
-
-                    <!-- Disclaimer -->
-                    <div class="quantum-disclaimer">
-                        <strong>⚠️ Important Disclaimer:</strong> These quantum estimates are theoretical and educational only.
-                        <strong>Large-scale quantum computers capable of password cracking do not yet exist.</strong>
-                        These are future-proofing estimates, not current threats.
-                        <br><br>
-                        We apply Grover's algorithm modeling (quadratic speedup) to brute-force resistance calculations.
-                        <strong>We make no guarantee of accuracy in real-world quantum attack scenarios.</strong>
-                        Actual quantum cracking capabilities depend on hardware availability, error correction,
-                        coherence time, qubit count, and many other factors that remain uncertain.
-                        This is a theoretical model for educational and planning purposes.
-                        <br><br>
-                        <strong>🔒 Privacy Note:</strong> We never transmit or store your password. All analysis runs in your browser.
-                    </div>
-
-                    <!-- Password Input -->
-                    <div class="checker-card">
-                        <div class="input-group">
-                            <label for="quantum-password-input">Enter Password for Quantum Analysis</label>
-                            <div class="password-input-wrapper">
-                                <input
-                                    type="password"
-                                    id="quantum-password-input"
-                                    class="password-input"
-                                    placeholder="Type your password here..."
-                                    autocomplete="off"
-                                    spellcheck="false"
-                                >
-                                <button type="button" class="toggle-visibility" id="quantum-toggle-btn" aria-label="Toggle password visibility">
-                                    👁️
-                                </button>
-                            </div>
-                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                💡 You can test the same password or try a different one
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Results -->
-                    <div id="quantum-results-display" style="display: none;">
-                        <!-- Classical Results -->
-                        <div class="result-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; margin-bottom: 2rem;">
-                            <h2 style="color: white; margin-bottom: 1rem;">📊 Password Analysis</h2>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-                                <div>
-                                    <div style="font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;" id="q-entropy">-</div>
-                                    <div style="opacity: 0.9;">Entropy (bits)</div>
-                                    <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 0.25rem; font-style: italic;">Randomness measure: each bit doubles difficulty</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;" id="q-strength">-</div>
-                                    <div style="opacity: 0.9;">Strength Score</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;" id="q-length">-</div>
-                                    <div style="opacity: 0.9;">Length</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Classical vs Quantum Comparison -->
-                        <h2 style="margin-bottom: 1rem;">⏱️ Estimated Crack Times</h2>
-
-                        <div class="results-grid">
-                            <!-- Classical -->
-                            <div class="result-card">
-                                <h3>🖥️ Classical Computing</h3>
-                                <div class="result-value" id="classical-crack-time">-</div>
-                                <div class="result-label">Using modern GPU (10⁹ attempts/sec)</div>
-                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.875rem;">
-                                    <strong>Bits of Security:</strong> <span id="classical-bits">-</span>
-                                </div>
-                            </div>
-
-                            <!-- Quantum - Pessimistic -->
-                            <div class="result-card" style="border: 2px solid #dc2626;">
-                                <h3>⚛️ Quantum (Pessimistic)</h3>
-                                <div class="result-value" style="color: #dc2626;" id="quantum-pessimistic-time">-</div>
-                                <div class="result-label">Early quantum hardware (10³ Grover iter/sec)</div>
-                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.875rem;">
-                                    <strong>Effective Bits:</strong> <span id="quantum-pessimistic-bits">-</span>
-                                </div>
-                            </div>
-
-                            <!-- Quantum - Plausible -->
-                            <div class="result-card" style="border: 2px solid #f59e0b;">
-                                <h3>⚛️ Quantum (Plausible)</h3>
-                                <div class="result-value" style="color: #f59e0b;" id="quantum-plausible-time">-</div>
-                                <div class="result-label">Near-term capability (10⁵ Grover iter/sec)</div>
-                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.875rem;">
-                                    <strong>Effective Bits:</strong> <span id="quantum-plausible-bits">-</span>
-                                </div>
-                            </div>
-
-                            <!-- Quantum - Optimistic -->
-                            <div class="result-card" style="border: 2px solid #7c3aed;">
-                                <h3>⚛️ Quantum (Optimistic)</h3>
-                                <div class="result-value" style="color: #7c3aed;" id="quantum-optimistic-time">-</div>
-                                <div class="result-label">Future high-rate (10⁷ Grover iter/sec)</div>
-                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.875rem;">
-                                    <strong>Effective Bits:</strong> <span id="quantum-optimistic-bits">-</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Explanation -->
-                        <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 1.5rem; border-radius: 0.5rem; margin-top: 2rem;">
-                            <h3 style="color: #0c4a6e; margin-bottom: 0.5rem;">📚 Understanding These Numbers</h3>
-                            <p style="font-size: 0.9rem; color: #075985; line-height: 1.6;">
-                                <strong>Classical attacks</strong> use GPUs/ASICs to try billions of passwords per second.
-                                <strong>Quantum attacks</strong> use Grover's algorithm, which provides a quadratic speedup (square root of search space).
-                                This means a password with 80 bits of classical security has approximately 40 bits of quantum security.
-                            </p>
-                            <p style="font-size: 0.9rem; color: #075985; line-height: 1.6; margin-top: 0.75rem;">
-                                <strong>Important:</strong> Real-world quantum computers face significant overhead from error correction,
-                                coherence limitations, and circuit depth. Memory-hard password hashing (bcrypt, Argon2) further reduces
-                                quantum advantage. <strong>Use long, random passphrases and enable MFA for best security.</strong>
-                            </p>
-                        </div>
-
-                        <!-- Recommendations -->
-                        <div id="recommendations-section" style="margin-top: 2rem;">
-                            <h3 style="margin-bottom: 1rem;">💡 Recommendations</h3>
-                            <div id="recommendations-content"></div>
-                        </div>
-                    </div>
-
-                    <!-- Phonetic Password Generator (Included in $1 Purchase) -->
-                    <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #10b981, #059669); border-radius: 0.75rem; color: white;">
-                        <h2 style="color: white; margin-bottom: 0.5rem;">✨ Phonetic Password Generator</h2>
-                        <p style="opacity: 0.9; margin-bottom: 1.5rem;">
-                            Turn memorable phrases into quantum-resistant passwords — free for everyone.
-                        </p>
-
-                        <!-- Phrase Input -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">
-                                Enter a Memorable Phrase
-                            </label>
-                            <textarea
-                                id="phonetic-phrase-input"
-                                style="width: 100%; padding: 1rem; border: 2px solid rgba(255,255,255,0.3); border-radius: 0.5rem; font-size: 1rem; background: rgba(255,255,255,0.95); color: var(--text-primary); resize: vertical; min-height: 80px;"
-                                placeholder="e.g., 'mission to mars' or 'I love hiking in Yosemite'"
-                                rows="2"
-                            ></textarea>
-                        </div>
-
-                        <!-- Memorability Slider -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
-                                <span>Memorability vs Strength</span>
-                                <span id="phonetic-slider-value">Medium</span>
-                            </div>
-                            <input
-                                type="range"
-                                min="1"
-                                max="5"
-                                value="3"
-                                id="phonetic-slider"
-                                style="width: 100%; height: 8px; border-radius: 4px; background: linear-gradient(to right, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.5) 40%, rgba(153,246,228,0.8) 50%, rgba(16,185,129,0.9) 100%);"
-                            >
-                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.9; margin-top: 0.25rem;">
-                                <span>← Easy to Remember</span>
-                                <span style="color: #10b981; font-weight: 600;">⚛️ Quantum Resistant →</span>
-                            </div>
-                            <div style="font-size: 0.875rem; opacity: 0.9; margin-top: 0.5rem;" id="phonetic-slider-hint">
-                                Balanced mix of original characters and creative substitutions
-                            </div>
-                        </div>
-
-                        <button
-                            class="btn"
-                            id="generate-phonetic-btn"
-                            onclick="generatePhoneticPasswords()"
-                            style="background: white; color: #059669; font-weight: 600; width: 100%;"
-                        >
-                            Generate Quantum-Resistant Passwords
-                        </button>
-
-                        <!-- Loading -->
-                        <div id="phonetic-loading" style="display: none; text-align: center; margin-top: 1.5rem;">
-                            <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                            <p style="margin-top: 0.5rem;">Generating...</p>
-                        </div>
-
-                        <!-- Results -->
-                        <div id="phonetic-results" style="display: none; margin-top: 2rem;">
-                            <h3 style="color: white; margin-bottom: 1rem;">Generated Passwords:</h3>
-                            <div id="phonetic-variations" style="display: grid; gap: 1rem;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Breach Check (Included in $1 Purchase) -->
-                    <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 0.75rem; color: white;">
-                        <h2 style="color: white; margin-bottom: 0.5rem;">🔍 Password Breach Check</h2>
-                        <p style="opacity: 0.9; margin-bottom: 1.5rem;">
-                            Check if your password appears in 800+ million known data breaches using Have I Been Pwned — free for everyone.
-                        </p>
-
-                        <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border-left: 4px solid rgba(255,255,255,0.5);">
-                            <strong>🔒 Privacy First:</strong> Your password is hashed using SHA-1 in your browser. Only the first 5 characters of the hash are sent (k-anonymity model), ensuring 99.9875% of your password hash remains completely private. Neither we nor HIBP ever see your actual password.
-                        </div>
-
-                        <!-- Password Input -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
-                                Password to Check
-                            </label>
-                            <input
-                                type="password"
-                                id="breach-password-input"
-                                style="width: 100%; padding: 1rem; border: 2px solid rgba(255,255,255,0.3); border-radius: 0.5rem; font-size: 1rem; background: rgba(255,255,255,0.95); color: var(--text-primary);"
-                                placeholder="Enter password to check for breaches"
-                            >
-                        </div>
-
-                        <button
-                            class="btn"
-                            id="check-breach-btn"
-                            onclick="checkPasswordBreach()"
-                            style="background: white; color: #d97706; font-weight: 600; width: 100%;"
-                        >
-                            🔍 Check for Breaches
-                        </button>
-
-                        <!-- Loading -->
-                        <div id="breach-loading" style="display: none; text-align: center; margin-top: 1.5rem;">
-                            <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                            <p style="margin-top: 0.5rem;">Checking breach database...</p>
-                        </div>
-
-                        <!-- Results -->
-                        <div id="breach-results" style="display: none; margin-top: 2rem;">
-                            <div id="breach-status-card" style="background: rgba(255,255,255,0.95); padding: 2rem; border-radius: 0.75rem; text-align: center;">
-                                <div id="breach-icon" style="font-size: 4rem; margin-bottom: 1rem;"></div>
-                                <h3 id="breach-title" style="margin-bottom: 0.5rem; color: var(--text-primary);"></h3>
-                                <p id="breach-message" style="color: var(--text-secondary); font-size: 1.125rem; margin-bottom: 1.5rem;"></p>
-                                <div id="breach-count" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;"></div>
-                                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 0.5rem; text-align: left; font-size: 0.875rem; color: var(--text-secondary);">
-                                    <strong style="color: var(--text-primary);">Privacy Details:</strong><br>
-                                    Method: <span id="breach-privacy-method"></span><br>
-                                    Hash prefix sent: <code id="breach-privacy-prefix" style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;"></code><br>
-                                    Anonymity set: <span id="breach-privacy-set"></span> possible passwords<br>
-                                    Data shared: <span id="breach-privacy-shared"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Error -->
-                        <div id="breach-error" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(220,38,38,0.2); border: 2px solid rgba(220,38,38,0.4); border-radius: 0.5rem; color: white;">
-                            <strong>Error:</strong> <span id="breach-error-message"></span>
-                        </div>
-                    </div>
+        <div id="breach-results" style="display: none;">
+            <section class="breach-outcome" aria-label="Breach check result" id="breach-status-card">
+                <div class="breach-status" id="breach-icon"></div>
+                <h3 id="breach-title"></h3>
+                <p id="breach-message" class="text-muted" style="max-width: 56ch;"></p>
+                <div class="breach-figure" id="breach-count"></div>
+                <div class="privacy-details">
+                    <strong>Privacy details</strong><br>
+                    Method: <span id="breach-privacy-method"></span><br>
+                    Hash prefix sent: <code id="breach-privacy-prefix"></code><br>
+                    Anonymity set: <span id="breach-privacy-set"></span> possible passwords<br>
+                    Data shared: <span id="breach-privacy-shared"></span>
                 </div>
+            </section>
+        </div>
 
-                <!-- Premium Ad Section - Rotating combo banner (ForgeMCP + FlowGuideAI) -->
-                <section class="ad-section">
-                    <iframe src="/ads/rotating-combo-ad.html" width="100%" height="120" frameborder="0" scrolling="no" style="display:block;border:none" title="Sponsored — ForgeMCP and FlowGuideAI" loading="lazy"></iframe>
-                </section>
+    </div><!-- /premium-content -->
+
+    <section class="body-rail">
+        <div class="body-main">
+            <h2>More free tools</h2>
+            <div class="tool-cards">
+                <div class="card">
+                    <div class="card-kicker">Generator</div>
+                    <div class="card-title">Phonetic passphrase generator</div>
+                    <p class="card-body">Turn a phrase you can actually say into a password worth keeping — five variations, each scored for classical and quantum crack time.</p>
+                    <a class="btn btn-secondary" href="/generate-phonetic">Open the generator</a>
+                </div>
+                <div class="card">
+                    <div class="card-kicker">Attack model</div>
+                    <div class="card-title">Password cracker test</div>
+                    <p class="card-body">Dictionary, brute force, rainbow tables and quantum — see how long your password survives each attack, with the assumptions printed.</p>
+                    <a class="btn btn-secondary" href="/password-cracker-test">Run the cracker test</a>
+                </div>
+                <div class="card">
+                    <div class="card-kicker">Developers</div>
+                    <div class="card-title">Password strength API</div>
+                    <p class="card-body">The same entropy, GPU and Grover figures these tools compute, returned from one POST. The only paid product on this site.</p>
+                    <a class="btn btn-secondary" href="/password-api">Read the API docs</a>
+                </div>
             </div>
         </div>
-    </main>
-
-    <!-- Page carousel (bottom) -->
-    <nav class="page-nav" aria-label="Page navigation">
-        <a class="page-nav-link" href="/">← Home</a>
-        <a class="page-nav-link" href="/password-api">Developer API →</a>
-    </nav>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>MyPasswordChecker.com</h4>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Tools</h4>
-                    <ul>
-                        <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium">Premium Tools</a></li>
-                        <li><a href="/docs">API Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms of Service</a></li>
-                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Developer</h4>
-                    <ul>
-                        <li><a href="/dashboard">Dashboard</a></li>
-                        <li><a href="/pricing">API Pricing</a></li>
-                        <li><a href="/docs">Documentation</a></li>
-                    </ul>
-                </div>
+        <aside class="ad-rail" aria-label="More tools we build">
+            <h6>More tools we build</h6>
+            <div class="ad-slot" data-slot="a">
+                <div class="ad-creative"><iframe src="/ads/forgemcp-300x250" title="ForgeMCP — Engineering MCP servers" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/flowguideai-300x250" title="FlowGuideAI — AI documentation generator" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/suggestibility-300x250" title="suggestibility.ai — AI expert review board" scrolling="no" loading="lazy"></iframe></div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
-                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
-                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
-                    This service is also available at:
-                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
-                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
-                </p>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
-            </div>
+            <!-- Slot B is cloned from slot A at init — single roster source. -->
+            <div class="ad-slot" data-slot="b"></div>
+        </aside>
+    </section>
+
+    <footer class="site-footer">
+        <div>
+            <strong>MyPasswordChecker.com</strong>
+            <span class="text-muted">Free password strength analysis with quantum resistance estimates. Operated by All Aligned Consulting LLC, California.</span>
         </div>
+        <div class="footer-col"><h6>Tools</h6><a href="/">Checker</a><a href="/generate-phonetic">Phonetic generator</a><a href="/premium">Breach check</a></div>
+        <div class="footer-col"><h6>Developers</h6><a href="/docs">API docs</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+        <div class="footer-col"><h6>Legal</h6><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/disclaimer">Quantum disclaimer</a></div>
     </footer>
 
+    <div class="domains-strip">
+        <div class="hr"></div>
+        <div class="domains-row">
+            <span class="domains-kicker">Same tool, three addresses</span>
+            <a href="https://quantumpasswordchecker.com">QuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://myquantumpasswordchecker.com">MyQuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://mypasswordchecker.com">MyPasswordChecker.com</a>
+            <span class="text-muted">— typed one of the others and landed here? You are in the right place.</span>
+        </div>
+    </div>
+
+</div>
+
+    <script src="/js/ad-tracking.js"></script>
+    <script src="/js/ad-rotation.js"></script>
+    <script>initAdRail();</script>
     <script src="/js/vendor/zxcvbn-4.4.2.js"></script>
     <script src="/js/quantum-estimator.js?v=3"></script>
-    <script src="/js/phonetic-generator.js?v=8"></script>
-    <script src="/js/ads-config.js?v=4"></script>
-    <script src="/js/ad-tracking.js"></script>
     <script>
         // Get session_id from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -467,7 +377,7 @@
         // Verify payment
         async function verifyPayment() {
             // ── PAYWALL DISABLED ──────────────────────────────────────
-            // Premium tools are free for all users. To restore the gate:
+            // These tools are free for all users. To restore the gate:
             // delete the 3 lines below and un-comment the original logic.
             verificationLoading.style.display = 'none';
             premiumContent.style.display = 'block';
@@ -498,8 +408,8 @@
                     // Show expiration warning if < 2 hours
                     if (hoursRemaining <= 2) {
                         const banner = document.createElement('div');
-                        banner.style.cssText = 'background: #fef3c7; border: 2px solid #f59e0b; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; text-align: center;';
-                        banner.textContent = `⏰ Your access expires in ${hoursRemaining} hour${hoursRemaining !== 1 ? 's' : ''}`;
+                        banner.style.cssText = 'border: 2px solid var(--color-divider); padding: 1rem; margin-bottom: 1rem; text-align: left;';
+                        banner.textContent = `Your access expires in ${hoursRemaining} hour${hoursRemaining !== 1 ? 's' : ''}`;
                         premiumContent.insertBefore(banner, premiumContent.firstChild);
                     }
 
@@ -536,8 +446,8 @@
                     // Show expiration info if approaching end
                     if (data.expires_in_hours <= 2) {
                         const banner = document.createElement('div');
-                        banner.style.cssText = 'background: #fef3c7; border: 2px solid #f59e0b; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; text-align: center;';
-                        banner.textContent = `⏰ Your access expires in ${data.expires_in_hours} hour${data.expires_in_hours !== 1 ? 's' : ''}`;
+                        banner.style.cssText = 'border: 2px solid var(--color-divider); padding: 1rem; margin-bottom: 1rem; text-align: left;';
+                        banner.textContent = `Your access expires in ${data.expires_in_hours} hour${data.expires_in_hours !== 1 ? 's' : ''}`;
                         premiumContent.insertBefore(banner, premiumContent.firstChild);
                     }
 
@@ -572,7 +482,7 @@
         }
 
         // ============================================================================
-        // PAYPAL INTEGRATION
+        // PAYPAL INTEGRATION (legacy purchase flow — inert while the gate is off)
         // ============================================================================
 
         // Load PayPal SDK
@@ -629,7 +539,7 @@
                             localStorage.setItem('premium_session', verifyData.session_token);
                             localStorage.setItem('premium_expires', verifyData.expires_at);
 
-                            // Reload page to show premium content
+                            // Reload page to show content
                             window.location.href = '/premium?paypal_success=true';
                         } else {
                             throw new Error(verifyData.error || 'Payment verification failed');
@@ -678,7 +588,7 @@
         toggleBtn.addEventListener('click', () => {
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
-            toggleBtn.textContent = type === 'password' ? '👁️' : '🙈';
+            toggleBtn.textContent = type === 'password' ? 'Show' : 'Hide';
         });
 
         let lastTrackedPassword = '';
@@ -705,7 +615,9 @@
             document.getElementById('q-strength').textContent = result.zxcvbn.score + '/4';
             document.getElementById('q-length').textContent = result.passwordLength + ' chars';
 
-            // Display classical time with technical notation if available
+            // Display classical time with technical notation if available.
+            // (innerHTML here renders model-generated labels from quantum-estimator.js,
+            // never raw user input — same behavior as the original page.)
             const classicalTime = result.classical.human.label;
             const classicalTech = result.classical.human.technical;
             document.getElementById('classical-crack-time').innerHTML = classicalTech
@@ -735,22 +647,22 @@
                 : optimisticTime;
             document.getElementById('quantum-optimistic-bits').textContent = result.quantum.optimistic.bitsOfSecurity.toFixed(1) + ' bits';
 
-            // Generate recommendations
+            // Generate recommendations (static strings — no user input interpolated)
             let recommendations = '';
             if (result.quantum.optimistic.bitsOfSecurity < 32) {
-                recommendations += '<div class="alert alert-error">❌ <strong>Critical:</strong> This password is vulnerable even to optimistic quantum attacks. Use a much longer password or passphrase.</div>';
+                recommendations += '<div class="alert alert-error"><strong>Critical:</strong> This password is vulnerable even to optimistic quantum attacks. Use a much longer password or passphrase.</div>';
             } else if (result.quantum.plausible.bitsOfSecurity < 40) {
-                recommendations += '<div class="alert alert-warning">⚠️ <strong>Warning:</strong> This password may be vulnerable to near-term quantum computers. Consider using a longer password.</div>';
+                recommendations += '<div class="alert alert-warning"><strong>Warning:</strong> This password may be vulnerable to near-term quantum computers. Consider using a longer password.</div>';
             } else if (result.quantum.pessimistic.bitsOfSecurity >= 50) {
-                recommendations += '<div class="alert alert-success">✅ <strong>Excellent:</strong> This password has strong quantum resistance across all scenarios.</div>';
+                recommendations += '<div class="alert alert-success"><strong>Excellent:</strong> This password has strong quantum resistance across all scenarios.</div>';
             } else {
-                recommendations += '<div class="alert alert-info">ℹ️ <strong>Good:</strong> This password shows reasonable quantum resistance, but longer is always better.</div>';
+                recommendations += '<div class="alert alert-info"><strong>Good:</strong> This password shows reasonable quantum resistance, but longer is always better.</div>';
             }
 
             recommendations += `
-                <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 0.5rem;">
-                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>Best Practices:</strong></p>
-                    <ul style="margin-left: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
+                <div class="best-practices">
+                    <strong>Best practices</strong>
+                    <ul>
                         <li>Use a password manager to generate and store complex passwords</li>
                         <li>Enable multi-factor authentication (MFA) wherever possible</li>
                         <li>Use passphrases: 4-5 random words are easier to remember and very strong</li>
@@ -762,172 +674,6 @@
 
             document.getElementById('recommendations-content').innerHTML = recommendations;
         });
-
-        // Phonetic Generator - Slider handling
-        const phoneticSlider = document.getElementById('phonetic-slider');
-        const phoneticSliderValue = document.getElementById('phonetic-slider-value');
-        const phoneticSliderHint = document.getElementById('phonetic-slider-hint');
-
-        const phoneticSliderLabels = {
-            1: {
-                label: 'Very Easy',
-                hint: '⚠️ NOT likely quantum resistant - Simple substitutions with spaces (e.g., "! LoV3 c0ff33 @ Sunr!s3"). Very memorable.',
-                value: 'very-low'
-            },
-            2: {
-                label: 'Easy',
-                hint: '⚠️ NOT likely quantum resistant - More substitutions, first-letter caps, hyphens/underscores (e.g., "L0v3-C0ff33-Sunr!s3"). Still memorable.',
-                value: 'low'
-            },
-            3: {
-                label: 'Medium',
-                hint: '⚛️ Likely quantum resistant begins - Full substitutions, camelCase/bookend caps, special separators (e.g., "l0v3^C0ff33^SunriS3"). Balanced.',
-                value: 'medium'
-            },
-            4: {
-                label: 'Strong',
-                hint: '⚛️ Likely quantum resistant - Aggressive substitutions, random/alternate caps, complex separators (e.g., "L0V3*c0Ff33*sUnR!S3"). Strong.',
-                value: 'high'
-            },
-            5: {
-                label: 'Maximum',
-                hint: '⚛️ Maximum - NATO Phonetic Alphabet conversion (e.g., "Ind14-L0v3-C0ff33-@t-Sunr1s3"). Quantum resistant.',
-                value: 'very-high'
-            }
-        };
-
-        phoneticSlider.addEventListener('input', (e) => {
-            const level = parseInt(e.target.value);
-            phoneticSliderValue.textContent = phoneticSliderLabels[level].label;
-            phoneticSliderHint.textContent = phoneticSliderLabels[level].hint;
-
-            // Update button text based on quantum resistance threshold
-            const generateBtn = document.getElementById('generate-phonetic-btn');
-            if (level <= 2) {
-                // Levels 1-2: NOT likely quantum resistant
-                generateBtn.textContent = 'Generate Strong Password';
-            } else {
-                // Levels 3-5: Likely quantum resistant
-                generateBtn.textContent = 'Generate Quantum-Resistant Password';
-            }
-        });
-
-        // Set initial button text based on default slider value (3)
-        const initialLevel = parseInt(phoneticSlider.value);
-        const generateBtn = document.getElementById('generate-phonetic-btn');
-        if (initialLevel <= 2) {
-            generateBtn.textContent = 'Generate Strong Password';
-        } else {
-            generateBtn.textContent = 'Generate Quantum-Resistant Password';
-        }
-
-        // Phonetic Password Generation (Client-side only, no API call needed - already paid!)
-        function generatePhoneticPasswords() {
-            const phrase = document.getElementById('phonetic-phrase-input').value.trim();
-            const aggressiveness = phoneticSliderLabels[phoneticSlider.value].value;
-
-            if (!phrase) {
-                alert('Please enter a memorable phrase');
-                return;
-            }
-
-            if (phrase.length < 10) {
-                alert('Please enter a phrase with at least 10 characters for better security');
-                return;
-            }
-
-            // Track usage
-            trackUsage('phonetic_generation');
-
-            // Show loading
-            document.getElementById('phonetic-loading').style.display = 'block';
-            document.getElementById('phonetic-results').style.display = 'none';
-            document.getElementById('generate-phonetic-btn').disabled = true;
-
-            // Generate client-side (no API call - user already paid $1!)
-            setTimeout(() => {
-                try {
-                    const variations = PhoneticGenerator.generateMultiple(phrase, 5, {
-                        aggressiveness
-                    });
-
-                    displayPhoneticResults(variations);
-                } catch (error) {
-                    console.error('Generation error:', error);
-                    alert(`Failed to generate passwords: ${error.message}\n\nPlease check console for details.`);
-                } finally {
-                    document.getElementById('phonetic-loading').style.display = 'none';
-                    document.getElementById('generate-phonetic-btn').disabled = false;
-                }
-            }, 100);
-        }
-
-        function displayPhoneticResults(variations) {
-            const container = document.getElementById('phonetic-variations');
-            container.innerHTML = '';
-
-            variations.forEach((v, index) => {
-                const div = document.createElement('div');
-                div.style.cssText = 'background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 0.5rem; color: var(--text-primary);';
-                div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                        <div>
-                            <strong>Variation ${index + 1}</strong>
-                            <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem; ${v.quantumResistant ? 'background: #d1fae5; color: #065f46;' : 'background: #fee2e2; color: #991b1b;'}">
-                                ${v.quantumResistant ? '✅ Quantum Resistant' : '⚠️ Not Quantum Resistant'}
-                            </span>
-                        </div>
-                        <button
-                            onclick="copyPhoneticPassword(this, '${v.password.replace(/'/g, "\\'")}')"
-                            style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600;"
-                        >
-                            Copy
-                        </button>
-                    </div>
-
-                    <div style="font-family: 'Courier New', monospace; font-size: 1.125rem; font-weight: bold; word-break: break-all; margin-bottom: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.375rem;">
-                        ${v.password}
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; font-size: 0.875rem;">
-                        <div>
-                            <div style="color: var(--text-secondary); font-weight: 600;">Length</div>
-                            <div style="font-weight: bold;">${v.length} chars</div>
-                        </div>
-                        <div>
-                            <div style="color: var(--text-secondary); font-weight: 600;">Entropy</div>
-                            <div style="font-weight: bold;">${v.entropy.toFixed(1)} bits</div>
-                        </div>
-                        <div>
-                            <div style="color: var(--text-secondary); font-weight: 600;">Classical</div>
-                            <div style="font-weight: bold;">${v.classical.human.label}</div>
-                        </div>
-                        <div>
-                            <div style="color: var(--text-secondary); font-weight: 600;">Quantum</div>
-                            <div style="font-weight: bold;">${v.quantum.plausible.human.label}</div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-
-            document.getElementById('phonetic-results').style.display = 'block';
-        }
-
-        function copyPhoneticPassword(button, password) {
-            navigator.clipboard.writeText(password).then(() => {
-                const originalText = button.textContent;
-                button.textContent = 'Copied!';
-                button.style.background = '#10b981';
-
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = 'var(--primary-color)';
-                }, 2000);
-            }).catch(err => {
-                alert('Failed to copy. Please select and copy manually.');
-            });
-        }
 
         // Breach Check Function
         async function checkPasswordBreach() {
@@ -1003,19 +749,15 @@
             const count = document.getElementById('breach-count');
 
             if (isPwned) {
-                icon.textContent = '⚠️';
+                icon.textContent = 'Exposed';
                 title.textContent = 'Password Found in Breaches';
-                title.style.color = '#dc2626';
                 message.textContent = 'This password has been exposed in data breaches and should be changed immediately.';
                 count.textContent = `${breachCount.toLocaleString()} breaches`;
-                count.style.color = '#dc2626';
             } else {
-                icon.textContent = '✅';
+                icon.textContent = 'Clear';
                 title.textContent = 'Password Not Found';
-                title.style.color = '#10b981';
                 message.textContent = 'Good news! This password does not appear in any known data breaches.';
-                count.textContent = 'Safe';
-                count.style.color = '#10b981';
+                count.textContent = 'Not in any known breach';
             }
 
             // Privacy details
