@@ -405,3 +405,10 @@ const PhoneticGenerator = (() => {
 if (typeof window !== 'undefined') {
   window.PhoneticGenerator = PhoneticGenerator;
 }
+
+// CommonJS export so the Cloudflare Worker can bundle the SAME generator the
+// browser runs (workers/lib/v1-api.js imports it). `module` is undefined in a
+// classic <script>, so this is inert in the browser.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { PhoneticGenerator };
+}

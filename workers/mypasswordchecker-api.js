@@ -17,6 +17,14 @@
 //   GET  /api/verify-session           - Verify premium session
 //   GET  /api/verify-api-key           - Verify API key & quota
 //   POST /api/track-usage              - Track feature usage
+//
+// PUBLIC v1 API (workers/lib/v1-api.js) — key auth + domain/IP + quotas:
+//   POST /api/v1/check-password        - Strength, entropy, crack times
+//   POST /api/v1/estimate-quantum      - Grover scenarios (alias: /quantum-estimate)
+//   POST /api/v1/generate-phonetic     - Phrase -> password variations
+//   POST /api/v1/breach-check          - HIBP k-anonymity lookup
+
+import { handleV1, V1_ROUTES } from './lib/v1-api.js';
 
 /**
  * Main Worker Entry Point
@@ -78,6 +86,14 @@ export default {
 		}
 
 		try {
+			// ═══════════════════════════════════════════════
+			// PUBLIC v1 API (the paid product)
+			// ═══════════════════════════════════════════════
+			// Scoring endpoints behind key auth + domain/IP verification +
+			// per-feature quotas. Returns null when the path isn't a v1 route.
+			const v1 = await handleV1(request, env, ctx, corsHeaders);
+			if (v1) return v1;
+
 			// ═══════════════════════════════════════════════
 			// PAYMENT ENDPOINTS
 			// ═══════════════════════════════════════════════
@@ -277,6 +293,7 @@ export default {
 			return jsonResponse({
 				error: 'Endpoint not found',
 				available_endpoints: [
+				...V1_ROUTES.map((p) => `POST ${p}`),
 					'POST /api/create-payment',
 					'POST /api/paypal/create-order',
 					'POST /api/paypal/verify-payment',
