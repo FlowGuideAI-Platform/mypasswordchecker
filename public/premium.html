@@ -364,7 +364,13 @@
     <script src="/js/ad-rotation.js"></script>
     <script>initAdRail();</script>
     <script src="/js/vendor/zxcvbn-4.4.2.js"></script>
-    <script src="/js/quantum-estimator.js?v=3"></script>
+    <!-- The quantum tool runs the SAME model as the checker and the API
+         (crack-model.js) so every number on the site agrees. -->
+    <script type="module">
+      import { estimateTimes } from '/js/crack-model.js';
+      window.CrackModel = { estimateTimes };
+      window.dispatchEvent(new Event('crack-model-ready'));
+    </script>
     <script>
         // Get session_id from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -592,6 +598,10 @@
         });
 
         let lastTrackedPassword = '';
+        window.addEventListener('crack-model-ready', () => {
+            if (passwordInput.value) passwordInput.dispatchEvent(new Event('input'));
+        });
+
         passwordInput.addEventListener('input', () => {
             const password = passwordInput.value;
 
@@ -600,7 +610,8 @@
                 return;
             }
 
-            const result = QuantumEstimator.estimateTimes(password);
+            if (!window.CrackModel) { resultsDisplay.style.display = 'none'; return; }
+            const result = window.CrackModel.estimateTimes(password);
 
             // Track usage (debounce to avoid tracking every keystroke)
             if (password !== lastTrackedPassword && password.length >= 4) {
@@ -612,48 +623,26 @@
             resultsDisplay.style.display = 'block';
 
             document.getElementById('q-entropy').textContent = result.bits.toFixed(1);
-            document.getElementById('q-strength').textContent = result.zxcvbn.score + '/4';
-            document.getElementById('q-length').textContent = result.passwordLength + ' chars';
+            document.getElementById('q-strength').textContent = result.score + '/4';
+            document.getElementById('q-length').textContent = result.length + ' chars';
 
-            // Display classical time with technical notation if available.
-            // (innerHTML here renders model-generated labels from quantum-estimator.js,
-            // never raw user input — same behavior as the original page.)
-            const classicalTime = result.classical.human.label;
-            const classicalTech = result.classical.human.technical;
-            document.getElementById('classical-crack-time').innerHTML = classicalTech
-                ? `${classicalTime}<br><span style="font-size: 0.8em; opacity: 0.7;">(${classicalTech})</span>`
-                : classicalTime;
+            document.getElementById('classical-crack-time').textContent = result.classical.label;
             document.getElementById('classical-bits').textContent = result.classical.bitsOfSecurity.toFixed(1) + ' bits';
 
-            // Display quantum times with technical notation if available
-            const pessimisticTime = result.quantum.pessimistic.human.label;
-            const pessimisticTech = result.quantum.pessimistic.human.technical;
-            document.getElementById('quantum-pessimistic-time').innerHTML = pessimisticTech
-                ? `${pessimisticTime}<br><span style="font-size: 0.8em; opacity: 0.7;">(${pessimisticTech})</span>`
-                : pessimisticTime;
-            document.getElementById('quantum-pessimistic-bits').textContent = result.quantum.pessimistic.bitsOfSecurity.toFixed(1) + ' bits';
+            for (const name of ['pessimistic', 'plausible', 'optimistic']) {
+                const q = result.quantum[name];
+                document.getElementById('quantum-' + name + '-time').textContent = q.label;
+                document.getElementById('quantum-' + name + '-bits').textContent = q.bitsOfSecurity.toFixed(1) + ' bits';
+            }
 
-            const plausibleTime = result.quantum.plausible.human.label;
-            const plausibleTech = result.quantum.plausible.human.technical;
-            document.getElementById('quantum-plausible-time').innerHTML = plausibleTech
-                ? `${plausibleTime}<br><span style="font-size: 0.8em; opacity: 0.7;">(${plausibleTech})</span>`
-                : plausibleTime;
-            document.getElementById('quantum-plausible-bits').textContent = result.quantum.plausible.bitsOfSecurity.toFixed(1) + ' bits';
-
-            const optimisticTime = result.quantum.optimistic.human.label;
-            const optimisticTech = result.quantum.optimistic.human.technical;
-            document.getElementById('quantum-optimistic-time').innerHTML = optimisticTech
-                ? `${optimisticTime}<br><span style="font-size: 0.8em; opacity: 0.7;">(${optimisticTech})</span>`
-                : optimisticTime;
-            document.getElementById('quantum-optimistic-bits').textContent = result.quantum.optimistic.bitsOfSecurity.toFixed(1) + ' bits';
-
-            // Generate recommendations (static strings — no user input interpolated)
+            // Recommendations keyed off the effective quantum strength (bits/2).
+            const qBits = result.quantum.plausible.bitsOfSecurity;
             let recommendations = '';
-            if (result.quantum.optimistic.bitsOfSecurity < 32) {
+            if (qBits < 32) {
                 recommendations += '<div class="alert alert-error"><strong>Critical:</strong> This password is vulnerable even to optimistic quantum attacks. Use a much longer password or passphrase.</div>';
-            } else if (result.quantum.plausible.bitsOfSecurity < 40) {
+            } else if (qBits < 40) {
                 recommendations += '<div class="alert alert-warning"><strong>Warning:</strong> This password may be vulnerable to near-term quantum computers. Consider using a longer password.</div>';
-            } else if (result.quantum.pessimistic.bitsOfSecurity >= 50) {
+            } else if (qBits >= 50) {
                 recommendations += '<div class="alert alert-success"><strong>Excellent:</strong> This password has strong quantum resistance across all scenarios.</div>';
             } else {
                 recommendations += '<div class="alert alert-info"><strong>Good:</strong> This password shows reasonable quantum resistance, but longer is always better.</div>';

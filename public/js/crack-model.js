@@ -35,6 +35,60 @@ export function fmtTime(sec) {
   return [n, UNITS[k][1]];
 }
 
+// Quantum hardware scenarios for the full analysis view. The canonical
+// single-figure estimate the checker prints stays GROVER_ITERS_PER_SEC (10⁶);
+// these bracket it. Kept identical to workers/lib/scoring.js so the site and
+// the API never disagree.
+export const QUANTUM_SCENARIOS = {
+  pessimistic: { rate: 1e3, scenario: 'Early quantum computers (2025-2030)' },
+  plausible:   { rate: 1e5, scenario: 'Mid-term quantum systems (2030-2040)' },
+  optimistic:  { rate: 1e7, scenario: 'Mature quantum computers (2040+)' },
+};
+
+// zxcvbn-compatible 0–4 score derived from the same bit thresholds as the labels.
+export function score0to4(bits) {
+  const b = Math.round(bits);
+  return b < 28 ? 0 : b < 36 ? 1 : b < 60 ? 2 : b < 80 ? 3 : 4;
+}
+
+export function classicalSeconds(bits) {
+  return Math.pow(2, Math.max(0, bits - 1)) / CLASSICAL_GUESSES_PER_SEC;
+}
+
+// Grover halves the effective exponent: 2^(bits/2) sequential oracle queries.
+export function quantumSeconds(bits, rate = GROVER_ITERS_PER_SEC) {
+  return Math.pow(2, bits / 2) / rate;
+}
+
+/**
+ * Full analysis for the deep-dive view: entropy, classical time, and the three
+ * quantum scenarios. Same model as analyze() — this only adds the bracket.
+ */
+export function estimateTimes(password) {
+  const a = analyze(password || '');
+  const bits = a.bitsExact || 0;
+  const label = (sec) => fmtTime(sec).join(' ');
+
+  const quantum = {};
+  for (const [name, { rate, scenario }] of Object.entries(QUANTUM_SCENARIOS)) {
+    const sec = quantumSeconds(bits, rate);
+    // Grover halves the effective key strength — the same figure the trust row cites.
+    quantum[name] = { rate, scenario, seconds: sec, label: label(sec), bitsOfSecurity: bits / 2 };
+  }
+
+  const cSec = classicalSeconds(bits);
+  return {
+    bits,
+    length: (password || '').length,
+    score: score0to4(bits),
+    strengthLabel: strengthLabel(bits),
+    classical: { rate: CLASSICAL_GUESSES_PER_SEC, seconds: cSec, label: label(cSec), bitsOfSecurity: bits },
+    quantum,
+    grover: { rate: GROVER_ITERS_PER_SEC, seconds: quantumSeconds(bits), label: label(quantumSeconds(bits)) },
+    notes: a.notes,
+  };
+}
+
 export function strengthLabel(bits) {
   const b = Math.round(bits);
   return b < 28 ? 'Very weak' : b < 36 ? 'Weak' : b < 60 ? 'Fair' : b < 80 ? 'Strong' : b < TARGET_BITS ? 'Very strong' : 'Quantum-ready';
