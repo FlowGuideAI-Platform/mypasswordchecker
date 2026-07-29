@@ -51,6 +51,15 @@ for (const [name, html] of Object.entries(pages)) {
   }
 }
 
+// Each page's static caption (the no-JS fallback) must be the model's generated
+// caption verbatim — a printed rate can never disagree with the computed value.
+for (const [name, html] of Object.entries(pages)) {
+  for (const [key, text] of Object.entries(m.CAPTIONS)) {
+    if (key === 'target') continue; // rendered in the strength row, not a caption
+    check(`${name} caption "${key}" matches CAPTIONS`, html.includes(text), true);
+  }
+}
+
 // The static crack-time table must be the generator's verbatim output
 const { rows } = await import(join(root, 'scripts/generate-crack-table.mjs'));
 for (const row of rows()) {

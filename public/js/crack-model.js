@@ -17,7 +17,7 @@ const pow10 = (n) => '10' + String(Math.round(Math.log10(n))).split('').map(d =>
 export const CAPTIONS = {
   gpu: `At ${pow10(CLASSICAL_GUESSES_PER_SEC)} guesses per second — a single rented GPU rig, offline against a leaked hash.`,
   entropy: `Every bit doubles the work. 60 is fair, 80 is strong, ${TARGET_BITS} or more survives a quantum halving.`,
-  quantum: `A machine this large does not exist yet. This is a future-proofing estimate at ${pow10(GROVER_ITERS_PER_SEC)} Grover iterations per second, not today's threat.`,
+  quantum: `A machine this large does not exist yet — this is a future-proofing estimate at ${pow10(GROVER_ITERS_PER_SEC)} Grover iterations per second, not today's threat. But stolen password databases are archived and attacked for years, so a password taken today may face tomorrow's hardware. Rotating the ones that matter is why this number is worth knowing.`,
   target: `Target: ${TARGET_BITS} bits`,
 };
 
