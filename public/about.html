@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how MyPasswordChecker.com works, frequently asked questions, and tips for creating strong passwords with quantum resistance.">
-    <title>About & FAQ - MyPasswordChecker.com</title>
+    <meta name="description" content="How we measure password strength: entropy, GPU crack time and the Grover model, with the assumptions printed. Plus practical tips and answers to the questions people ask.">
+    <title>How Password Testing Works — Method, Tips & FAQ</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mypasswordchecker.com/about">
+    <meta property="og:title" content="How Password Testing Works — Method, Tips & FAQ">
+    <meta property="og:description" content="How we measure password strength: entropy, GPU crack time and the Grover model, with the assumptions printed. Plus practical tips and answers to the questions people ask.">
+    <meta property="og:image" content="https://mypasswordchecker.com/og-image.png">
+    <meta property="og:site_name" content="MyPasswordChecker.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="How Password Testing Works — Method, Tips & FAQ">
+    <meta name="twitter:description" content="How we measure password strength: entropy, GPU crack time and the Grover model, with the assumptions printed. Plus practical tips and answers to the questions people ask.">
+    <meta name="twitter:image" content="https://mypasswordchecker.com/og-image.png">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://mypasswordchecker.com/about">
@@ -66,7 +77,12 @@
       .legal-line { padding: 0 var(--space-8) var(--space-8); font-size: 12px; }
       .legal-line p { margin: 0 0 var(--space-1); }
 
+      .body-rail { display: grid; grid-template-columns: 1fr 340px; border-bottom: 2px solid var(--color-divider); }
+      .how-main { padding: var(--space-8); border-right: 2px solid var(--color-divider); }
+
       @media (max-width: 768px) {
+        .body-rail { display: block; }
+        .how-main { padding: var(--space-4); border-right: 0; border-bottom: 2px solid var(--color-divider); }
         .reassure { padding: var(--space-3) var(--space-4); }
         .hero, .section { padding: var(--space-4); }
         .split, .feature-grid, .resource-grid, .domain-grid { grid-template-columns: 1fr; gap: var(--space-4); }
@@ -346,34 +362,46 @@
     </section>
 
     <!-- How Password Testing Works -->
-    <section class="section how" aria-label="How password testing works">
-        <h2>How Password Testing Works</h2>
+    <div class="body-rail">
+        <section class="how-main" aria-label="How password testing works">
+            <h2>How Password Testing Works</h2>
 
-        <div class="prose">
-            <h3>Password testing uses multiple techniques to evaluate strength:</h3>
+            <div class="prose">
+                <h3>Password testing uses multiple techniques to evaluate strength:</h3>
 
-            <h4>1. Entropy Estimation</h4>
-            <p class="text-muted">Calculates the average unpredictability of your password based on character set size and length. For example, an 8-character password using uppercase, lowercase, numbers, and symbols could have ~52-64 bits of entropy if truly random.</p>
+                <h4>1. Entropy Estimation</h4>
+                <p class="text-muted">Calculates the average unpredictability of your password based on character set size and length. For example, an 8-character password using uppercase, lowercase, numbers, and symbols could have ~52-64 bits of entropy if truly random.</p>
 
-            <h4>2. Dictionary &amp; Pattern Checks</h4>
-            <p class="text-muted">Passwords are tested against common password dictionaries and pattern recognition algorithms. This catches passwords like "password123", "qwerty", keyboard patterns (like "asdfgh"), and simple substitutions (like "P@ssw0rd").</p>
+                <h4>2. Dictionary &amp; Pattern Checks</h4>
+                <p class="text-muted">Passwords are tested against common password dictionaries and pattern recognition algorithms. This catches passwords like "password123", "qwerty", keyboard patterns (like "asdfgh"), and simple substitutions (like "P@ssw0rd").</p>
 
-            <h4>3. Crack Time Calculation</h4>
-            <p class="text-muted">Based on entropy and patterns, we estimate how long it would take to crack your password using:</p>
-            <ul>
-                <li><strong>Classical attacks:</strong> Modern GPU farms (10&sup1;&sup2; guesses/second)</li>
-                <li><strong>Quantum attacks:</strong> Grover's algorithm with varying quantum computer capabilities</li>
-            </ul>
+                <h4>3. Crack Time Calculation</h4>
+                <p class="text-muted">Based on entropy and patterns, we estimate how long it would take to crack your password using:</p>
+                <ul>
+                    <li><strong>Classical attacks:</strong> Modern GPU farms (10&sup1;&sup2; guesses/second)</li>
+                    <li><strong>Quantum attacks:</strong> Grover's algorithm with varying quantum computer capabilities</li>
+                </ul>
 
-            <h4>4. Grover's Algorithm (Quantum)</h4>
-            <p class="text-muted">Grover's algorithm provides a quadratic speedup for brute-force search. This means:</p>
-            <ul>
-                <li>Classical: Search through N possibilities &rarr; takes N steps</li>
-                <li>Quantum: Search through N possibilities &rarr; takes &radic;N steps</li>
-                <li>Result: A password with 80 bits of classical security has ~40 bits of quantum security</li>
-            </ul>
-        </div>
-    </section>
+                <h4>4. Grover's Algorithm (Quantum)</h4>
+                <p class="text-muted">Grover's algorithm provides a quadratic speedup for brute-force search. This means:</p>
+                <ul>
+                    <li>Classical: Search through N possibilities &rarr; takes N steps</li>
+                    <li>Quantum: Search through N possibilities &rarr; takes &radic;N steps</li>
+                    <li>Result: A password with 80 bits of classical security has ~40 bits of quantum security</li>
+                </ul>
+            </div>
+        </section>
+        <aside class="ad-rail" aria-label="More tools we build">
+            <h6>More tools we build</h6>
+            <div class="ad-slot" data-slot="a">
+                <div class="ad-creative"><iframe src="/ads/forgemcp-300x250" title="ForgeMCP — Engineering MCP servers" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/flowguideai-300x250" title="FlowGuideAI — AI documentation generator" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/suggestibility-300x250" title="suggestibility.ai — AI expert review board" scrolling="no" loading="lazy"></iframe></div>
+            </div>
+            <!-- Slot B is cloned from slot A at init — single roster source. -->
+            <div class="ad-slot" data-slot="b"></div>
+        </aside>
+    </div>
 
     <!-- Additional Resources -->
     <section class="section" aria-label="Additional resources">
@@ -459,6 +487,10 @@
     </div>
 
 </div>
+
+    <script src="/js/ad-tracking.js"></script>
+    <script src="/js/ad-rotation.js"></script>
+    <script>initAdRail();</script>
 
     <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
     <script>

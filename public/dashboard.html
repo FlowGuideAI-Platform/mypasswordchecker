@@ -6,485 +6,572 @@
     <meta name="description" content="Developer dashboard for MyPasswordChecker.com API - manage API keys and view usage statistics">
     <title>Developer Dashboard - MyPasswordChecker.com</title>
     <link rel="canonical" href="https://mypasswordchecker.com/dashboard">
-    <link rel="stylesheet" href="/css/styles.css">
+    <!-- No robots meta on purpose: /dashboard is Disallowed in robots.txt,
+         excluded from sitemap.xml and tagged noindex at the edge. Adding an
+         indexing hint here would contradict all three. -->
+    <link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/modernist.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
-</head>
-<body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">🔐 MyPasswordChecker.com</a>
-                <nav class="nav">
-                    <a href="/">Password Checker</a>
-                    <a href="/password-api">Developer API</a>
-                    <a href="/docs">Docs</a>
-                    <a href="/pricing">Pricing</a>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <div class="container">
-            <h1 style="margin-bottom: 2rem;">Developer Dashboard</h1>
-
-            <!-- Registration/Login Section -->
-            <div id="auth-section" class="checker-card" style="max-width: 600px; margin: 0 auto 2rem;">
-                <h2 style="margin-bottom: 1rem;">Get Started with API Access</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    Sign in to receive your API key and start using MyPasswordChecker.com API.
-                </p>
-
-                <!-- GitHub Login Button -->
-                <a href="/api/auth/github" class="btn btn-primary" style="width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
-                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-                    </svg>
-                    Sign in with GitHub
-                </a>
-
-                <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;">
-                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                    <span style="color: var(--text-secondary); font-size: 0.875rem;">or</span>
-                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                </div>
-
-                <div class="input-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" class="password-input" placeholder="your@email.com" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="name">Name (Optional)</label>
-                    <input type="text" id="name" class="password-input" placeholder="Your Name">
-                </div>
-
-                <button class="btn btn-secondary" style="width: 100%;" onclick="registerAccount()">
-                    Register with Email
-                </button>
-
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                    <p style="font-size: 0.875rem; color: var(--text-secondary);">
-                        Already have an API key? <a href="#" onclick="showApiKeyInput(); return false;" style="color: var(--primary-color);">Enter it here</a>
-                    </p>
-                </div>
-            </div>
-
-            <!-- API Key Input Section (Hidden by default) -->
-            <div id="api-key-input-section" class="checker-card" style="max-width: 600px; margin: 0 auto 2rem; display: none;">
-                <h2 style="margin-bottom: 1rem;">Enter Your API Key</h2>
-
-                <div class="input-group">
-                    <label for="existing-api-key">API Key</label>
-                    <input type="text" id="existing-api-key" class="password-input" placeholder="pk_...">
-                </div>
-
-                <button class="btn btn-primary" style="width: 100%;" onclick="loadDashboard()">
-                    Load Dashboard
-                </button>
-
-                <div style="margin-top: 1rem;">
-                    <p style="font-size: 0.875rem; color: var(--text-secondary);">
-                        <a href="#" onclick="showRegistration(); return false;" style="color: var(--primary-color);">← Back to registration</a>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Dashboard Content (Hidden until API key loaded) -->
-            <div id="dashboard-content" style="display: none;">
-                <!-- Onboarding Banner for New Subscribers (Hidden by default) -->
-                <div id="onboarding-banner" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;">
-                    <h3 style="margin: 0 0 0.5rem 0; color: white;">🎉 Welcome! Your subscription is active</h3>
-                    <p style="margin: 0 0 1rem 0; opacity: 0.95;">To start using the API, you need to verify your domain. This prevents unauthorized use of your API key.</p>
-                    <a href="/domains" class="btn" style="background: white; color: #667eea; border: none; display: inline-block; text-decoration: none;">
-                        🔐 Verify Your Domain Now
-                    </a>
-                    <button onclick="document.getElementById('onboarding-banner').style.display='none'" style="margin-left: 1rem; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
-                        Dismiss
-                    </button>
-                </div>
-
-                <!-- API Key Display -->
-                <div class="checker-card" style="margin-bottom: 2rem;">
-                    <h2 style="margin-bottom: 1rem;">🔑 Your API Key</h2>
-                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 0.5rem; font-family: 'Courier New', monospace; word-break: break-all; margin-bottom: 1rem;">
-                        <span id="display-api-key">pk_...</span>
-                    </div>
-                    <div class="alert alert-warning">
-                        <strong>⚠️ Keep this secret!</strong> Your API key grants access to your account. Never share it publicly or commit it to version control.
-                    </div>
-                    <button class="btn btn-secondary" onclick="copyApiKey()" style="margin-top: 1rem;">
-                        📋 Copy to Clipboard
-                    </button>
-                    <a href="#" onclick="adminSignIn(); return false;" style="margin-left: 1rem; font-size: 0.875rem; color: var(--text-secondary);">🛡️ Enter admin token</a>
-                </div>
-
-                <!-- Current Plan -->
-                <div class="checker-card" style="margin-bottom: 2rem;">
-                    <h2 style="margin-bottom: 1rem;">📊 Current Plan</h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-                        <div>
-                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Plan</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);" id="current-plan">Free</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Monthly Cost</div>
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="monthly-cost">$0</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <button id="btn-standard" class="btn btn-primary" onclick="upgradePlan('standard')">
-                            ⬆️ Upgrade to Standard ($2.50/mo)
-                        </button>
-                        <button id="btn-basic-quantum" class="btn btn-primary" onclick="upgradePlan('basic_quantum')">
-                            ⬆️ Basic Quantum ($5/mo)
-                        </button>
-                        <button id="btn-quantum" class="btn btn-primary" onclick="upgradePlan('standard_quantum')">
-                            ⬆️ Standard Quantum ($20/mo)
-                        </button>
-                        <button id="btn-large-quantum" class="btn btn-primary" onclick="upgradePlan('large_quantum')">
-                            ⬆️ Large Quantum ($40/mo)
-                        </button>
-                        <button id="btn-xl-quantum" class="btn btn-primary" onclick="upgradePlan('xl_quantum')">
-                            ⬆️ XL Quantum ($60/mo)
-                        </button>
-                        <button id="btn-super-quantum" class="btn btn-primary" onclick="upgradePlan('super_quantum')" style="background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);">
-                            ⬆️ Super Quantum ($99/mo)
-                        </button>
-                    </div>
-                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                        <button id="btn-manage-subscription" class="btn btn-secondary" onclick="manageSubscription()">
-                            ⚙️ Manage subscription
-                        </button>
-                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                            Opens Stripe's hosted Customer Portal (for $10+ tiers) or cancels your PayPal subscription (under-$10 tiers).
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Overage Protection Setting (P5) -->
-                <div class="checker-card" style="margin-bottom: 2rem;">
-                    <h2 style="margin-bottom: 1rem;">🛡️ Overage Protection</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                        Control what happens when you exceed your monthly quota.
-                    </p>
-
-                    <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.5rem; border: 2px solid var(--border-color);">
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-                            <div style="flex: 1; min-width: 200px;">
-                                <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <span id="overage-status-icon">🔒</span>
-                                    <span id="overage-status-text">Block Overages (Recommended)</span>
-                                </h3>
-                                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;" id="overage-status-description">
-                                    API stops serving requests when quota is reached. No unexpected charges.
-                                </p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="overage-toggle" onchange="toggleOverageSetting()">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-
-                        <div id="overage-warning" class="alert alert-warning" style="display: none; margin-bottom: 0;">
-                            ⚠️ <strong>Warning:</strong> When overage billing is enabled, you will be charged for usage beyond your quota limits.
-                        </div>
-
-                        <div id="overage-blocked-info" class="alert alert-info" style="display: none; margin-bottom: 0;">
-                            ℹ️ <strong>Protected:</strong> Your API will stop serving requests when quota limits are reached to prevent overage charges.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Usage Statistics -->
-                <div class="checker-card">
-                    <h2 style="margin-bottom: 1rem;">📈 Usage This Month</h2>
-                    <div id="usage-loading" style="text-align: center; padding: 2rem;">
-                        <div class="loading"></div>
-                        <p style="margin-top: 1rem; color: var(--text-secondary);">Loading usage data...</p>
-                    </div>
-
-                    <div id="usage-data" style="display: none;">
-                        <!-- Tier 1 Usage -->
-                        <div style="margin-bottom: 2rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <h3 style="font-size: 1.125rem;">Tier 1: Password Checker</h3>
-                                <span style="font-weight: 600; color: var(--text-secondary);">
-                                    <span id="tier1-used">0</span> / <span id="tier1-quota">50</span>
-                                </span>
-                            </div>
-                            <div class="strength-bar-container" style="height: 1rem;">
-                                <div class="strength-bar" id="tier1-bar" style="background: var(--primary-color);"></div>
-                            </div>
-                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                <span id="tier1-remaining">50</span> requests remaining
-                            </p>
-                        </div>
-
-                        <!-- Tier 2 Usage -->
-                        <div style="margin-bottom: 2rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <h3 style="font-size: 1.125rem;">Tier 2: Quantum Estimate</h3>
-                                <span style="font-weight: 600; color: var(--text-secondary);">
-                                    <span id="tier2-used">0</span> / <span id="tier2-quota">0</span>
-                                </span>
-                            </div>
-                            <div class="strength-bar-container" style="height: 1rem;">
-                                <div class="strength-bar" id="tier2-bar" style="background: #7c3aed;"></div>
-                            </div>
-                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                <span id="tier2-status">Upgrade to access Tier 2</span>
-                            </p>
-                        </div>
-
-                        <!-- Tier 3 Usage -->
-                        <div style="margin-bottom: 2rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <h3 style="font-size: 1.125rem;">Tier 3: Phonetic Password Generator</h3>
-                                <span style="font-weight: 600; color: var(--text-secondary);">
-                                    <span id="tier3-used">0</span> / <span id="tier3-quota">0</span>
-                                </span>
-                            </div>
-                            <div class="strength-bar-container" style="height: 1rem;">
-                                <div class="strength-bar" id="tier3-bar" style="background: #10b981;"></div>
-                            </div>
-                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                <span id="tier3-status">Upgrade to access Tier 3</span>
-                            </p>
-                        </div>
-
-                        <!-- Tier 4 Usage: Breach Check -->
-                        <div style="margin-bottom: 2rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <h3 style="font-size: 1.125rem;">🔍 Breach Check (HIBP)</h3>
-                                <span style="font-weight: 600; color: var(--text-secondary);">
-                                    <span id="breach-used">0</span> / <span id="breach-quota">0</span>
-                                </span>
-                            </div>
-                            <div class="strength-bar-container" style="height: 1rem;">
-                                <div class="strength-bar" id="breach-bar" style="background: #f59e0b;"></div>
-                            </div>
-                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                <span id="breach-status">Checking breach database access...</span>
-                            </p>
-                        </div>
-
-                        <div class="alert alert-info">
-                            ℹ️ Usage resets on the 1st of each month. Current period: <strong id="current-month">-</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Admin Panel for Domain Mismatch Alerts (Only for admin) -->
-                <div id="admin-panel-section" class="checker-card" style="margin-top: 2rem; display: none;">
-                    <h2 style="margin-bottom: 1rem;">⚠️ Admin Panel - Security Alerts</h2>
-
-                    <!-- Domain Mismatch Alerts -->
-                    <div style="margin-bottom: 2rem;">
-                        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Domain Mismatch Alerts</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.875rem;">
-                            Tracks API keys used from unexpected domains (potential theft or unauthorized sharing).
-                        </p>
-                        <div id="admin-alerts-loading" style="text-align: center; padding: 2rem;">
-                            <div class="loading"></div>
-                            <p style="margin-top: 1rem; color: var(--text-secondary);">Loading security alerts...</p>
-                        </div>
-                        <div id="admin-alerts-data" style="display: none;"></div>
-                    </div>
-
-                    <!-- Unverified Email Users -->
-                    <div style="margin-bottom: 2rem;">
-                        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Unverified Email Users</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.875rem;">
-                            API users who haven't verified their email addresses yet.
-                        </p>
-                        <div id="admin-unverified-loading" style="text-align: center; padding: 2rem;">
-                            <div class="loading"></div>
-                            <p style="margin-top: 1rem; color: var(--text-secondary);">Loading unverified users...</p>
-                        </div>
-                        <div id="admin-unverified-data" style="display: none;"></div>
-                    </div>
-                </div>
-
-                <!-- Domain and Email Verification (Only for Quantum Tiers) -->
-                <div id="domain-verification-section" class="checker-card" style="margin-top: 2rem; display: none;">
-                    <h2 style="margin-bottom: 1rem;">🔐 Domain and Email Verification</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                        Quantum tier plans require domain verification to use the API. This prevents unauthorized use of your API key.
-                    </p>
-
-                    <div id="verified-domains" style="margin-bottom: 1.5rem;"></div>
-
-                    <div id="add-domain-form" style="display: none; background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-                        <h3 style="margin-bottom: 1rem;">Add New Domain</h3>
-                        <input type="text" id="new-domain-input" placeholder="example.com" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem; margin-bottom: 1rem;">
-
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification Method:</label>
-                            <select id="verification-method" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem;">
-                                <option value="dns">DNS TXT Record (Recommended)</option>
-                                <option value="http">HTTP File Upload</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-primary" onclick="addDomain()">Generate Verification Token</button>
-                            <button class="btn btn-secondary" onclick="cancelAddDomain()">Cancel</button>
-                        </div>
-                    </div>
-
-                    <div id="verification-instructions" style="display: none; background: #fef3c7; border-left: 3px solid #f59e0b; padding: 1rem; border-radius: 0.25rem; margin-bottom: 1.5rem;">
-                        <h3 style="margin-bottom: 0.5rem;">Verification Instructions</h3>
-                        <div id="dns-instructions" style="display: none;">
-                            <p style="margin-bottom: 0.5rem;"><strong>Domain:</strong> <span id="verifying-domain"></span></p>
-                            <p style="margin-bottom: 0.5rem;"><strong>Add this TXT record to your DNS:</strong></p>
-                            <div style="background: white; padding: 0.75rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; margin-bottom: 0.5rem;">
-                                <strong>Name:</strong> _mypasswordchecker<br>
-                                <strong>Value:</strong> <span id="verification-token" style="word-break: break-all;"></span>
-                            </div>
-                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
-                                Note: Some DNS providers require the full name <code>_mypasswordchecker.yourdomain.com</code>. DNS changes can take up to 48 hours to propagate.
-                            </p>
-                        </div>
-                        <div id="http-instructions" style="display: none;">
-                            <p style="margin-bottom: 0.5rem;"><strong>Domain:</strong> <span id="verifying-domain-http"></span></p>
-                            <p style="margin-bottom: 0.5rem;"><strong>Upload a file with this content:</strong></p>
-                            <div style="background: white; padding: 0.75rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; margin-bottom: 0.5rem;">
-                                <span id="http-verification-token" style="word-break: break-all;"></span>
-                            </div>
-                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>File location:</strong></p>
-                            <div style="background: white; padding: 0.75rem; border-radius: 0.25rem; font-family: 'Courier New', monospace;">
-                                https://<span id="domain-for-file"></span>/.well-known/mypasswordchecker-verification.txt
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="verifyDomain()" style="margin-top: 1rem;">Verify Domain Now</button>
-                    </div>
-
-                    <button id="add-domain-btn" class="btn btn-secondary" onclick="showAddDomainForm()">+ Add Domain</button>
-                </div>
-
-                <!-- Quick Start Guide -->
-                <div class="checker-card" style="margin-top: 2rem;">
-                    <h2 style="margin-bottom: 1rem;">🚀 Quick Start</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                        Make your first API request:
-                    </p>
-
-                    <div class="code-block">
-curl -X POST https://mypasswordchecker.com/api/v1/check-password \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: <span id="code-api-key">YOUR_API_KEY</span>" \
-  -d '{"password":"test123"}'</div>
-
-                    <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                        📚 <a href="/docs" style="color: var(--primary-color); font-weight: 600;">Developer Documentation</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>MyPasswordChecker.com</h4>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Free password strength analysis with quantum resistance estimates.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Tools</h4>
-                    <ul>
-                        <li><a href="/">Password Checker</a></li>
-                        <li><a href="/premium">Quantum Estimate</a></li>
-                        <li><a href="/docs">API Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms of Service</a></li>
-                        <li><a href="/disclaimer">Quantum Estimate Disclaimer</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Developer</h4>
-                    <ul>
-                        <li><a href="/dashboard">Dashboard</a></li>
-                        <li><a href="/pricing">API Pricing</a></li>
-                        <li><a href="/docs">Documentation</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. | <a href="/privacy" style="color: inherit;">Privacy</a> | <a href="/terms" style="color: inherit;">Terms</a></p>
-                <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Operated by All Aligned Consulting LLC (California, USA)</p>
-                <p style="margin-top: 0.25rem; font-size: 0.75rem; opacity: 0.9;">
-                    This service is also available at:
-                    <a href="https://myquantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">MyQuantumPasswordChecker.com</a> |
-                    <a href="https://quantumpasswordchecker.com" style="color: inherit; text-decoration: underline;">QuantumPasswordChecker.com</a>
-                </p>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
-            </div>
-        </div>
-    </footer>
 
     <style>
-        /* Toggle Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
+      /* Page layout — /dashboard in the 1a system. Shared components (topnav,
+         .table, .tag, .card-kicker, .meter, footer, domains strip) come from
+         modernist.css. Colour budget: bright red appears only through
+         .card-kicker and the quota meter fill (the homepage meter component,
+         reused unchanged). No red panels and no status hexes anywhere — every
+         state is a .tag label or plain text, so the page reads in one ink. */
+      .hero { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .hero h1 { font-size: 60px; margin: 0 0 var(--space-4); max-width: 20ch; }
+      .lead { font-size: 17px; max-width: 60ch; margin: 0; }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+      .section { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .section > h2 { margin-bottom: var(--space-4); }
+      .section-head {
+        display: flex; align-items: flex-end; justify-content: space-between;
+        gap: var(--space-4); margin-bottom: var(--space-6);
+      }
+      .section-head h2 { margin: 0; }
+      .note { font-size: 13px; max-width: 74ch; }
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #10b981;
-            transition: .4s;
-            border-radius: 34px;
-        }
+      /* Every button label sits flush left (readme: "Keep everything flush
+         left — the labels inside wide buttons"). */
+      .btn { justify-content: flex-start; }
+      .btn-xs { font-size: 11px; padding: 2px var(--space-2); }
+      .btn-xs + .btn-xs { margin-left: var(--space-2); }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+      /* — auth panels — */
+      .auth-panel { padding: var(--space-8); border-bottom: 2px solid var(--color-divider); }
+      .auth-form { max-width: 440px; background: var(--color-surface); padding: var(--space-4); }
+      .auth-form .field + .field { margin-top: var(--space-3); }
+      .auth-form .input { background: var(--color-bg); }
+      .auth-form .btn { width: 100%; margin-top: var(--space-4); }
+      .auth-divider {
+        display: flex; align-items: center; gap: var(--space-3);
+        margin: var(--space-4) 0; font-size: 11px; font-weight: 600;
+        letter-spacing: 0.12em; text-transform: uppercase;
+      }
+      .auth-divider::before, .auth-divider::after {
+        content: ""; flex: 1; height: 2px; background: var(--color-divider);
+      }
+      .auth-alt { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--color-divider); font-size: 13px; }
+      .auth-alt p { margin: 0; }
 
-        input:checked + .slider {
-            background-color: #dc2626;
-        }
+      /* — key, admin token and verification-token display — */
+      .mono-block {
+        font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+        background: var(--color-surface); padding: var(--space-3);
+        word-break: break-all; margin-bottom: var(--space-4);
+      }
+      .key-actions { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-4); }
+      code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; background: var(--color-neutral-200); padding: 1px 5px; }
+      .code-block {
+        font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.6;
+        background: var(--color-neutral-900); color: var(--color-neutral-100);
+        padding: var(--space-4); overflow: auto; white-space: pre;
+        margin: var(--space-3) 0; max-width: 100%;
+      }
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
+      /* Notices carry no colour — the left rule marks the ones that matter. */
+      .alert {
+        border: 1px solid var(--color-divider); background: var(--color-surface);
+        padding: var(--space-3); font-size: 13px; margin-bottom: var(--space-3);
+        max-width: 74ch;
+      }
+      .alert-warning, .alert-error { border-left: 2px solid var(--color-text); }
+      .alert:last-child { margin-bottom: 0; }
 
-        input:focus + .slider {
-            box-shadow: 0 0 1px #10b981;
-        }
+      /* — plan — */
+      .plan-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-6); }
+      .plan-figures .kicker { margin-bottom: var(--space-2); }
+      .figure-value { font-family: var(--font-heading); font-weight: 800; font-size: 32px; line-height: 1; letter-spacing: -0.03em; }
+      .plan-buttons { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+      .plan-manage { margin-top: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--color-divider); }
+      .plan-manage p { margin: var(--space-2) 0 0; }
+      .subpanel { background: var(--color-surface); padding: var(--space-4); margin-top: var(--space-4); }
+      .subpanel h3 { font-size: 20px; }
+      .subpanel p:last-child { margin-bottom: 0; }
+      .subpanel .input, .subpanel .select { background: var(--color-bg); }
 
-        input:checked:focus + .slider {
-            box-shadow: 0 0 1px #dc2626;
-        }
+      /* — overage toggle: square, no radius, no transition — */
+      .overage-panel { background: var(--color-surface); padding: var(--space-4); }
+      .overage-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-4); }
+      .overage-copy { flex: 1; min-width: 240px; }
+      .overage-state { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+      .overage-state h3 { font-size: 17px; margin: 0; }
+      .switch { position: relative; display: inline-block; width: 56px; height: 28px; flex: none; }
+      .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+      .slider {
+        position: absolute; inset: 0; cursor: pointer;
+        background: var(--color-neutral-300); border: 1px solid var(--color-divider);
+      }
+      .slider::before { content: ""; position: absolute; left: 1px; top: 1px; width: 24px; height: 24px; background: var(--color-text); }
+      input:checked + .slider { background: var(--color-neutral-800); }
+      input:checked + .slider::before { left: 29px; background: var(--color-bg); }
+      input:focus-visible + .slider { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+      /* — usage quotas: the homepage meter component, unchanged — */
+      .quota { margin-bottom: var(--space-6); }
+      .quota-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); }
+      .quota-head h3 { font-size: 17px; margin: 0; }
+      .quota-count { font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+      .quota .meter { margin: var(--space-2) 0; }
+      .quota-note { font-size: 12px; margin: 0; }
+
+      /* — house-ad click-throughs (operator-only) — */
+      .ad-totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-4); }
+      .ad-totals .kicker { margin-bottom: var(--space-2); }
+      .ad-totals .numeral { font-size: 42px; }
+      .footnote { font-size: 12px; max-width: 74ch; margin: 0 0 var(--space-1); }
+      .subhead { margin: var(--space-6) 0 0; }
+      .table-wrap { overflow-x: auto; margin: var(--space-3) 0 0; }
+
+      /* — domain verification — */
+      .domain-row {
+        background: var(--color-surface); border: 1px solid var(--color-divider);
+        padding: var(--space-3); margin-bottom: var(--space-2);
+        display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;
+      }
+      .select {
+        width: 100%; min-height: 36px; padding: 6px 10px; font: inherit; font-size: 14px;
+        color: var(--color-text); background: var(--color-surface);
+        border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+      }
+      .callout {
+        border: 2px solid var(--color-divider); background: var(--color-surface);
+        padding: var(--space-4); margin-bottom: var(--space-4); font-size: 14px; max-width: 74ch;
+      }
+      .callout .mono-block { background: var(--color-bg); }
+      .form-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+      .legal-line { padding: 0 var(--space-8) var(--space-8); font-size: 12px; }
+      .legal-line p { margin: 0 0 var(--space-1); }
+
+      @media (max-width: 768px) {
+        .hero, .section, .auth-panel { padding: var(--space-4); }
+        .hero h1 { font-size: 40px; }
+        .lead { font-size: 15px; }
+        .plan-figures, .ad-totals { grid-template-columns: 1fr; gap: var(--space-4); }
+        .ad-totals .numeral { font-size: 34px; }
+        .section-head { flex-direction: column; align-items: flex-start; }
+        .input, .select, .btn { min-height: 44px; }
+        .btn-xs { min-height: 32px; }
+        .plan-buttons .btn, .form-actions .btn { width: 100%; }
+        .legal-line { padding: 0 var(--space-4) var(--space-4); }
+      }
     </style>
+</head>
+<body>
+<div class="shell">
+
+    <nav class="topnav" aria-label="Main">
+        <a class="wordmark" href="/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD700" aria-hidden="true"><path d="M6 10V7a6 6 0 1 1 12 0v3h1.5v12h-15V10H6zm2.2 0h7.6V7a3.8 3.8 0 0 0-7.6 0v3z"/></svg>
+            MyPasswordChecker<span class="tld">.com</span>
+        </a>
+        <div class="topnav-links">
+            <a href="/">Checker</a>
+            <a href="/generate-phonetic">Phonetic Generator</a>
+            <a href="/premium">Breach Check</a>
+            <a href="/password-api">Developer API</a>
+            <a href="/pricing">Pricing</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="eyebrow">API keys · quotas · domain verification</div>
+        <h1>Developer Dashboard</h1>
+        <p class="lead">Your key, your quota and your verified domains — all keyed off the API key itself. No sessions, no cookies. Sign in below to load it.</p>
+    </header>
+
+    <!-- Registration/Login Section -->
+    <section id="auth-section" class="auth-panel">
+        <h2>Get started with API access</h2>
+        <p class="note text-muted">Sign in to receive your API key and start using the MyPasswordChecker.com API.</p>
+
+        <div class="auth-form">
+            <!-- GitHub Login Button -->
+            <a href="/api/auth/github" class="btn btn-primary">
+                <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                Sign in with GitHub
+            </a>
+
+            <div class="auth-divider"><span>or</span></div>
+
+            <div class="field">
+                <label for="email">Email address</label>
+                <input type="email" id="email" class="input" placeholder="your@email.com" required>
+            </div>
+
+            <div class="field">
+                <label for="name">Name (optional)</label>
+                <input type="text" id="name" class="input" placeholder="Your name">
+            </div>
+
+            <button class="btn btn-secondary" onclick="registerAccount()">
+                Register with email
+            </button>
+
+            <div class="auth-alt">
+                <p class="text-muted">Already have an API key? <a href="#" onclick="showApiKeyInput(); return false;">Enter it here</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Key Input Section (Hidden by default) -->
+    <section id="api-key-input-section" class="auth-panel" style="display: none;">
+        <h2>Enter your API key</h2>
+
+        <div class="auth-form">
+            <div class="field">
+                <label for="existing-api-key">API key</label>
+                <input type="text" id="existing-api-key" class="input" placeholder="pk_...">
+            </div>
+
+            <button class="btn btn-primary" onclick="loadDashboard()">
+                Load dashboard
+            </button>
+
+            <div class="auth-alt">
+                <p class="text-muted"><a href="#" onclick="showRegistration(); return false;">Back to registration</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Content (Hidden until API key loaded) -->
+    <div id="dashboard-content" style="display: none;">
+
+        <!-- Onboarding Banner for New Subscribers (Hidden by default) -->
+        <section id="onboarding-banner" class="section" style="display: none;">
+            <div class="card-kicker">Next step</div>
+            <h2>Welcome — your subscription is active</h2>
+            <p class="note">To start using the API you need to verify your domain. This prevents unauthorized use of your API key.</p>
+            <div class="form-actions">
+                <a href="/domains" class="btn btn-primary">Verify your domain now</a>
+                <button class="btn btn-secondary" onclick="document.getElementById('onboarding-banner').style.display='none'">Dismiss</button>
+            </div>
+        </section>
+
+        <!-- API Key Display -->
+        <section class="section">
+            <h2>Your API Key</h2>
+            <div class="mono-block">
+                <span id="display-api-key">pk_...</span>
+            </div>
+            <div class="alert alert-warning">
+                <strong>Keep this secret.</strong> Your API key grants access to your account. Never share it publicly or commit it to version control.
+            </div>
+            <div class="key-actions">
+                <button class="btn btn-secondary" onclick="copyApiKey()">Copy to clipboard</button>
+                <a href="#" onclick="adminSignIn(); return false;" class="text-muted" style="font-size: 13px;">Enter admin token</a>
+            </div>
+        </section>
+
+        <!-- Current Plan -->
+        <section class="section">
+            <h2>Current Plan</h2>
+            <div class="plan-figures">
+                <div>
+                    <div class="kicker text-muted">Plan</div>
+                    <div class="figure-value" id="current-plan">Free</div>
+                </div>
+                <div>
+                    <div class="kicker text-muted">Monthly cost</div>
+                    <div class="figure-value" id="monthly-cost">$0</div>
+                </div>
+            </div>
+
+            <div class="card-kicker">Upgrade</div>
+            <div class="plan-buttons">
+                <button id="btn-standard" class="btn btn-secondary" onclick="upgradePlan('standard')">
+                    Standard — $2.50/mo
+                </button>
+                <button id="btn-basic-quantum" class="btn btn-secondary" onclick="upgradePlan('basic_quantum')">
+                    Basic Quantum — $5/mo
+                </button>
+                <button id="btn-quantum" class="btn btn-secondary" onclick="upgradePlan('standard_quantum')">
+                    Standard Quantum — $20/mo
+                </button>
+                <button id="btn-large-quantum" class="btn btn-secondary" onclick="upgradePlan('large_quantum')">
+                    Large Quantum — $40/mo
+                </button>
+                <button id="btn-xl-quantum" class="btn btn-secondary" onclick="upgradePlan('xl_quantum')">
+                    XL Quantum — $60/mo
+                </button>
+                <button id="btn-super-quantum" class="btn btn-secondary" onclick="upgradePlan('super_quantum')">
+                    Super Quantum — $99/mo
+                </button>
+            </div>
+
+            <!-- Toggled by showSuperQuantumOptions() -->
+            <div id="super-quantum-options" class="subpanel" style="display: none;">
+                <h3>Super Quantum billing</h3>
+                <p class="note text-muted">Super Quantum ($99/mo) is billed through Stripe Checkout — the upgrade button above opens the hosted session. The tier's quotas are listed on the <a href="/pricing">pricing page</a>.</p>
+            </div>
+
+            <div class="plan-manage">
+                <button id="btn-manage-subscription" class="btn btn-secondary" onclick="manageSubscription()">
+                    Manage subscription
+                </button>
+                <p class="note text-muted">
+                    Opens Stripe's hosted Customer Portal (for $10+ tiers) or cancels your PayPal subscription (under-$10 tiers).
+                </p>
+            </div>
+        </section>
+
+        <!-- Overage Protection Setting (P5) -->
+        <section class="section">
+            <h2>Overage Protection</h2>
+            <p class="note text-muted">Control what happens when you exceed your monthly quota.</p>
+
+            <div class="overage-panel">
+                <div class="overage-row">
+                    <div class="overage-copy">
+                        <div class="overage-state">
+                            <span class="tag tag-neutral" id="overage-status-icon">Blocked</span>
+                            <h3 id="overage-status-text">Block Overages (Recommended)</h3>
+                        </div>
+                        <p class="note text-muted" style="margin: 0;" id="overage-status-description">
+                            API stops serving requests when quota is reached. No unexpected charges.
+                        </p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="overage-toggle" onchange="toggleOverageSetting()" aria-label="Allow overage billing">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div id="overage-warning" class="alert alert-warning" style="display: none; margin-bottom: 0;">
+                    <strong>Warning:</strong> When overage billing is enabled, you will be charged for usage beyond your quota limits.
+                </div>
+
+                <div id="overage-blocked-info" class="alert" style="display: none; margin-bottom: 0;">
+                    <strong>Protected:</strong> Your API will stop serving requests when quota limits are reached to prevent overage charges.
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage Statistics -->
+        <section class="section">
+            <h2>Usage This Month</h2>
+            <div id="usage-loading">
+                <p class="text-muted">Loading usage data…</p>
+            </div>
+
+            <div id="usage-data" style="display: none;">
+                <!-- Tier 1 Usage -->
+                <div class="quota">
+                    <div class="quota-head">
+                        <h3>Tier 1: Password Checker</h3>
+                        <span class="quota-count text-muted"><span id="tier1-used">0</span> / <span id="tier1-quota">50</span></span>
+                    </div>
+                    <div class="meter" aria-hidden="true"><div class="meter-fill" id="tier1-bar"></div></div>
+                    <p class="quota-note text-muted"><span id="tier1-remaining">50</span> requests remaining</p>
+                </div>
+
+                <!-- Tier 2 Usage -->
+                <div class="quota">
+                    <div class="quota-head">
+                        <h3>Tier 2: Quantum Estimate</h3>
+                        <span class="quota-count text-muted"><span id="tier2-used">0</span> / <span id="tier2-quota">0</span></span>
+                    </div>
+                    <div class="meter" aria-hidden="true"><div class="meter-fill" id="tier2-bar"></div></div>
+                    <p class="quota-note text-muted"><span id="tier2-status">Upgrade to access Tier 2</span></p>
+                </div>
+
+                <!-- Tier 3 Usage -->
+                <div class="quota">
+                    <div class="quota-head">
+                        <h3>Tier 3: Phonetic Password Generator</h3>
+                        <span class="quota-count text-muted"><span id="tier3-used">0</span> / <span id="tier3-quota">0</span></span>
+                    </div>
+                    <div class="meter" aria-hidden="true"><div class="meter-fill" id="tier3-bar"></div></div>
+                    <p class="quota-note text-muted"><span id="tier3-status">Upgrade to access Tier 3</span></p>
+                </div>
+
+                <!-- Tier 4 Usage: Breach Check -->
+                <div class="quota">
+                    <div class="quota-head">
+                        <h3>Breach Check (HIBP)</h3>
+                        <span class="quota-count text-muted"><span id="breach-used">0</span> / <span id="breach-quota">0</span></span>
+                    </div>
+                    <div class="meter" aria-hidden="true"><div class="meter-fill" id="breach-bar"></div></div>
+                    <p class="quota-note text-muted"><span id="breach-status">Checking breach database access…</span></p>
+                </div>
+
+                <div class="alert">
+                    Usage resets on the 1st of each month. Current period: <strong id="current-month">-</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- House ad click-throughs (operator-only; stays hidden on 403) -->
+        <section id="ad-analytics-section" class="section" style="display: none;">
+            <div class="section-head">
+                <div>
+                    <div class="card-kicker">Operator</div>
+                    <h2>House ad click-throughs</h2>
+                </div>
+                <button class="btn btn-secondary" id="ad-refresh-btn" type="button">Refresh</button>
+            </div>
+
+            <div class="ad-totals" id="ad-totals"></div>
+
+            <p class="footnote text-muted">Nothing is filtered out: rows with placement <code>phase0-audit</code> or <code>post-v1-check</code>, and rows whose traffic source starts with <code>verify-test</code>, are verification test clicks written by the build — they are counted in every figure below.</p>
+            <p class="footnote text-muted" id="ad-generated"></p>
+
+            <h6 class="subhead">Clicks by placement</h6>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead id="ad-placement-head"></thead>
+                    <tbody id="ad-placement-body"></tbody>
+                </table>
+            </div>
+
+            <h6 class="subhead">Clicks by traffic source</h6>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr><th>Banner</th><th>Source</th><th>Clicks</th><th>Share</th></tr>
+                    </thead>
+                    <tbody id="ad-source-body"></tbody>
+                </table>
+            </div>
+
+            <h6 class="subhead">Recent clicks (last 50)</h6>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr><th>Time</th><th>Banner</th><th>Placement</th><th>Device</th><th>Source</th><th>On site</th></tr>
+                    </thead>
+                    <tbody id="ad-recent-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Admin Panel for Domain Mismatch Alerts (Only for admin) -->
+        <section id="admin-panel-section" class="section" style="display: none;">
+            <h2>Admin Panel — Security Alerts</h2>
+
+            <!-- Domain Mismatch Alerts -->
+            <h6 class="subhead">Domain mismatch alerts</h6>
+            <p class="note text-muted">Tracks API keys used from unexpected domains (potential theft or unauthorized sharing).</p>
+            <div id="admin-alerts-loading">
+                <p class="text-muted">Loading security alerts…</p>
+            </div>
+            <div id="admin-alerts-data" style="display: none;"></div>
+
+            <!-- Unverified Email Users -->
+            <h6 class="subhead">Unverified email users</h6>
+            <p class="note text-muted">API users who haven't verified their email addresses yet.</p>
+            <div id="admin-unverified-loading">
+                <p class="text-muted">Loading unverified users…</p>
+            </div>
+            <div id="admin-unverified-data" style="display: none;"></div>
+        </section>
+
+        <!-- Domain and Email Verification (Only for Quantum Tiers) -->
+        <section id="domain-verification-section" class="section" style="display: none;">
+            <h2>Domain and Email Verification</h2>
+            <p class="note text-muted">Quantum tier plans require domain verification to use the API. This prevents unauthorized use of your API key.</p>
+
+            <div id="verified-domains" style="margin-bottom: var(--space-4);"></div>
+
+            <div id="add-domain-form" class="subpanel" style="display: none;">
+                <h3>Add new domain</h3>
+                <div class="field">
+                    <label for="new-domain-input">Domain</label>
+                    <input type="text" id="new-domain-input" class="input" placeholder="example.com">
+                </div>
+
+                <div class="field" style="margin-top: var(--space-3);">
+                    <label for="verification-method">Verification method</label>
+                    <select id="verification-method" class="select">
+                        <option value="dns">DNS TXT record (recommended)</option>
+                        <option value="http">HTTP file upload</option>
+                    </select>
+                </div>
+
+                <div class="form-actions" style="margin-top: var(--space-4);">
+                    <button class="btn btn-primary" onclick="addDomain()">Generate verification token</button>
+                    <button class="btn btn-secondary" onclick="cancelAddDomain()">Cancel</button>
+                </div>
+            </div>
+
+            <div id="verification-instructions" class="callout" style="display: none;">
+                <h3>Verification instructions</h3>
+                <div id="dns-instructions" style="display: none;">
+                    <p><strong>Domain:</strong> <span id="verifying-domain"></span></p>
+                    <p><strong>Add this TXT record to your DNS:</strong></p>
+                    <div class="mono-block">
+                        <strong>Name:</strong> _mypasswordchecker<br>
+                        <strong>Value:</strong> <span id="verification-token"></span>
+                    </div>
+                    <p class="note text-muted">
+                        Note: Some DNS providers require the full name <code>_mypasswordchecker.yourdomain.com</code>. DNS changes can take up to 48 hours to propagate.
+                    </p>
+                </div>
+                <div id="http-instructions" style="display: none;">
+                    <p><strong>Domain:</strong> <span id="verifying-domain-http"></span></p>
+                    <p><strong>Upload a file with this content:</strong></p>
+                    <div class="mono-block">
+                        <span id="http-verification-token"></span>
+                    </div>
+                    <p><strong>File location:</strong></p>
+                    <div class="mono-block">
+                        https://<span id="domain-for-file"></span>/.well-known/mypasswordchecker-verification.txt
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="verifyDomain()">Verify domain now</button>
+            </div>
+
+            <button id="add-domain-btn" class="btn btn-secondary" onclick="showAddDomainForm()">Add domain</button>
+        </section>
+
+        <!-- Quick Start Guide -->
+        <section class="section">
+            <h2>Quick Start</h2>
+            <p class="note text-muted">Make your first API request:</p>
+
+            <pre class="code-block">curl -X POST https://mypasswordchecker.com/api/v1/check-password \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <span id="code-api-key">YOUR_API_KEY</span>" \
+  -d '{"password":"test123"}'</pre>
+
+            <p class="note"><a href="/docs">Developer documentation</a></p>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div>
+            <strong>MyPasswordChecker.com</strong>
+            <span class="text-muted">Free password strength analysis with quantum resistance estimates. Operated by All Aligned Consulting LLC, California.</span>
+        </div>
+        <div class="footer-col"><h6>Tools</h6><a href="/">Checker</a><a href="/generate-phonetic">Phonetic generator</a><a href="/premium">Breach check</a></div>
+        <div class="footer-col"><h6>Developers</h6><a href="/docs">API docs</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+        <div class="footer-col"><h6>Legal</h6><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/disclaimer">Quantum disclaimer</a></div>
+    </footer>
+
+    <div class="domains-strip">
+        <div class="hr"></div>
+        <div class="domains-row">
+            <span class="domains-kicker">Same tool, three addresses</span>
+            <a href="https://quantumpasswordchecker.com">QuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://myquantumpasswordchecker.com">MyQuantumPasswordChecker.com</a><span class="text-muted">·</span>
+            <a href="https://mypasswordchecker.com">MyPasswordChecker.com</a>
+            <span class="text-muted">— typed one of the others and landed here? You are in the right place.</span>
+        </div>
+    </div>
+
+    <div class="legal-line text-muted">
+        <p>&copy; <span id="copyright-year"></span> MyPasswordChecker.com. All rights reserved. <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+        <p>Affiliate Disclosure: We may earn commissions from recommended products at no extra cost to you.</p>
+    </div>
+
+</div>
+
+    <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
 
     <!-- Centralized tier catalog (single source of truth, spec §4). -->
     <script src="/js/pricing.js"></script>
@@ -577,6 +664,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             document.getElementById('code-api-key').textContent = currentApiKey;
 
             loadUsageData();
+            loadAdAnalytics();
         }
 
         // Helpers — DOM methods only, no innerHTML, so any worker-supplied
@@ -590,7 +678,6 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             _clear(el);
             const a = document.createElement('a');
             a.href = '/pricing';
-            a.style.color = 'var(--primary-color)';
             a.textContent = 'Upgrade to access';
             el.appendChild(a);
         }
@@ -600,6 +687,14 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             _clear(el);
             const div = document.createElement('div');
             div.className = 'alert alert-error';
+            div.textContent = message;
+            el.appendChild(div);
+        }
+        function _showNotice(el, message) {
+            if (!el) return;
+            _clear(el);
+            const div = document.createElement('div');
+            div.className = 'alert';
             div.textContent = message;
             el.appendChild(div);
         }
@@ -645,10 +740,8 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                     const btn = document.getElementById(b.id);
                     if (!btn) return;
                     if (b.tier === data.tier) {
-                        btn.textContent = '✓ Current Plan';
+                        btn.textContent = 'Current plan';
                         btn.disabled = true;
-                        btn.style.opacity = '0.6';
-                        btn.style.cursor = 'not-allowed';
                         btn.onclick = null;
                     }
                 });
@@ -682,7 +775,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         // Copy API key
         function copyApiKey() {
             navigator.clipboard.writeText(currentApiKey).then(() => {
-                alert('API key copied to clipboard!');
+                alert('API key copied to clipboard.');
             }).catch(() => {
                 alert('Failed to copy. Please select and copy manually.');
             });
@@ -793,7 +886,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    alert('✅ Domain verified successfully!');
+                    alert('Domain verified successfully.');
 
                     // Hide instructions if they were showing
                     document.getElementById('verification-instructions').style.display = 'none';
@@ -808,7 +901,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                     // Reload domain list
                     loadDomains();
                 } else {
-                    alert('❌ Verification failed: ' + (data.message || data.error || 'Could not verify domain. Please check your DNS/HTTP setup and try again.'));
+                    alert('Verification failed: ' + (data.message || data.error || 'Could not verify domain. Please check your DNS/HTTP setup and try again.'));
                 }
             } catch (error) {
                 console.error('Verify domain error:', error);
@@ -833,8 +926,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                 const list = Array.isArray(data.domains) ? data.domains : [];
                 if (list.length === 0) {
                     const p = document.createElement('p');
-                    p.style.color = 'var(--text-secondary)';
-                    p.style.fontStyle = 'italic';
+                    p.className = 'note text-muted';
                     p.textContent = 'No domains verified yet.';
                     container.appendChild(p);
                     return;
@@ -842,23 +934,23 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
 
                 // Build rows with DOM methods so worker-returned domain strings
                 // can't inject HTML even if validation upstream is weakened.
+                // Status is a .tag label rather than a colour — the colour
+                // budget keeps bright red for the primary action and the meter.
                 list.forEach(d => {
                     const isVerified = d.status === 'verified';
                     const row = document.createElement('div');
-                    row.style.cssText =
-                        'background:' + (isVerified ? '#d1fae5' : '#fee2e2') +
-                        ';border:1px solid ' + (isVerified ? '#10b981' : '#ef4444') +
-                        ';padding:1rem;border-radius:0.25rem;margin-bottom:0.5rem;';
+                    row.className = 'domain-row';
                     const strong = document.createElement('strong');
                     strong.textContent = d.domain || '';
                     row.appendChild(strong);
-                    row.appendChild(document.createTextNode(' - ' + (isVerified ? '✅ Verified' : '⏳ Pending')));
+                    const tag = document.createElement('span');
+                    tag.className = 'tag tag-neutral';
+                    tag.textContent = isVerified ? 'Verified' : 'Pending';
+                    row.appendChild(tag);
                     if (!isVerified) {
                         const btn = document.createElement('button');
-                        btn.className = 'btn btn-secondary';
-                        btn.style.marginLeft = '1rem';
-                        btn.style.padding = '0.25rem 0.75rem';
-                        btn.textContent = 'Retry Verification';
+                        btn.className = 'btn btn-secondary btn-xs';
+                        btn.textContent = 'Retry verification';
                         btn.addEventListener('click', () => retryVerification(d.domain));
                         row.appendChild(btn);
                     }
@@ -1045,14 +1137,14 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
 
                     if (blockOverages) {
                         // Block overages (protected)
-                        statusIcon.textContent = '🔒';
+                        statusIcon.textContent = 'Blocked';
                         statusText.textContent = 'Block Overages (Recommended)';
                         statusDesc.textContent = 'API stops serving requests when quota is reached. No unexpected charges.';
                         warningDiv.style.display = 'none';
                         blockedDiv.style.display = 'block';
                     } else {
                         // Allow overages
-                        statusIcon.textContent = '💳';
+                        statusIcon.textContent = 'Billed';
                         statusText.textContent = 'Allow Overage Billing';
                         statusDesc.textContent = 'You will be charged for usage beyond your quota at the overage rate.';
                         warningDiv.style.display = 'block';
@@ -1072,10 +1164,10 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
             // Show confirmation dialog
             if (allowOverage) {
                 const confirmed = confirm(
-                    '⚠️ Warning: Enabling overage billing means you will be charged for API usage beyond your quota limits.\n\n' +
+                    'Warning: Enabling overage billing means you will be charged for API usage beyond your quota limits.\n\n' +
                     'Your overage rate depends on your plan:\n' +
-                    '• Free tier: $0.20 per request\n' +
-                    '• Paid tiers: $0.0125 per request\n\n' +
+                    '- Free tier: $0.20 per request\n' +
+                    '- Paid tiers: $0.0125 per request\n\n' +
                     'Are you sure you want to enable overage billing?'
                 );
 
@@ -1109,20 +1201,20 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
 
                     if (allowOverage) {
                         // Allow overages
-                        statusIcon.textContent = '💳';
+                        statusIcon.textContent = 'Billed';
                         statusText.textContent = 'Allow Overage Billing';
                         statusDesc.textContent = 'You will be charged for usage beyond your quota at the overage rate.';
                         warningDiv.style.display = 'block';
                         blockedDiv.style.display = 'none';
-                        alert('✅ Overage billing enabled. You will be charged for usage beyond your quota limits.');
+                        alert('Overage billing enabled. You will be charged for usage beyond your quota limits.');
                     } else {
                         // Block overages (protected)
-                        statusIcon.textContent = '🔒';
+                        statusIcon.textContent = 'Blocked';
                         statusText.textContent = 'Block Overages (Recommended)';
                         statusDesc.textContent = 'API stops serving requests when quota is reached. No unexpected charges.';
                         warningDiv.style.display = 'none';
                         blockedDiv.style.display = 'block';
-                        alert('✅ Overage protection enabled. Your API will stop serving requests when quota is reached.');
+                        alert('Overage protection enabled. Your API will stop serving requests when quota is reached.');
                     }
                 } else {
                     const error = await response.json();
@@ -1191,6 +1283,9 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
         }
 
         // Load domain mismatch alerts for admin
+        // Rows are built with createElement/textContent (same rule as the rest
+        // of the page) so operator-visible strings from the DB can't inject
+        // markup, and the status pill is a .tag rather than a colour.
         async function loadAdminAlerts() {
             try {
                 const response = await fetch('/api/admin/domain-alerts', {
@@ -1202,56 +1297,52 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                     const container = document.getElementById('admin-alerts-data');
                     document.getElementById('admin-alerts-loading').style.display = 'none';
                     container.style.display = 'block';
+                    _clear(container);
 
                     if (!data.alerts || data.alerts.length === 0) {
-                        container.innerHTML = '<div class="alert alert-info">No domain mismatch alerts found. Great!</div>';
+                        _showNotice(container, 'No domain mismatch alerts found.');
                     } else {
-                        container.innerHTML = `
-                            <div style="overflow-x: auto;">
-                                <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
-                                    <thead>
-                                        <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);">
-                                            <th style="padding: 0.75rem; text-align: left;">Email</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Email Domain</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Request Domain</th>
-                                            <th style="padding: 0.75rem; text-align: center;">Count</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Last Seen</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Country</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Status</th>
-                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${data.alerts.map(alert => `
-                                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                                <td style="padding: 0.75rem;">${alert.email}</td>
-                                                <td style="padding: 0.75rem;"><code>${alert.email_domain}</code></td>
-                                                <td style="padding: 0.75rem;"><code style="color: #dc2626;">${alert.request_domain}</code></td>
-                                                <td style="padding: 0.75rem; text-align: center;"><strong>${alert.occurrence_count}</strong></td>
-                                                <td style="padding: 0.75rem; font-size: 0.75rem;">${new Date(alert.last_seen_at).toLocaleDateString()}</td>
-                                                <td style="padding: 0.75rem;">${alert.request_country || 'N/A'}</td>
-                                                <td style="padding: 0.75rem;">
-                                                    <span style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; background: ${alert.status === 'pending' ? '#fef3c7' : alert.status === 'reviewed' ? '#dbeafe' : '#fee2e2'}; color: ${alert.status === 'pending' ? '#92400e' : alert.status === 'reviewed' ? '#1e40af' : '#991b1b'}; font-size: 0.75rem; font-weight: 600;">
-                                                        ${alert.status}
-                                                    </span>
-                                                </td>
-                                                <td style="padding: 0.75rem; text-align: center;">
-                                                    ${alert.status === 'pending' ? `
-                                                        <button onclick="updateAlertStatus(${alert.id}, 'reviewed')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; margin-right: 0.25rem;">Review</button>
-                                                        <button onclick="updateAlertStatus(${alert.id}, 'ignored')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Ignore</button>
-                                                    ` : '-'}
-                                                </td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        `;
+                        const table = _table([
+                            'Email', 'Email domain', 'Request domain', 'Count',
+                            'Last seen', 'Country', 'Status', 'Actions'
+                        ]);
+                        data.alerts.forEach(row => {
+                            const statusCell = document.createElement('td');
+                            const tag = document.createElement('span');
+                            tag.className = 'tag tag-neutral';
+                            tag.textContent = row.status || '';
+                            statusCell.appendChild(tag);
+
+                            const actionsCell = document.createElement('td');
+                            if (row.status === 'pending') {
+                                [['Review', 'reviewed'], ['Ignore', 'ignored']].forEach(pair => {
+                                    const btn = document.createElement('button');
+                                    btn.className = 'btn btn-secondary btn-xs';
+                                    btn.textContent = pair[0];
+                                    btn.addEventListener('click', () => updateAlertStatus(row.id, pair[1]));
+                                    actionsCell.appendChild(btn);
+                                });
+                            } else {
+                                actionsCell.textContent = '—';
+                            }
+
+                            table.body.appendChild(_tr([
+                                _td(row.email || ''),
+                                _tdCode(row.email_domain || ''),
+                                _tdCode(row.request_domain || ''),
+                                _td(String(row.occurrence_count == null ? '' : row.occurrence_count), true),
+                                _td(row.last_seen_at ? new Date(row.last_seen_at).toLocaleDateString() : '—'),
+                                _td(row.request_country || 'N/A'),
+                                statusCell,
+                                actionsCell
+                            ]));
+                        });
+                        container.appendChild(table.wrap);
                     }
                 }
             } catch (error) {
                 console.error('Load admin alerts error:', error);
-                document.getElementById('admin-alerts-loading').innerHTML = '<div class="alert alert-error">Failed to load alerts.</div>';
+                _showError('admin-alerts-loading', 'Failed to load alerts.');
             }
         }
 
@@ -1267,48 +1358,52 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                     const container = document.getElementById('admin-unverified-data');
                     document.getElementById('admin-unverified-loading').style.display = 'none';
                     container.style.display = 'block';
+                    _clear(container);
 
                     if (!data.users || data.users.length === 0) {
-                        container.innerHTML = '<div class="alert alert-info">All users have verified their email addresses!</div>';
+                        _showNotice(container, 'All users have verified their email addresses.');
                     } else {
-                        container.innerHTML = `
-                            <div style="overflow-x: auto;">
-                                <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
-                                    <thead>
-                                        <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);">
-                                            <th style="padding: 0.75rem; text-align: left;">Email</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Name</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Plan</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Registered</th>
-                                            <th style="padding: 0.75rem; text-align: left;">Verification Sent</th>
-                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${data.users.map(user => `
-                                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                                <td style="padding: 0.75rem;">${user.email}</td>
-                                                <td style="padding: 0.75rem;">${user.name || '-'}</td>
-                                                <td style="padding: 0.75rem;"><span style="text-transform: capitalize;">${user.plan}</span></td>
-                                                <td style="padding: 0.75rem; font-size: 0.75rem;">${new Date(user.created_at).toLocaleDateString()}</td>
-                                                <td style="padding: 0.75rem; font-size: 0.75rem;">${user.email_verification_sent_at ? new Date(user.email_verification_sent_at).toLocaleDateString() : '-'}</td>
-                                                <td style="padding: 0.75rem; text-align: center;">
-                                                    <button onclick="resendVerificationAdmin('${user.customer_id}')" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Resend</button>
-                                                </td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                                Total unverified: <strong>${data.users.length}</strong>
-                            </p>
-                        `;
+                        const table = _table([
+                            'Email', 'Name', 'Plan', 'Registered', 'Verification sent', 'Actions'
+                        ]);
+                        data.users.forEach(user => {
+                            const planCell = document.createElement('td');
+                            const planSpan = document.createElement('span');
+                            planSpan.style.textTransform = 'capitalize';
+                            planSpan.textContent = user.plan || '';
+                            planCell.appendChild(planSpan);
+
+                            const actionsCell = document.createElement('td');
+                            const btn = document.createElement('button');
+                            btn.className = 'btn btn-secondary btn-xs';
+                            btn.textContent = 'Resend';
+                            btn.addEventListener('click', () => resendVerificationAdmin(user.customer_id));
+                            actionsCell.appendChild(btn);
+
+                            table.body.appendChild(_tr([
+                                _td(user.email || ''),
+                                _td(user.name || '—'),
+                                planCell,
+                                _td(user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'),
+                                _td(user.email_verification_sent_at ? new Date(user.email_verification_sent_at).toLocaleDateString() : '—'),
+                                actionsCell
+                            ]));
+                        });
+                        container.appendChild(table.wrap);
+
+                        const total = document.createElement('p');
+                        total.className = 'note text-muted';
+                        total.style.marginTop = 'var(--space-3)';
+                        total.appendChild(document.createTextNode('Total unverified: '));
+                        const strong = document.createElement('strong');
+                        strong.textContent = String(data.users.length);
+                        total.appendChild(strong);
+                        container.appendChild(total);
                     }
                 }
             } catch (error) {
                 console.error('Load unverified users error:', error);
-                document.getElementById('admin-unverified-loading').innerHTML = '<div class="alert alert-error">Failed to load unverified users.</div>';
+                _showError('admin-unverified-loading', 'Failed to load unverified users.');
             }
         }
 
@@ -1326,7 +1421,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                 });
 
                 if (response.ok) {
-                    alert('Alert status updated!');
+                    alert('Alert status updated.');
                     await loadAdminAlerts(); // Reload
                 } else {
                     const error = await response.json();
@@ -1352,7 +1447,7 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                 });
 
                 if (response.ok) {
-                    alert('Verification email sent!');
+                    alert('Verification email sent.');
                 } else {
                     const error = await response.json();
                     alert('Failed to resend: ' + (error.error || 'Unknown error'));
@@ -1362,6 +1457,248 @@ curl -X POST https://mypasswordchecker.com/api/v1/check-password \
                 alert('Failed to resend verification email.');
             }
         }
+
+        // ═══════════════════════════════════════════════════════════════
+        // Table builders — shared by the admin panels and the ad panel.
+        // Cells are always createElement/textContent: placement and
+        // traffic_source are client-submitted, so they never touch innerHTML.
+        // ═══════════════════════════════════════════════════════════════
+        function _th(text) {
+            const el = document.createElement('th');
+            el.textContent = text;
+            return el;
+        }
+        function _td(text, strong, colSpan) {
+            const el = document.createElement('td');
+            if (strong) {
+                const s = document.createElement('strong');
+                s.textContent = text;
+                el.appendChild(s);
+            } else {
+                el.textContent = text;
+            }
+            if (colSpan) el.colSpan = colSpan;
+            return el;
+        }
+        function _tdCode(text) {
+            const el = document.createElement('td');
+            const code = document.createElement('code');
+            code.textContent = text;
+            el.appendChild(code);
+            return el;
+        }
+        function _tr(cells) {
+            const r = document.createElement('tr');
+            cells.forEach(c => r.appendChild(c));
+            return r;
+        }
+        // Returns { wrap, body } — append rows to body, append wrap to the DOM.
+        function _table(columns) {
+            const wrap = document.createElement('div');
+            wrap.className = 'table-wrap';
+            const table = document.createElement('table');
+            table.className = 'table';
+            const head = document.createElement('thead');
+            head.appendChild(_tr(columns.map(c => _th(c))));
+            const body = document.createElement('tbody');
+            table.appendChild(head);
+            table.appendChild(body);
+            wrap.appendChild(table);
+            return { wrap: wrap, body: body };
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // House ad click-throughs (operator-only)
+        // ═══════════════════════════════════════════════════════════════
+        // POST /api/ad-analytics gates on an operator email whitelist in the
+        // worker, so an ordinary developer key gets a 403. On anything other
+        // than a 200 the whole section stays display:none — a normal developer
+        // must never see an empty or broken panel, and there is nothing to
+        // explain to them. Same fetch shape and render approach as /numbers.
+        const AD_BANNER_NAMES = {
+            forgemcp: 'ForgeMCP',
+            flowguideai: 'FlowGuideAI',
+            suggestibility: 'suggestibility.ai'
+        };
+        // Display order for the creatives we know about; anything else the API
+        // reports is appended (alphabetically) under its raw banner_id, so a
+        // fourth creative shows up without a code change here.
+        const AD_BANNER_ORDER = ['forgemcp', 'flowguideai', 'suggestibility'];
+
+        const AD_SOURCE_NAMES = {
+            google: 'Google', bing: 'Bing', duckduckgo: 'DuckDuckGo', yahoo: 'Yahoo', baidu: 'Baidu', yandex: 'Yandex',
+            claude_ai: 'Claude AI', chatgpt: 'ChatGPT', gemini: 'Gemini', copilot: 'Microsoft Copilot',
+            perplexity: 'Perplexity', you_ai: 'You.com', grok: 'Grok', poe: 'Poe', character_ai: 'Character.AI',
+            twitter: 'Twitter/X', linkedin: 'LinkedIn', reddit: 'Reddit', facebook: 'Facebook', hackernews: 'Hacker News',
+            github: 'GitHub', stackoverflow: 'Stack Overflow', direct: 'Direct', internal: 'Internal',
+            flowguideai_site: 'FlowGuideAI.com', forgemcp_site: 'ForgeMCP.ai', unknown: 'Unknown'
+        };
+
+        function adBannerName(id) { return AD_BANNER_NAMES[id] || id; }
+        function adSourceName(s) {
+            if (s && s.indexOf('other_') === 0) return s.slice(6);
+            return AD_SOURCE_NAMES[s] || s || 'Unknown';
+        }
+        function adTimeOnSite(sec) {
+            if (sec === null || sec === undefined) return '—';
+            if (sec < 60) return sec + 's';
+            if (sec < 3600) return Math.floor(sec / 60) + 'm ' + (sec % 60) + 's';
+            return Math.floor(sec / 3600) + 'h ' + Math.floor((sec % 3600) / 60) + 'm';
+        }
+
+        // Every banner_id the response mentions anywhere, known ones first.
+        function adBannerIds(d) {
+            const seen = {};
+            Object.keys(d.totals || {}).forEach(k => { seen[k] = true; });
+            Object.keys(d.byPlacement || {}).forEach(p => {
+                Object.keys(d.byPlacement[p] || {}).forEach(k => { seen[k] = true; });
+            });
+            Object.keys(d.bySource || {}).forEach(k => { seen[k] = true; });
+            const known = AD_BANNER_ORDER.filter(id => seen[id]);
+            const extra = Object.keys(seen).filter(id => AD_BANNER_ORDER.indexOf(id) === -1).sort();
+            return known.concat(extra);
+        }
+
+        function _adTotalCell(label, n) {
+            const wrap = document.createElement('div');
+            const k = document.createElement('div');
+            k.className = 'kicker text-muted';
+            k.textContent = label;
+            const v = document.createElement('div');
+            v.className = 'numeral';
+            v.textContent = n.toLocaleString();
+            wrap.appendChild(k);
+            wrap.appendChild(v);
+            return wrap;
+        }
+
+        async function loadAdAnalytics() {
+            const section = document.getElementById('ad-analytics-section');
+            if (!section) return;
+            const key = getApiKey();
+            if (!key) { section.style.display = 'none'; return; }
+            try {
+                const res = await fetch('/api/ad-analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_key: key })
+                });
+                if (!res.ok) { section.style.display = 'none'; return; }
+                const data = await res.json();
+                renderAdAnalytics(data);
+                section.style.display = 'block';
+            } catch (error) {
+                // Silent by design — a non-operator key must see nothing here.
+                section.style.display = 'none';
+            }
+        }
+
+        function renderAdAnalytics(d) {
+            const ids = adBannerIds(d);
+            const totals = d.totals || {};
+
+            // 1. Totals — one kicker/numeral pair per creative, plus the sum
+            //    of every banner_id the API returned.
+            const totalsEl = document.getElementById('ad-totals');
+            _clear(totalsEl);
+            let grand = 0;
+            ids.forEach(id => {
+                const n = Number(totals[id] || 0);
+                grand += n;
+                totalsEl.appendChild(_adTotalCell(adBannerName(id), n));
+            });
+            totalsEl.appendChild(_adTotalCell('Total', grand));
+
+            _setText('ad-generated', d.generatedAt
+                ? 'Generated ' + new Date(d.generatedAt).toLocaleString()
+                : 'Generated ' + new Date().toLocaleString());
+
+            // 2. Clicks by placement — one column per banner present, a row
+            //    total per placement and a totals row across all placements.
+            const head = document.getElementById('ad-placement-head');
+            _clear(head);
+            const headCells = [_th('Placement')];
+            ids.forEach(id => headCells.push(_th(adBannerName(id))));
+            headCells.push(_th('Total'));
+            head.appendChild(_tr(headCells));
+
+            const placeBody = document.getElementById('ad-placement-body');
+            _clear(placeBody);
+            const byPlacement = d.byPlacement || {};
+            const places = Object.keys(byPlacement).sort();
+            const colTotals = {};
+            let placeGrand = 0;
+            places.forEach(place => {
+                const counts = byPlacement[place] || {};
+                const cells = [_td(place)];
+                let rowTotal = 0;
+                ids.forEach(id => {
+                    const n = Number(counts[id] || 0);
+                    rowTotal += n;
+                    colTotals[id] = (colTotals[id] || 0) + n;
+                    cells.push(_td(n.toLocaleString()));
+                });
+                placeGrand += rowTotal;
+                cells.push(_td(rowTotal.toLocaleString(), true));
+                placeBody.appendChild(_tr(cells));
+            });
+            if (!places.length) {
+                placeBody.appendChild(_tr([_td('No clicks recorded yet.', false, ids.length + 2)]));
+            } else {
+                const totalCells = [_td('All placements', true)];
+                ids.forEach(id => totalCells.push(_td(Number(colTotals[id] || 0).toLocaleString(), true)));
+                totalCells.push(_td(placeGrand.toLocaleString(), true));
+                placeBody.appendChild(_tr(totalCells));
+            }
+
+            // 3. Clicks by traffic source — banner / source / clicks / share.
+            const srcBody = document.getElementById('ad-source-body');
+            _clear(srcBody);
+            ids.forEach(id => {
+                const banner = (d.bySource || {})[id] || {};
+                const sources = banner.sources || {};
+                const total = Number(banner.total || 0);
+                const rows = Object.keys(sources)
+                    .map(s => [s, Number(sources[s] || 0)])
+                    .sort((a, b) => b[1] - a[1]);
+                if (!rows.length) {
+                    srcBody.appendChild(_tr([_td(adBannerName(id)), _td('No clicks yet', false, 3)]));
+                    return;
+                }
+                rows.forEach(r => {
+                    const pct = total ? ((r[1] / total) * 100).toFixed(1) : '0.0';
+                    srcBody.appendChild(_tr([
+                        _td(adBannerName(id)),
+                        _td(adSourceName(r[0])),
+                        _td(r[1].toLocaleString(), true),
+                        _td(pct + '%')
+                    ]));
+                });
+            });
+
+            // 4. Recent clicks — newest first, as returned (max 50).
+            const recentBody = document.getElementById('ad-recent-body');
+            _clear(recentBody);
+            const clicks = Array.isArray(d.recentClicks) ? d.recentClicks : [];
+            if (!clicks.length) {
+                recentBody.appendChild(_tr([_td('No clicks recorded yet.', false, 6)]));
+            }
+            clicks.forEach(c => {
+                recentBody.appendChild(_tr([
+                    _td(c.timestamp ? new Date(c.timestamp).toLocaleString() : '—'),
+                    _td(c.banner_id ? adBannerName(c.banner_id) : '—'),
+                    _td(c.placement || '—'),
+                    _td(c.user_agent_type || '—'),
+                    _td(adSourceName(c.traffic_source)),
+                    _td(adTimeOnSite(c.time_on_site))
+                ]));
+            });
+        }
+
+        (function wireAdRefresh() {
+            const btn = document.getElementById('ad-refresh-btn');
+            if (btn) btn.addEventListener('click', loadAdAnalytics);
+        })();
     </script>
 </body>
 </html>

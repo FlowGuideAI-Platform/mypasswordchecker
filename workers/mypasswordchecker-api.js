@@ -1986,13 +1986,12 @@ async function handleAdAnalytics(request, env, corsHeaders) {
 		const sourceRows = await env.DB.prepare(
 			`SELECT banner_id, traffic_source, COUNT(*) AS clicks FROM ad_clicks GROUP BY banner_id, traffic_source`
 		).all();
-		const bySource = {
-			flowguideai: { total: 0, sources: {} },
-			forgemcp: { total: 0, sources: {} },
-		};
+		// Built from the rows, not a fixed list — a hardcoded pair silently
+		// dropped every suggestibility click from the by-source breakdown.
+		const bySource = {};
+		for (const id of AD_BANNER_IDS) bySource[id] = { total: 0, sources: {} };
 		(sourceRows.results || []).forEach(r => {
-			const b = bySource[r.banner_id];
-			if (!b) return;
+			const b = bySource[r.banner_id] || (bySource[r.banner_id] = { total: 0, sources: {} });
 			b.sources[r.traffic_source || 'unknown'] = r.clicks;
 			b.total += r.clicks;
 		});

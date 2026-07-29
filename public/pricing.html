@@ -112,12 +112,20 @@
       .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
       .faq-grid p { font-size: 14px; margin: 0; }
 
+      /* House-ad rail — the FAQ section sits beside it, so the tier-card grid
+         above stays full-width. .ad-rail/.ad-slot/.ad-creative come from
+         modernist.css; never redeclared here. */
+      .faq-rail { display: grid; grid-template-columns: 1fr 340px; border-bottom: 2px solid var(--color-divider); }
+      .faq-rail > .section { border-bottom: 0; border-right: 2px solid var(--color-divider); }
+
       @media (max-width: 768px) {
         .hero { padding: var(--space-4); }
         .hero h1 { font-size: 40px; }
         .section { padding: var(--space-4); }
         .free-grid, .plans-grid, .enterprise-grid, .faq-grid { grid-template-columns: 1fr; gap: var(--space-4); }
         .card .btn { min-height: 44px; }
+        .faq-rail { display: block; }
+        .faq-rail > .section { border-right: 0; border-bottom: 2px solid var(--color-divider); }
       }
     </style>
 </head>
@@ -394,6 +402,8 @@
         </div>
     </section>
 
+    <!-- FAQ — wrapped beside the house-ad rail -->
+    <div class="faq-rail">
     <section class="section" aria-label="Frequently asked questions">
         <h2>Frequently Asked Questions</h2>
         <div class="faq-grid">
@@ -404,6 +414,17 @@
             <div><h4>Is there a free trial?</h4><p class="text-muted">Yes! The Free plan includes 50 requests per month forever. No credit card required to start.</p></div>
         </div>
     </section>
+        <aside class="ad-rail" aria-label="More tools we build">
+            <h6>More tools we build</h6>
+            <div class="ad-slot" data-slot="a">
+                <div class="ad-creative"><iframe src="/ads/forgemcp-300x250" title="ForgeMCP — Engineering MCP servers" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/flowguideai-300x250" title="FlowGuideAI — AI documentation generator" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/suggestibility-300x250" title="suggestibility.ai — AI expert review board" scrolling="no" loading="lazy"></iframe></div>
+            </div>
+            <!-- Slot B is cloned from slot A at init — single roster source. -->
+            <div class="ad-slot" data-slot="b"></div>
+        </aside>
+    </div>
 
     <footer class="site-footer">
         <div>
@@ -427,5 +448,9 @@
     </div>
 
 </div>
+
+    <script src="/js/ad-tracking.js"></script>
+    <script src="/js/ad-rotation.js"></script>
+    <script>initAdRail();</script>
 </body>
 </html>

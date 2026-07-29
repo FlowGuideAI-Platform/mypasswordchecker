@@ -56,6 +56,15 @@
         .table-wrap { overflow-x: auto; margin: var(--space-3) 0; }
         .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin: var(--space-4) 0; }
 
+        /* House-ad rail — one mid-page reference section sits beside it.
+           .ad-rail/.ad-slot/.ad-creative come from modernist.css; never redeclared here. */
+        .docs-rail { display: grid; grid-template-columns: 1fr 340px; border-bottom: 2px solid var(--color-divider); }
+        .docs-rail > .doc-section { border-bottom: 0; border-right: 2px solid var(--color-divider); }
+
+        /* Widget promotion block — matches the .callout weight on this page. */
+        .embed-card { max-width: 72ch; margin: var(--space-4) 0 0; padding: var(--space-4); border: 2px solid var(--color-divider); }
+        .embed-card .card-body { font-size: 14px; }
+
         .timestamp {
             margin-top: var(--space-8); padding-top: var(--space-4);
             border-top: 1px solid var(--color-divider); font-size: 13px;
@@ -66,6 +75,8 @@
             .hero h1 { font-size: 40px; }
             .card-grid { grid-template-columns: 1fr; }
             .toc-row a { min-height: 44px; display: inline-flex; align-items: center; }
+            .docs-rail { display: block; }
+            .docs-rail > .doc-section { border-right: 0; border-bottom: 2px solid var(--color-divider); }
         }
     </style>
 </head>
@@ -186,9 +197,16 @@
     "suggestions": ["Add more unique characters"]
   }
 }</pre>
+
+        <article class="card embed-card">
+            <div class="card-kicker">Drop-in widget</div>
+            <div class="card-title">Embed the checker on your site</div>
+            <p class="card-body">Rather not build the UI? The widget is a drop-in script that renders the checker on your own page, works with a free API key, and carries a "Powered by MyPasswordChecker.com" attribution link back to this site. See it running on the <a href="/widget-demo">widget demo</a> — the script is served from <code>/widget/mypasswordchecker-widget.js</code>.</p>
+        </article>
     </section>
 
-    <!-- Rate Limits -->
+    <!-- Rate Limits — wrapped beside the house-ad rail -->
+    <div class="docs-rail">
     <section id="rate-limits" class="doc-section">
         <h6>Getting started</h6>
         <h2>Rate Limits</h2>
@@ -211,6 +229,17 @@
                 </table>
         </div>
     </section>
+        <aside class="ad-rail" aria-label="More tools we build">
+            <h6>More tools we build</h6>
+            <div class="ad-slot" data-slot="a">
+                <div class="ad-creative"><iframe src="/ads/forgemcp-300x250" title="ForgeMCP — Engineering MCP servers" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/flowguideai-300x250" title="FlowGuideAI — AI documentation generator" scrolling="no" loading="lazy"></iframe></div>
+                <div class="ad-creative"><iframe src="/ads/suggestibility-300x250" title="suggestibility.ai — AI expert review board" scrolling="no" loading="lazy"></iframe></div>
+            </div>
+            <!-- Slot B is cloned from slot A at init — single roster source. -->
+            <div class="ad-slot" data-slot="b"></div>
+        </aside>
+    </div>
 
     <!-- Best Practices -->
     <section id="best-practices" class="doc-section">
@@ -383,6 +412,10 @@ print(f"Crack time: {data['crack_time']['display']}")</pre>
     </div>
 
 </div>
+
+    <script src="/js/ad-tracking.js"></script>
+    <script src="/js/ad-rotation.js"></script>
+    <script>initAdRail();</script>
 
     <script>
         // Smooth scrolling for anchor links
