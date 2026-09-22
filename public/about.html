@@ -373,12 +373,12 @@
                 <p class="text-muted">Calculates the average unpredictability of your password based on character set size and length. For example, an 8-character password using uppercase, lowercase, numbers, and symbols could have ~52-64 bits of entropy if truly random.</p>
 
                 <h4>2. Dictionary &amp; Pattern Checks</h4>
-                <p class="text-muted">Passwords are tested against common password dictionaries and pattern recognition algorithms. This catches passwords like "password123", "qwerty", keyboard patterns (like "asdfgh"), and simple substitutions (like "P@ssw0rd").</p>
+                <p class="text-muted">Passwords are tested against common password dictionaries and pattern recognition algorithms. This catches passwords like "password123", "qwerty", keyboard patterns (like "asdfgh"), and simple substitutions (like "P@ssw0rd") — the exact substitutions that forced composition rules train people to make. See <a href="/password-composition-rules">why composition rules backfire</a>.</p>
 
                 <h4>3. Crack Time Calculation</h4>
                 <p class="text-muted">Based on entropy and patterns, we estimate how long it would take to crack your password using:</p>
                 <ul>
-                    <li><strong>Classical attacks:</strong> Modern GPU farms (10&sup1;&sup2; guesses/second)</li>
+                    <li><strong>Classical attacks:</strong> Modern GPU farms (10&sup1;&sup1; guesses/second)</li>
                     <li><strong>Quantum attacks:</strong> Grover's algorithm with varying quantum computer capabilities</li>
                 </ul>
 
